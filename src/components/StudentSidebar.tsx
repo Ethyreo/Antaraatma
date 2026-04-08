@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
-import { LayoutDashboard, BookOpen, Award, ChevronLeft, ChevronRight, TrendingUp, Package, Home, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Award, ChevronLeft, ChevronRight, TrendingUp, Package, Home, MessageSquare, LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const navItems = [
   { label: 'Dashboard', href: '/student-dashboard', icon: LayoutDashboard },
@@ -18,6 +19,13 @@ const navItems = [
 export default function StudentSidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userRole');
+    router?.push('/sign-up-login');
+  };
 
   return (
     <aside className={`sticky top-0 h-screen flex flex-col bg-[#FAF8F4] border-r border-stone-200/60 transition-all duration-300 shrink-0 ${collapsed ? 'w-16' : 'w-56'}`}>
@@ -43,6 +51,15 @@ export default function StudentSidebar() {
             </Link>
           );
         })}
+        {/* Sign Out */}
+        <button
+          onClick={handleSignOut}
+          title={collapsed ? 'Sign Out' : undefined}
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-sans text-stone-600 hover:bg-amber-50/50 hover:text-red-600 transition-all duration-150 w-full ${collapsed ? 'justify-center' : ''}`}
+        >
+          <LogOut size={16} className="shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
+        </button>
       </nav>
       <div className="px-2 pb-4 border-t border-stone-200/60 pt-3">
         <button
