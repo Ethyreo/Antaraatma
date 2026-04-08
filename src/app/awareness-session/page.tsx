@@ -22,27 +22,55 @@ export default function AwarenessSessionPage() {
     e.preventDefault();
     setLoading(true);
     setSubmitError(null);
+
+    console.log('[AwarenessSession] Form submit triggered');
+    console.log('[AwarenessSession] Form data:', { name: formData.name, email: formData.email, phone: formData.phone });
+
     try {
       const supabase = createClient();
-      const { error } = await supabase.from('leads').insert({
+
+      console.log('[AwarenessSession] Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+      console.log('[AwarenessSession] Anon key present:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+      const payload = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone || null,
         source: 'Awareness Session',
         lead_status: 'new',
-      });
+      };
+
+      console.log('[AwarenessSession] Inserting payload:', payload);
+
+      const { data, error, status, statusText } = await supabase
+        .from('leads')
+        .insert(payload)
+        .select();
+
+      console.log('[AwarenessSession] Insert response — status:', status, statusText);
+      console.log('[AwarenessSession] Insert response — data:', data);
+      console.log('[AwarenessSession] Insert response — error:', error);
+
       if (error) {
-        console.error('Lead insert error:', error);
-        setSubmitError('Registration failed: ' + error.message);
+        console.error('[AwarenessSession] Lead insert FAILED:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+        });
+        setSubmitError('Registration failed: ' + error.message + (error.hint ? ` (${error.hint})` : ''));
         setLoading(false);
         return;
       }
+
+      console.log('[AwarenessSession] Lead inserted successfully:', data);
     } catch (err) {
-      console.error('Unexpected error:', err);
+      console.error('[AwarenessSession] Unexpected exception during insert:', err);
       setSubmitError('An unexpected error occurred. Please try again.');
       setLoading(false);
       return;
     }
+
     setLoading(false);
     setSubmitted(true);
   };
