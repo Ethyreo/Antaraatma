@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
-import { LayoutDashboard, BookOpen, Users, FileText, ShoppingCart, Star, HelpCircle, MessageSquare, Bell, Package, Settings, ChevronLeft, ChevronRight, Layers, Globe, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Users, FileText, ShoppingCart, Star, HelpCircle, MessageSquare, Bell, Package, Settings, ChevronLeft, ChevronRight, Layers, Globe, TrendingUp, LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const navItems = [
   { label: 'Dashboard', href: '/admin-dashboard', icon: LayoutDashboard },
@@ -25,6 +26,13 @@ const navItems = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userRole');
+    router?.push('/sign-up-login');
+  };
 
   return (
     <aside className={`sticky top-0 h-screen flex flex-col bg-stone-900 border-r border-stone-800 transition-all duration-300 shrink-0 ${collapsed ? 'w-16' : 'w-56'}`}>
@@ -52,6 +60,15 @@ export default function AdminSidebar() {
             </Link>
           );
         })}
+        {/* Sign Out */}
+        <button
+          onClick={handleSignOut}
+          title={collapsed ? 'Sign Out' : undefined}
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-sans text-stone-400 hover:bg-stone-800 hover:text-red-400 transition-all duration-150 w-full ${collapsed ? 'justify-center' : ''}`}
+        >
+          <LogOut size={16} className="shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
+        </button>
       </nav>
       {/* Collapse toggle */}
       <div className="px-2 pb-4 border-t border-stone-800 pt-3">
