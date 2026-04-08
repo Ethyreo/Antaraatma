@@ -91,7 +91,7 @@ export default function PublicNav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          {isLoggedIn ? (
+          {loading ? null : isLoggedIn ? (
             <div className="flex items-center gap-3">
               <Link
                 href={getDashboardHref()}
@@ -147,7 +147,7 @@ export default function PublicNav() {
             </Link>
           ))}
           <div className="pt-3 mt-2 border-t border-white/5 flex flex-col gap-2">
-            {isLoggedIn ? (
+            {loading ? null : isLoggedIn ? (
               <>
                 <Link
                   href={getDashboardHref()}
