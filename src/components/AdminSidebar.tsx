@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
-import { LayoutDashboard, BookOpen, Users, FileText, ShoppingCart, Star, HelpCircle, MessageSquare, Bell, Package, Settings, ChevronLeft, ChevronRight, Layers, Globe, TrendingUp, LogOut } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Users, FileText, ShoppingCart, Star, HelpCircle, MessageSquare, Bell, Package, Settings, ChevronLeft, ChevronRight, Layers, Globe, TrendingUp, LogOut, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const navItems = [
@@ -21,6 +21,7 @@ const navItems = [
   { label: 'Announcements', href: '/admin/announcements', icon: Bell },
   { label: 'Shipments', href: '/admin/shipments', icon: Package },
   { label: 'Site Content', href: '/admin/site-content', icon: Settings },
+  { label: 'Go to Home', href: '/homepage', icon: Home },
 ];
 
 export default function AdminSidebar() {

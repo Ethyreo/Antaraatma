@@ -13,7 +13,7 @@ const navItems = [
   { label: 'Community', href: '/community', icon: MessageSquare },
   { label: 'Certificates', href: '/student-dashboard', icon: Award },
   { label: 'Shipments', href: '/student-dashboard', icon: Package },
-  { label: 'Back to Site', href: '/homepage', icon: Home },
+  { label: 'Go to Home', href: '/homepage', icon: Home },
 ];
 
 export default function StudentSidebar() {
