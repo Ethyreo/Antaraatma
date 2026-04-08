@@ -220,17 +220,25 @@ export default function PathwaySliderSection() {
           </div>
 
           {/* Mobile slider */}
-          <div className="lg:hidden overflow-hidden">
+          <div className="lg:hidden" style={{ overflow: 'hidden', width: '100%' }}>
             <div
               style={{
                 display: 'flex',
-                transform: `translateX(calc(-${active * 100}% - ${active * 16}px))`,
+                width: `${cards.length * 100}%`,
+                transform: `translateX(calc(-${active * (100 / cards.length)}%))`,
                 transition: isDragging ? 'none' : 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
-                gap: '16px',
               }}
             >
               {cards.map((card, i) => (
-                <div key={card.label} style={{ minWidth: '100%', flexShrink: 0, display: 'flex', justifyContent: 'center', padding: '0 8px', boxSizing: 'border-box' }}>
+                <div
+                  key={card.label}
+                  style={{
+                    width: `${100 / cards.length}%`,
+                    flexShrink: 0,
+                    boxSizing: 'border-box',
+                    padding: '0 12px',
+                  }}
+                >
                   <SliderCard card={card} index={i} visible={visible} isActive={i === active} />
                 </div>
               ))}
