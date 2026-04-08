@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&display=swap');
+
+@layer base {
+  :root {
+    --background: 40 33% 97%;
+    --foreground: 60 3% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 60 3% 11%;
+    --border: 35 20% 88%;
+    --input: 35 20% 88%;
+    --primary: 38 47% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 35 15% 92%;
+    --secondary-foreground: 60 3% 25%;
+    --muted: 35 15% 94%;
+    --muted-foreground: 35 10% 50%;
+    --accent: 100 12% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 38 47% 55%;
+    --radius: 0.5rem;
+    --gold: 43 55% 55%;
+    --earth: 30 25% 45%;
+    --sage: 100 12% 50%;
+    --charcoal: 60 3% 11%;
+  }
+
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'DM Sans', sans-serif;
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: pan-y;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'DM Serif Display', serif;
+    font-weight: 400;
+    line-height: 1.15;
+  }
+
+  .font-serif {
+    font-family: 'DM Serif Display', serif;
+  }
+
+  .font-sans {
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .editorial-container {
+    @apply max-w-5xl mx-auto px-6 lg:px-12 xl:px-16;
+  }
+.section-label  {
+    @apply text-xs font-sans uppercase tracking-[0.12em] text-amber-700/70;
+  }
+.btn-primary  {
+    @apply inline-flex items-center gap-2 bg-amber-800 text-amber-50 px-6 py-3 text-sm font-sans tracking-wide transition-all duration-200 hover:bg-amber-900 active:scale-95 rounded-sm;
+  }
+.btn-ghost  {
+    @apply inline-flex items-center gap-2 border border-amber-800/30 text-amber-900 px-6 py-3 text-sm font-sans tracking-wide transition-all duration-200 hover:bg-amber-50 active:scale-95 rounded-sm;
+  }
+
+  .card-base {
+    @apply bg-white border border-stone-200/80 rounded-sm;
+  }
+.sidebar-item  {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-sans text-stone-600 transition-all duration-150 hover:bg-amber-50 hover:text-amber-900;
+  }
+
+  .sidebar-item-active {
+    @apply bg-amber-50 text-amber-900 border-l-2 border-amber-700;
+  }
+.status-badge  {
+    @apply inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-sans;
+  }
+
+  .input-base {
+    @apply w-full px-3 py-2.5 text-sm font-sans bg-white border border-stone-200 rounded-sm focus:outline-none focus:ring-1 focus:ring-amber-600/40 focus:border-amber-600/60 transition-all duration-150 placeholder:text-stone-400;
+  }
+
+  .progress-ring-track {
+    stroke: hsl(35 15% 90%);
+    stroke-width: 4;
+    fill: none;
+  }
+
+  .progress-ring-fill {
+    stroke: hsl(38 47% 55%);
+    stroke-width: 4;
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease forwards;
+  }
+
+  /* Parallax utility */
+  .parallax-layer {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  /* Mobile touch scroll optimization */
+  .scroll-touch {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Center-constrained text blocks */
+  .text-editorial {
+    max-width: 52ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Smooth GPU-accelerated transitions */
+  .transition-gpu {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+
+  /* Scene reveal animation */
+  .scene-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .scene-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes orbitPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+}

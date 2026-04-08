@@ -1,0 +1,481 @@
+'use client';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+
+const zones = [
+  {
+    phase: '01',
+    label: 'Awareness',
+    headline: 'The body speaks before the mind listens.',
+    body: 'Every symptom is a signal. Every pattern has a root. Naturopathy begins where conventional medicine stops — at the origin.',
+  },
+  {
+    phase: '02',
+    label: 'Understanding',
+    headline: 'Healing is not suppression. It is resolution.',
+    body: 'When you understand what your body is communicating, the path forward becomes clear — not complicated.',
+  },
+  {
+    phase: '03',
+    label: 'Transformation',
+    headline: 'Lasting change happens in layers.',
+    body: 'Physical. Emotional. Energetic. Each dimension must be addressed for transformation to hold.',
+  },
+];
+
+const TOTAL_STAGES = zones.length;
+const STAGE_THRESHOLD = 300;
+
+export default function ScrollSequenceScene() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [activeZone, setActiveZone] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [locked, setLocked] = useState(false);
+
+  const accDelta = useRef(0);
+  const lockedRef = useRef(false);
+  const activeZoneRef = useRef(0);
+  // Track whether we've exited forward (completed all stages)
+  const completedRef = useRef(false);
+
+  useEffect(() => { lockedRef.current = locked; }, [locked]);
+  useEffect(() => { activeZoneRef.current = activeZone; }, [activeZone]);
+
+  const computeProgress = useCallback((zone: number, delta: number) => {
+    const stageProgress = Math.min(1, Math.max(0, delta / STAGE_THRESHOLD));
+    return (zone + stageProgress) / TOTAL_STAGES;
+  }, []);
+
+  const enterLock = useCallback(() => {
+    if (lockedRef.current) return;
+    lockedRef.current = true;
+    setLocked(true);
+    sectionRef.current?.scrollIntoView({ behavior: 'instant' as ScrollBehavior });
+  }, []);
+
+  const exitLock = useCallback((direction: 'forward' | 'backward') => {
+    lockedRef.current = false;
+    setLocked(false);
+    accDelta.current = 0;
+    if (direction === 'forward') {
+      completedRef.current = true;
+    }
+  }, []);
+
+  // IntersectionObserver — re-lock whenever section enters viewport
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          // Always re-lock when entering, reset completed state
+          completedRef.current = false;
+          accDelta.current = 0;
+          enterLock();
+        } else if (!entry.isIntersecting) {
+          if (lockedRef.current) exitLock('backward');
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [enterLock, exitLock]);
+
+  // Wheel handler — attached to WINDOW when locked to capture all scroll events
+  const handleWheel = useCallback(
+    (e: WheelEvent) => {
+      if (!lockedRef.current) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const delta = e.deltaY;
+      const currentZone = activeZoneRef.current;
+
+      if (delta > 0) {
+        accDelta.current += delta;
+        if (accDelta.current >= STAGE_THRESHOLD) {
+          accDelta.current = 0;
+          if (currentZone < TOTAL_STAGES - 1) {
+            const next = currentZone + 1;
+            setActiveZone(next);
+            setProgress(computeProgress(next, 0));
+          } else {
+            setProgress(1);
+            exitLock('forward');
+          }
+        } else {
+          setProgress(computeProgress(currentZone, accDelta.current));
+        }
+      } else if (delta < 0) {
+        accDelta.current += delta;
+        if (accDelta.current <= -STAGE_THRESHOLD) {
+          accDelta.current = 0;
+          if (currentZone > 0) {
+            const prev = currentZone - 1;
+            setActiveZone(prev);
+            setProgress(computeProgress(prev, 0));
+          } else {
+            exitLock('backward');
+          }
+        } else {
+          const clampedDelta = Math.max(0, accDelta.current);
+          setProgress(computeProgress(currentZone, clampedDelta));
+        }
+      }
+    },
+    [computeProgress, exitLock]
+  );
+
+  const touchStartY = useRef(0);
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (!lockedRef.current) return;
+      e.preventDefault();
+      const dy = touchStartY.current - e.touches[0].clientY;
+      touchStartY.current = e.touches[0].clientY;
+
+      const currentZone = activeZoneRef.current;
+      if (dy > 0) {
+        accDelta.current += dy * 3;
+        if (accDelta.current >= STAGE_THRESHOLD) {
+          accDelta.current = 0;
+          if (currentZone < TOTAL_STAGES - 1) {
+            const next = currentZone + 1;
+            setActiveZone(next);
+            setProgress(computeProgress(next, 0));
+          } else {
+            setProgress(1);
+            exitLock('forward');
+          }
+        } else {
+          setProgress(computeProgress(currentZone, accDelta.current));
+        }
+      } else if (dy < 0) {
+        accDelta.current += dy * 3;
+        if (accDelta.current <= -STAGE_THRESHOLD) {
+          accDelta.current = 0;
+          if (currentZone > 0) {
+            const prev = currentZone - 1;
+            setActiveZone(prev);
+            setProgress(computeProgress(prev, 0));
+          } else {
+            exitLock('backward');
+          }
+        } else {
+          const clampedDelta = Math.max(0, accDelta.current);
+          setProgress(computeProgress(currentZone, clampedDelta));
+        }
+      }
+    },
+    [computeProgress, exitLock]
+  );
+
+  // Attach wheel/touch to WINDOW when locked — this ensures we capture all scroll
+  useEffect(() => {
+    if (!locked) return;
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [locked, handleWheel, handleTouchStart, handleTouchMove]);
+
+  // Lock body scroll when locked
+  useEffect(() => {
+    if (locked) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [locked]);
+
+  const ringRadius = 46;
+  const orbitalAngle = progress * Math.PI * 2;
+  const dotX = 50 + ringRadius * Math.cos(orbitalAngle - Math.PI / 2);
+  const dotY = 50 + ringRadius * Math.sin(orbitalAngle - Math.PI / 2);
+
+  return (
+    <div
+      ref={sectionRef}
+      style={{
+        position: 'relative',
+        height: '100vh',
+        background: '#0e0d0b',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      {/* Ambient orb */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse 60% 50% at 50% ${45 + progress * 10}%, rgba(180,130,55,${0.05 + progress * 0.07}) 0%, transparent 65%)`,
+          transition: 'background 0.4s ease',
+        }}
+      />
+
+      {/* Grain texture */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.018]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+          backgroundSize: '128px 128px',
+        }}
+      />
+
+      {/* Progress line — left edge */}
+      <div
+        className="absolute left-0 top-0 w-px pointer-events-none"
+        style={{ height: '100%', background: 'rgba(180,130,55,0.08)' }}
+      >
+        <div
+          style={{
+            width: '100%',
+            height: `${progress * 100}%`,
+            background: 'rgba(180,130,55,0.35)',
+            transition: 'height 0.08s linear',
+          }}
+        />
+      </div>
+
+      {/* Main layout — vertically centered */}
+      <div className="relative z-10 flex flex-col flex-1 items-center justify-center px-6">
+
+        {/* ── Orbital ring display ── */}
+        <div
+          className="relative mb-10 flex-shrink-0"
+          style={{
+            width: 'clamp(180px, 24vw, 280px)',
+            height: 'clamp(180px, 24vw, 280px)',
+          }}
+        >
+          <svg
+            className="absolute inset-0 w-full h-full"
+            viewBox="0 0 100 100"
+            style={{ overflow: 'visible' }}
+          >
+            <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(180,130,55,0.08)" strokeWidth="0.5" />
+            <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(180,130,55,0.05)" strokeWidth="0.4" />
+            <circle cx="50" cy="50" r="22" fill="none" stroke="rgba(180,130,55,0.04)" strokeWidth="0.3" />
+
+            <circle
+              cx="50" cy="50" r="46"
+              fill="none"
+              stroke="rgba(180,130,55,0.32)"
+              strokeWidth="0.9"
+              strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * 46}`}
+              strokeDashoffset={`${2 * Math.PI * 46 * (1 - progress)}`}
+              transform="rotate(-90 50 50)"
+              style={{ transition: 'stroke-dashoffset 0.08s linear' }}
+            />
+
+            {[0, 1, 2]?.map((i) => {
+              const angle = (i / 3) * Math.PI * 2 - Math.PI / 2;
+              const mx = 50 + 46 * Math.cos(angle);
+              const my = 50 + 46 * Math.sin(angle);
+              const isActive = i <= activeZone;
+              return (
+                <g key={i}>
+                  <circle
+                    cx={mx} cy={my} r="2.4"
+                    fill={isActive ? 'rgba(180,130,55,0.75)' : 'rgba(180,130,55,0.12)'}
+                    style={{ transition: 'fill 0.5s ease' }}
+                  />
+                  <circle
+                    cx={mx} cy={my} r="4.5"
+                    fill="none"
+                    stroke={isActive ? 'rgba(180,130,55,0.18)' : 'transparent'}
+                    strokeWidth="0.5"
+                    style={{ transition: 'stroke 0.5s ease' }}
+                  />
+                </g>
+              );
+            })}
+
+            <circle
+              cx={dotX} cy={dotY} r="2"
+              fill="rgba(200,155,70,0.95)"
+              style={{ transition: 'cx 0.08s linear, cy 0.08s linear' }}
+            />
+            <circle
+              cx={dotX} cy={dotY} r="4"
+              fill="rgba(200,155,70,0.15)"
+              style={{ transition: 'cx 0.08s linear, cy 0.08s linear' }}
+            />
+
+            <circle
+              cx="50" cy="50"
+              r={`${7 + progress * 8}`}
+              fill={`rgba(180,130,55,${0.04 + progress * 0.09})`}
+              style={{ transition: 'r 0.12s ease, fill 0.12s ease' }}
+            />
+          </svg>
+
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span
+              className="font-serif"
+              style={{
+                fontSize: 'clamp(2.4rem, 5vw, 4rem)',
+                color: `rgba(232,224,208,${0.1 + progress * 0.3})`,
+                lineHeight: 1,
+                letterSpacing: '-0.03em',
+                transition: 'color 0.4s ease',
+              }}
+            >
+              {String(activeZone + 1)?.padStart(2, '0')}
+            </span>
+            <span
+              className="font-sans uppercase mt-1"
+              style={{
+                fontSize: '0.48rem',
+                color: 'rgba(180,130,55,0.35)',
+                letterSpacing: '0.24em',
+              }}
+            >
+              of 03
+            </span>
+          </div>
+        </div>
+
+        {/* Zone content — centered, constrained */}
+        <div
+          className="relative w-full flex justify-center"
+          style={{ minHeight: 'clamp(11rem, 20vw, 15rem)' }}
+        >
+          {zones?.map((zone, i) => (
+            <div
+              key={zone?.phase}
+              className="absolute text-center"
+              style={{
+                width: 'min(90vw, 560px)',
+                opacity: activeZone === i ? 1 : 0,
+                transform: activeZone === i
+                  ? 'translateY(0)'
+                  : activeZone > i
+                  ? 'translateY(-10px)'
+                  : 'translateY(14px)',
+                transition: 'opacity 0.55s cubic-bezier(0.4,0,0.2,1), transform 0.55s cubic-bezier(0.4,0,0.2,1)',
+                pointerEvents: activeZone === i ? 'auto' : 'none',
+              }}
+            >
+              <p
+                className="font-serif mb-4"
+                style={{
+                  fontSize: 'clamp(1.15rem, 2.4vw, 1.7rem)',
+                  color: 'rgba(180,130,55,0.6)',
+                  letterSpacing: '0.04em',
+                  lineHeight: 1,
+                }}
+              >
+                {zone?.label}
+              </p>
+              <h2
+                className="font-serif text-balance mb-6"
+                style={{
+                  fontSize: 'clamp(1.6rem, 3.2vw, 2.6rem)',
+                  color: 'rgba(232,224,208,0.9)',
+                  lineHeight: 1.08,
+                }}
+              >
+                {zone?.headline}
+              </h2>
+              <p
+                className="font-sans font-light leading-relaxed mx-auto"
+                style={{
+                  fontSize: 'clamp(0.82rem, 1.1vw, 0.94rem)',
+                  color: 'rgba(232,224,208,0.32)',
+                  maxWidth: '42ch',
+                }}
+              >
+                {zone?.body}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Stage indicators — bottom */}
+        <div
+          className="absolute bottom-10 left-0 right-0 flex items-end justify-center"
+          style={{ gap: 'clamp(2.5rem, 6vw, 5rem)' }}
+        >
+          {zones?.map((zone, i) => {
+            const isActive = i === activeZone;
+            const isPast = i < activeZone;
+            return (
+              <div key={zone?.phase} className="flex flex-col items-center gap-2">
+                <div
+                  style={{
+                    width: isActive ? '2rem' : '1rem',
+                    height: '1px',
+                    background: isActive
+                      ? 'rgba(180,130,55,0.7)'
+                      : isPast
+                      ? 'rgba(180,130,55,0.3)'
+                      : 'rgba(255,255,255,0.1)',
+                    transition: 'width 0.4s ease, background 0.4s ease',
+                  }}
+                />
+                <span
+                  className="font-sans uppercase"
+                  style={{
+                    fontSize: '0.6rem',
+                    letterSpacing: '0.18em',
+                    color: isActive
+                      ? 'rgba(180,130,55,0.75)'
+                      : isPast
+                      ? 'rgba(232,224,208,0.25)'
+                      : 'rgba(232,224,208,0.12)',
+                    transition: 'color 0.4s ease',
+                  }}
+                >
+                  {zone?.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Scroll hint — shown only at start */}
+        <div
+          className="absolute bottom-10 right-8 flex flex-col items-center gap-1"
+          style={{
+            opacity: progress < 0.05 ? 0.4 : 0,
+            transition: 'opacity 0.5s ease',
+          }}
+        >
+          <span className="font-sans uppercase text-[0.55rem] tracking-[0.2em]" style={{ color: 'rgba(232,224,208,0.5)' }}>
+            scroll
+          </span>
+          <div
+            style={{
+              width: '1px',
+              height: '2rem',
+              background: 'linear-gradient(to bottom, rgba(180,130,55,0.4), transparent)',
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
