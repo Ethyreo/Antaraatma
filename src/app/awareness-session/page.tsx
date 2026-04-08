@@ -4,6 +4,7 @@ import PublicNav from '@/components/PublicNav';
 import PublicFooter from '@/components/PublicFooter';
 import { getProgramById, getModulesByProgram, getFeaturedTestimonials, getFAQsByProgram } from '@/lib/data/mockData';
 import { ArrowRight, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 export default function AwarenessSessionPage() {
   const program = getProgramById('prog-awareness');
@@ -19,8 +20,21 @@ export default function AwarenessSessionPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Backend integration point: POST /api/leads — create lead record
-    await new Promise(r => setTimeout(r, 1200));
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from('leads').insert({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || null,
+        source: 'Awareness Session',
+        lead_status: 'new',
+      });
+      if (error) {
+        console.error('Lead insert error:', error.message);
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+    }
     setLoading(false);
     setSubmitted(true);
   };
