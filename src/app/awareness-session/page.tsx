@@ -15,11 +15,13 @@ export default function AwarenessSessionPage() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSubmitError(null);
     try {
       const supabase = createClient();
       const { error } = await supabase.from('leads').insert({
@@ -30,10 +32,16 @@ export default function AwarenessSessionPage() {
         lead_status: 'new',
       });
       if (error) {
-        console.error('Lead insert error:', error.message);
+        console.error('Lead insert error:', error);
+        setSubmitError('Registration failed: ' + error.message);
+        setLoading(false);
+        return;
       }
     } catch (err) {
       console.error('Unexpected error:', err);
+      setSubmitError('An unexpected error occurred. Please try again.');
+      setLoading(false);
+      return;
     }
     setLoading(false);
     setSubmitted(true);
@@ -135,6 +143,11 @@ export default function AwarenessSessionPage() {
                         {loading ? 'Registering...' : 'Reserve My Seat — Free'}
                         {!loading && <ArrowRight size={15} />}
                       </button>
+                      {submitError && (
+                        <p className="text-xs font-sans text-red-600 text-center bg-red-50 border border-red-200 rounded-sm px-3 py-2">
+                          {submitError}
+                        </p>
+                      )}
                       <p className="text-xs font-sans text-stone-400 text-center">Free · No credit card · Cancel anytime</p>
                     </form>
                   </>
