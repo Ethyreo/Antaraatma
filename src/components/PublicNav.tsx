@@ -3,7 +3,9 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
-import { Menu, X, LogOut } from 'lucide-react';
+import { Menu, X, LogOut, User } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { createClient } from '@/lib/supabase/client';
 
 const navLinks = [
   { label: 'Programs', href: '/programs-overview' },
@@ -15,8 +17,10 @@ const navLinks = [
 export default function PublicNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
   const router = useRouter();
+  const { user, signOut, loading } = useAuth();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 24);
@@ -25,17 +29,38 @@ export default function PublicNav() {
   }, []);
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    setIsLoggedIn(loggedIn);
-  }, []);
+    if (!user) {
+      setUserRole(null);
+      setDisplayName(null);
+      return;
+    }
 
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userRole');
-    setIsLoggedIn(false);
-    setMobileOpen(false);
-    router?.push('/sign-up-login');
+    // Set display name from user metadata first (fast)
+    const metaName = user?.user_metadata?.full_name || user?.email?.split('@')?.[0] || 'Account';
+    setDisplayName(metaName);
+
+    // Fetch role from user_profiles
+    const supabase = createClient();
+    supabase?.from('user_profiles')?.select('role, full_name')?.eq('id', user?.id)?.single()?.then(({ data }) => {
+        if (data) {
+          setUserRole(data?.role);
+          if (data?.full_name) setDisplayName(data?.full_name);
+        }
+      });
+  }, [user]);
+
+  const getDashboardHref = () => {
+    if (userRole === 'admin') return '/admin-dashboard';
+    return '/student-dashboard';
   };
+
+  const handleLogout = async () => {
+    await signOut();
+    setMobileOpen(false);
+    router?.push('/homepage');
+  };
+
+  const isLoggedIn = !loading && !!user;
 
   return (
     <header
@@ -67,13 +92,22 @@ export default function PublicNav() {
 
         <div className="hidden md:flex items-center gap-3">
           {isLoggedIn ? (
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors"
-            >
-              <LogOut size={15} />
-              Sign Out
-            </button>
+            <div className="flex items-center gap-3">
+              <Link
+                href={getDashboardHref()}
+                className="flex items-center gap-1.5 text-sm font-sans font-medium text-amber-400 hover:text-amber-300 transition-colors"
+              >
+                <User size={15} />
+                {displayName}
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors"
+              >
+                <LogOut size={15} />
+                Sign Out
+              </button>
+            </div>
           ) : (
             <Link href="/sign-up-login" className="text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors">
               Sign In
@@ -114,13 +148,23 @@ export default function PublicNav() {
           ))}
           <div className="pt-3 mt-2 border-t border-white/5 flex flex-col gap-2">
             {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="py-2.5 text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors text-center flex items-center justify-center gap-1.5"
-              >
-                <LogOut size={15} />
-                Sign Out
-              </button>
+              <>
+                <Link
+                  href={getDashboardHref()}
+                  onClick={() => setMobileOpen(false)}
+                  className="py-2.5 text-sm font-sans font-medium text-amber-400 hover:text-amber-300 transition-colors text-center flex items-center justify-center gap-1.5"
+                >
+                  <User size={15} />
+                  {displayName}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="py-2.5 text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors text-center flex items-center justify-center gap-1.5"
+                >
+                  <LogOut size={15} />
+                  Sign Out
+                </button>
+              </>
             ) : (
               <Link href="/sign-up-login" className="py-2.5 text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors text-center">Sign In</Link>
             )}
