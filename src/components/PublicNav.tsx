@@ -1,8 +1,9 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut } from 'lucide-react';
 
 const navLinks = [
   { label: 'Programs', href: '/programs-overview' },
@@ -14,12 +15,27 @@ const navLinks = [
 export default function PublicNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 24);
     window.addEventListener('scroll', handler);
     return () => window.removeEventListener('scroll', handler);
   }, []);
+
+  useEffect(() => {
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    setIsLoggedIn(loggedIn);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userRole');
+    setIsLoggedIn(false);
+    setMobileOpen(false);
+    router?.push('/sign-up-login');
+  };
 
   return (
     <header
@@ -50,9 +66,19 @@ export default function PublicNav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/sign-up-login" className="text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors">
-            Sign In
-          </Link>
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors"
+            >
+              <LogOut size={15} />
+              Sign Out
+            </button>
+          ) : (
+            <Link href="/sign-up-login" className="text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors">
+              Sign In
+            </Link>
+          )}
           <Link
             href="/awareness-session"
             className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-sans tracking-wide transition-all duration-300"
@@ -87,7 +113,17 @@ export default function PublicNav() {
             </Link>
           ))}
           <div className="pt-3 mt-2 border-t border-white/5 flex flex-col gap-2">
-            <Link href="/sign-up-login" className="py-2.5 text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors text-center">Sign In</Link>
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="py-2.5 text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors text-center flex items-center justify-center gap-1.5"
+              >
+                <LogOut size={15} />
+                Sign Out
+              </button>
+            ) : (
+              <Link href="/sign-up-login" className="py-2.5 text-sm font-sans font-medium text-stone-400 hover:text-amber-400 transition-colors text-center">Sign In</Link>
+            )}
             <Link
               href="/awareness-session"
               className="py-2.5 text-sm font-sans text-center transition-all duration-300"
