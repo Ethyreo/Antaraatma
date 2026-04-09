@@ -4,7 +4,7 @@ import PublicNav from '@/components/PublicNav';
 import PublicFooter from '@/components/PublicFooter';
 import { getProgramById, getModulesByProgram, getFeaturedTestimonials, getFAQsByProgram } from '@/lib/data/mockData';
 import { ArrowRight, Check, ChevronDown, ChevronUp } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+
 
 export default function AwarenessSessionPage() {
   const program = getProgramById('prog-awareness');
@@ -23,49 +23,30 @@ export default function AwarenessSessionPage() {
     setLoading(true);
     setSubmitError(null);
 
-    console.log('[AwarenessSession] Form submit triggered');
-    console.log('[AwarenessSession] Form data:', { name: formData.name, email: formData.email, phone: formData.phone });
-
     try {
-      const supabase = createClient();
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || null,
+          source: 'Awareness Session',
+          lead_status: 'new',
+        }),
+      });
 
-      console.log('[AwarenessSession] Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-      console.log('[AwarenessSession] Anon key present:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+      const result = await response.json();
 
-      const payload = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone || null,
-        source: 'Awareness Session',
-        lead_status: 'new',
-      };
-
-      console.log('[AwarenessSession] Inserting payload:', payload);
-
-      const { data, error, status, statusText } = await supabase
-        .from('leads')
-        .insert(payload)
-        .select();
-
-      console.log('[AwarenessSession] Insert response — status:', status, statusText);
-      console.log('[AwarenessSession] Insert response — data:', data);
-      console.log('[AwarenessSession] Insert response — error:', error);
-
-      if (error) {
-        console.error('[AwarenessSession] Lead insert FAILED:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-        });
-        setSubmitError('Registration failed: ' + error.message + (error.hint ? ` (${error.hint})` : ''));
+      if (!response.ok) {
+        setSubmitError('Registration failed: ' + (result.error || 'Unknown error'));
         setLoading(false);
         return;
       }
 
-      console.log('[AwarenessSession] Lead inserted successfully:', data);
+      console.log('[AwarenessSession] Lead inserted successfully:', result.data);
     } catch (err) {
-      console.error('[AwarenessSession] Unexpected exception during insert:', err);
+      console.error('[AwarenessSession] Unexpected error:', err);
       setSubmitError('An unexpected error occurred. Please try again.');
       setLoading(false);
       return;
