@@ -182,6 +182,46 @@ export default function AuthForm() {
               Create an account
             </button>
           </p>
+
+          {/* Testing Accounts */}
+          <div className="mt-6 p-3 bg-stone-50 border border-stone-200 rounded-sm">
+            <p className="text-xs font-sans font-medium text-stone-500 mb-2 uppercase tracking-wide">🧪 Test Accounts</p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-sans font-medium text-stone-700">Admin</p>
+                  <p className="text-xs font-sans text-stone-500">admin@vijayheals.com</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    loginForm.setValue('email', 'admin@vijayheals.com');
+                    loginForm.setValue('password', 'Admin@123');
+                  }}
+                  className="text-xs font-sans text-amber-700 hover:text-amber-800 border border-amber-200 hover:border-amber-300 px-2 py-1 rounded-sm transition-colors"
+                >
+                  Use
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-sans font-medium text-stone-700">Student</p>
+                  <p className="text-xs font-sans text-stone-500">student@vijayheals.com</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    loginForm.setValue('email', 'student@vijayheals.com');
+                    loginForm.setValue('password', 'Student@123');
+                  }}
+                  className="text-xs font-sans text-amber-700 hover:text-amber-800 border border-amber-200 hover:border-amber-300 px-2 py-1 rounded-sm transition-colors"
+                >
+                  Use
+                </button>
+              </div>
+            </div>
+            <p className="text-xs font-sans text-stone-400 mt-2">Password: <span className="font-mono">Admin@123</span> / <span className="font-mono">Student@123</span></p>
+          </div>
         </form>
       )}
 
