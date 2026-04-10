@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
@@ -23,6 +23,11 @@ export default function AuthForm() {
   const supabase = createClient();
 
   const loginForm = useForm<LoginFormData>({ defaultValues: { email: '', password: '', remember: false } });
+
+  // Seed test accounts on first load
+  React.useEffect(() => {
+    fetch('/api/seed-test-accounts', { method: 'POST' }).catch(() => {});
+  }, []);
 
   const handleLoginSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
