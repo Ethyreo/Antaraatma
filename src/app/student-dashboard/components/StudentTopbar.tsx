@@ -1,15 +1,40 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, Search, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function StudentTopbar() {
   const [showLogout, setShowLogout] = useState(false);
+  const [displayName, setDisplayName] = useState('');
+  const [initials, setInitials] = useState('');
   const router = useRouter();
+  const { user, getUserProfile, signOut } = useAuth();
 
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userRole');
+  useEffect(() => {
+    const fetchName = async () => {
+      if (!user) return;
+      try {
+        const profile = await getUserProfile();
+        const name = profile?.full_name || user?.user_metadata?.full_name || user?.email || '';
+        setDisplayName(name);
+        setInitials(name ? name.charAt(0).toUpperCase() : '?');
+      } catch {
+        const fallback = user?.user_metadata?.full_name || user?.email || '';
+        setDisplayName(fallback);
+        setInitials(fallback ? fallback.charAt(0).toUpperCase() : '?');
+      }
+    };
+    fetchName();
+  }, [user]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+    }
     router?.push('/sign-up-login');
   };
 
@@ -18,7 +43,7 @@ export default function StudentTopbar() {
       <div className="flex-1">
         <div>
           <p className="text-xs font-sans text-stone-500">Good morning,</p>
-          <p className="font-serif text-lg text-stone-900 leading-tight">Priya Sharma</p>
+          <p className="font-serif text-lg text-stone-900 leading-tight">{displayName || 'Loading...'}</p>
         </div>
       </div>
 
@@ -42,10 +67,10 @@ export default function StudentTopbar() {
           className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
         >
           <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-            <span className="font-serif text-sm text-amber-800">P</span>
+            <span className="font-serif text-sm text-amber-800">{initials}</span>
           </div>
           <div className="hidden sm:block text-left">
-            <p className="text-xs font-sans font-500 text-stone-800">Priya Sharma</p>
+            <p className="text-xs font-sans font-500 text-stone-800">{displayName || 'Loading...'}</p>
             <p className="text-2xs font-sans text-stone-500">Foundation Course</p>
           </div>
         </button>
