@@ -47,32 +47,20 @@ export default function AdminLeadsPage() {
 
   const fetchLeads = async () => {
     setLoading(true);
-    const supabase = createClient();
 
-    console.log('[AdminLeads] Fetching leads from Supabase...');
+    try {
+      const res = await fetch('/api/leads');
+      const json = await res.json();
 
-    const { data, error, status, statusText } = await supabase
-      .from('leads')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    console.log('[AdminLeads] Fetch response — status:', status, statusText);
-    console.log('[AdminLeads] Fetch response — data:', data);
-    console.log('[AdminLeads] Fetch response — error:', error);
-
-    if (error) {
-      console.error('[AdminLeads] Leads fetch FAILED:', {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code,
-      });
+      if (!res.ok) {
+        console.error('[AdminLeads] Fetch failed:', json.error);
+      } else {
+        setLeads((json.data as Lead[]) || []);
+      }
+    } catch (err) {
+      console.error('[AdminLeads] Unexpected error:', err);
     }
 
-    if (!error && data) {
-      console.log('[AdminLeads] Loaded', data.length, 'leads');
-      setLeads(data as Lead[]);
-    }
     setLoading(false);
   };
 
