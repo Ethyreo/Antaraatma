@@ -43,11 +43,36 @@ export default function CreateProgramModal({ onClose }: Props) {
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    // Backend integration point: POST /api/admin/programs
-    await new Promise((r) => setTimeout(r, 1000));
-    setIsLoading(false);
-    toast.success(`Program "${data.title}" created as draft`);
-    onClose();
+    try {
+      const res = await fetch('/api/programs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: data.title,
+          slug: data.slug,
+          tagline: data.shortDescription,
+          description: data.shortDescription,
+          long_description: data.shortDescription,
+          duration: data.duration,
+          price: parseFloat(data.price) || 0,
+          price_label: `₹${data.price}`,
+          payment_type: 'one_time',
+          status: data.status,
+          featured: false,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        toast.error(json.error || 'Failed to create program.');
+      } else {
+        toast.success(`Program "${data.title}" created as ${data.status}`);
+        onClose();
+      }
+    } catch {
+      toast.error('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
