@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { TrendingUp, Clock, Award, Flame } from 'lucide-react';
 import { RadialBarChart, RadialBar, ResponsiveContainer, PolarAngleAxis } from 'recharts';
 import { createClient } from '@/lib/supabase/client';
@@ -35,116 +35,118 @@ export default function ProgressBentoGrid() {
   const [stats, setStats] = useState<ProgressStats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchProgress = useCallback(async () => {
     if (!user) return;
     const supabase = createClient();
+    try {
+      // Get active enrollment
+      const { data: enrollment } = await supabase
+        .from('enrollments')
+        .select('program_id, programs(title)')
+        .eq('user_id', user.id)
+        .eq('enrollment_status', 'active')
+        .order('enrolled_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-    async function fetchProgress() {
-      try {
-        // Get active enrollment
-        const { data: enrollment } = await supabase
-          .from('enrollments')
-          .select('program_id, programs(title)')
-          .eq('user_id', user.id)
-          .eq('enrollment_status', 'active')
-          .order('enrolled_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (!enrollment) {
-          setLoading(false);
-          return;
-        }
-
-        const programId = enrollment.program_id;
-        const programTitle = (enrollment.programs as any)?.title ?? 'Your Program';
-
-        // Get all modules for program
-        const { data: modules } = await supabase
-          .from('modules')
-          .select('id, title, sort_order')
-          .eq('program_id', programId)
-          .eq('status', 'published')
-          .order('sort_order', { ascending: true });
-
-        // Get all lessons for program
-        const { data: lessons } = await supabase
-          .from('lessons')
-          .select('id, module_id, sort_order')
-          .eq('program_id', programId)
-          .eq('status', 'published')
-          .order('sort_order', { ascending: true });
-
-        // Get completed progress records
-        const { data: progressRecords } = await supabase
-          .from('progress_records')
-          .select('lesson_id, completed_at, last_accessed_at')
-          .eq('user_id', user.id)
-          .eq('program_id', programId)
-          .eq('is_completed', true);
-
-        const totalLessons = lessons?.length ?? 0;
-        const completedLessons = progressRecords?.length ?? 0;
-        const overallPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-
-        // Find current module (first module with incomplete lessons)
-        const completedLessonIds = new Set(progressRecords?.map((p) => p.lesson_id) ?? []);
-        let currentModuleIndex = 0;
-        if (modules && lessons) {
-          for (let i = 0; i < modules.length; i++) {
-            const moduleLessons = lessons.filter((l) => l.module_id === modules[i].id);
-            const allDone = moduleLessons.every((l) => completedLessonIds.has(l.id));
-            if (!allDone) { currentModuleIndex = i; break; }
-            if (i === modules.length - 1) currentModuleIndex = i;
-          }
-        }
-
-        const currentModule = modules?.[currentModuleIndex];
-
-        // Lessons this week
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        const lessonsThisWeek = progressRecords?.filter((p) =>
-          p.completed_at && new Date(p.completed_at) >= weekAgo
-        ).length ?? 0;
-
-        // Streak: count consecutive days with activity
-        const activityDates = new Set(
-          progressRecords?.map((p) => p.last_accessed_at?.split('T')[0]).filter(Boolean) ?? []
-        );
-        let streakDays = 0;
-        const today = new Date();
-        for (let i = 0; i < 30; i++) {
-          const d = new Date(today);
-          d.setDate(d.getDate() - i);
-          const key = d.toISOString().split('T')[0];
-          if (activityDates.has(key)) streakDays++;
-          else if (i > 0) break;
-        }
-
-        const certPercent = overallPercent;
-
-        setStats({
-          overallPercent,
-          currentModuleTitle: currentModule?.title ?? 'Getting Started',
-          currentModuleNumber: currentModuleIndex + 1,
-          totalModules: modules?.length ?? 0,
-          completedLessons,
-          totalLessons,
-          streakDays,
-          lessonsThisWeek,
-          programTitle,
-          certPercent,
-        });
-      } catch (err) {
-        console.error('Progress fetch error:', err);
-      } finally {
+      if (!enrollment) {
         setLoading(false);
+        return;
       }
-    }
 
-    fetchProgress();
+      const programId = enrollment.program_id;
+      const programTitle = (enrollment.programs as any)?.title ?? 'Your Program';
+
+      const { data: modules } = await supabase
+        .from('modules')
+        .select('id, title, sort_order')
+        .eq('program_id', programId)
+        .eq('status', 'published')
+        .order('sort_order', { ascending: true });
+
+      const { data: lessons } = await supabase
+        .from('lessons')
+        .select('id, module_id, sort_order')
+        .eq('program_id', programId)
+        .eq('status', 'published')
+        .order('sort_order', { ascending: true });
+
+      const { data: progressRecords } = await supabase
+        .from('progress_records')
+        .select('lesson_id, completed_at, last_accessed_at')
+        .eq('user_id', user.id)
+        .eq('program_id', programId)
+        .eq('is_completed', true);
+
+      const totalLessons = lessons?.length ?? 0;
+      const completedLessons = progressRecords?.length ?? 0;
+      const overallPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+
+      const completedLessonIds = new Set(progressRecords?.map((p) => p.lesson_id) ?? []);
+      let currentModuleIndex = 0;
+      if (modules && lessons) {
+        for (let i = 0; i < modules.length; i++) {
+          const moduleLessons = lessons.filter((l) => l.module_id === modules[i].id);
+          const allDone = moduleLessons.every((l) => completedLessonIds.has(l.id));
+          if (!allDone) { currentModuleIndex = i; break; }
+          if (i === modules.length - 1) currentModuleIndex = i;
+        }
+      }
+
+      const currentModule = modules?.[currentModuleIndex];
+
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      const lessonsThisWeek = progressRecords?.filter((p) =>
+        p.completed_at && new Date(p.completed_at) >= weekAgo
+      ).length ?? 0;
+
+      const activityDates = new Set(
+        progressRecords?.map((p) => p.last_accessed_at?.split('T')[0]).filter(Boolean) ?? []
+      );
+      let streakDays = 0;
+      const today = new Date();
+      for (let i = 0; i < 30; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        if (activityDates.has(key)) streakDays++;
+        else if (i > 0) break;
+      }
+
+      setStats({
+        overallPercent,
+        currentModuleTitle: currentModule?.title ?? 'Getting Started',
+        currentModuleNumber: currentModuleIndex + 1,
+        totalModules: modules?.length ?? 0,
+        completedLessons,
+        totalLessons,
+        streakDays,
+        lessonsThisWeek,
+        programTitle,
+        certPercent: overallPercent,
+      });
+    } catch (err) {
+      console.error('Progress fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
+
+  useEffect(() => {
+    fetchProgress();
+  }, [fetchProgress]);
+
+  // Re-fetch when the tab becomes visible again (e.g. user returns from progress-tracking page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchProgress();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [fetchProgress]);
 
   if (loading) {
     return (

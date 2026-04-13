@@ -1,9 +1,9 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import StudentSidebar from '@/components/StudentSidebar';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { CheckCircle, Lock, Play, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle, Lock, Play, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 
 interface LessonRow {
   id: string;
@@ -44,6 +44,7 @@ interface ProgramData {
   modules: ModuleRow[];
   lessons: LessonRow[];
   completedLessonIds: Set<string>;
+  accessedLessonIds: Set<string>;
 }
 
 export default function ProgressTrackingPage() {
@@ -51,84 +52,150 @@ export default function ProgressTrackingPage() {
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
   const [programDataList, setProgramDataList] = useState<ProgramData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [markingLesson, setMarkingLesson] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!user) return;
     const supabase = createClient();
+    try {
+      const { data: enrollments } = await supabase
+        .from('enrollments')
+        .select('program_id, programs(id, title, duration)')
+        .eq('user_id', user.id)
+        .eq('enrollment_status', 'active');
 
-    async function fetchData() {
-      try {
-        // Get active enrollments
-        const { data: enrollments } = await supabase
-          .from('enrollments')
-          .select('program_id, programs(id, title, duration)')
-          .eq('user_id', user!.id)
-          .eq('enrollment_status', 'active');
-
-        if (!enrollments || enrollments.length === 0) {
-          setLoading(false);
-          return;
-        }
-
-        const results: ProgramData[] = [];
-
-        for (const enrollment of enrollments) {
-          const prog = enrollment.programs as any;
-          if (!prog) continue;
-
-          const programId = prog.id;
-
-          // Fetch courses, modules, lessons in parallel
-          const [coursesRes, modulesRes, lessonsRes, progressRes] = await Promise.all([
-            supabase
-              .from('courses')
-              .select('id, title, sort_order, program_id')
-              .eq('program_id', programId)
-              .eq('status', 'published')
-              .order('sort_order', { ascending: true }),
-            supabase
-              .from('modules')
-              .select('id, title, focus_area, sort_order, course_id')
-              .eq('program_id', programId)
-              .eq('status', 'published')
-              .order('sort_order', { ascending: true }),
-            supabase
-              .from('lessons')
-              .select('id, title, description, duration, is_free, unlock_type, sort_order, module_id, course_id')
-              .eq('program_id', programId)
-              .eq('status', 'published')
-              .order('sort_order', { ascending: true }),
-            supabase
-              .from('progress_records')
-              .select('lesson_id')
-              .eq('user_id', user!.id)
-              .eq('program_id', programId)
-              .eq('is_completed', true),
-          ]);
-
-          const completedLessonIds = new Set<string>(
-            (progressRes.data ?? []).map((p: any) => p.lesson_id)
-          );
-
-          results.push({
-            program: { id: prog.id, title: prog.title, duration: prog.duration },
-            courses: coursesRes.data ?? [],
-            modules: modulesRes.data ?? [],
-            lessons: lessonsRes.data ?? [],
-            completedLessonIds,
-          });
-        }
-
-        setProgramDataList(results);
-      } catch (err) {
-        console.error('Progress tracking fetch error:', err);
-      } finally {
+      if (!enrollments || enrollments.length === 0) {
         setLoading(false);
+        return;
+      }
+
+      const results: ProgramData[] = [];
+
+      for (const enrollment of enrollments) {
+        const prog = enrollment.programs as any;
+        if (!prog) continue;
+        const programId = prog.id;
+
+        const [coursesRes, modulesRes, lessonsRes, progressRes] = await Promise.all([
+          supabase
+            .from('courses')
+            .select('id, title, sort_order, program_id')
+            .eq('program_id', programId)
+            .eq('status', 'published')
+            .order('sort_order', { ascending: true }),
+          supabase
+            .from('modules')
+            .select('id, title, focus_area, sort_order, course_id')
+            .eq('program_id', programId)
+            .eq('status', 'published')
+            .order('sort_order', { ascending: true }),
+          supabase
+            .from('lessons')
+            .select('id, title, description, duration, is_free, unlock_type, sort_order, module_id, course_id')
+            .eq('program_id', programId)
+            .eq('status', 'published')
+            .order('sort_order', { ascending: true }),
+          supabase
+            .from('progress_records')
+            .select('lesson_id, is_completed, last_accessed_at')
+            .eq('user_id', user.id)
+            .eq('program_id', programId),
+        ]);
+
+        const completedLessonIds = new Set<string>(
+          (progressRes.data ?? []).filter((p: any) => p.is_completed).map((p: any) => p.lesson_id)
+        );
+        const accessedLessonIds = new Set<string>(
+          (progressRes.data ?? []).map((p: any) => p.lesson_id)
+        );
+
+        results.push({
+          program: { id: prog.id, title: prog.title, duration: prog.duration },
+          courses: coursesRes.data ?? [],
+          modules: modulesRes.data ?? [],
+          lessons: lessonsRes.data ?? [],
+          completedLessonIds,
+          accessedLessonIds,
+        });
+      }
+
+      setProgramDataList(results);
+    } catch (err) {
+      console.error('Progress tracking fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Auto-trigger last_accessed_at when a module is expanded (lesson opened)
+  const handleModuleExpand = async (modId: string, lessons: LessonRow[], programId: string, moduleId: string, courseId: string) => {
+    const isExpanding = expandedModule !== modId;
+    setExpandedModule(isExpanding ? modId : null);
+
+    if (isExpanding && user && lessons.length > 0) {
+      // Record access for the first unlocked, incomplete lesson
+      const firstLesson = lessons[0];
+      try {
+        await fetch('/api/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lesson_id: firstLesson.id,
+            module_id: moduleId,
+            course_id: courseId,
+            program_id: programId,
+            action: 'access',
+          }),
+        });
+      } catch (err) {
+        console.error('Access tracking error:', err);
       }
     }
+  };
 
-    fetchData();
-  }, [user]);
+  const handleMarkComplete = async (
+    lesson: LessonRow,
+    programId: string,
+    programDataIndex: number
+  ) => {
+    if (!user || markingLesson === lesson.id) return;
+    setMarkingLesson(lesson.id);
+
+    try {
+      const res = await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lesson_id: lesson.id,
+          module_id: lesson.module_id,
+          course_id: lesson.course_id,
+          program_id: programId,
+          action: 'complete',
+        }),
+      });
+
+      if (res.ok) {
+        // Optimistically update local state
+        setProgramDataList(prev => {
+          const updated = [...prev];
+          const pd = { ...updated[programDataIndex] };
+          const newCompleted = new Set(pd.completedLessonIds);
+          newCompleted.add(lesson.id);
+          pd.completedLessonIds = newCompleted;
+          updated[programDataIndex] = pd;
+          return updated;
+        });
+      }
+    } catch (err) {
+      console.error('Mark complete error:', err);
+    } finally {
+      setMarkingLesson(null);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-[#FAF8F4]">
@@ -158,7 +225,7 @@ export default function ProgressTrackingPage() {
             </div>
           )}
 
-          {!loading && programDataList.map(({ program, courses, modules, lessons, completedLessonIds }) => {
+          {!loading && programDataList.map(({ program, courses, modules, lessons, completedLessonIds, accessedLessonIds }, programDataIndex) => {
             const totalLessons = lessons.length;
             const completedCount = completedLessonIds.size;
             const programProgress = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
@@ -218,7 +285,7 @@ export default function ProgressTrackingPage() {
                             return (
                               <div key={mod.id} className="border border-stone-100 rounded-sm overflow-hidden">
                                 <button
-                                  onClick={() => setExpandedModule(isExpanded ? null : mod.id)}
+                                  onClick={() => handleModuleExpand(mod.id, modLessons, program.id, mod.id, course.id)}
                                   className="w-full flex items-center justify-between gap-4 px-5 py-3.5 bg-stone-50/50 hover:bg-stone-50 transition-colors text-left"
                                 >
                                   <div className="flex items-center gap-3">
@@ -237,6 +304,8 @@ export default function ProgressTrackingPage() {
                                   <div className="divide-y divide-stone-50">
                                     {modLessons.map((lesson, lessonIndex) => {
                                       const isCompleted = completedLessonIds.has(lesson.id);
+                                      const isAccessed = accessedLessonIds.has(lesson.id);
+                                      const isMarking = markingLesson === lesson.id;
                                       // Sequential unlock: first lesson always unlocked, rest unlock after previous is completed
                                       const unlocked = lesson.unlock_type === 'immediate' || lesson.is_free || lessonIndex === 0
                                         ? true
@@ -248,19 +317,38 @@ export default function ProgressTrackingPage() {
                                             {isCompleted ? (
                                               <CheckCircle size={16} className="text-amber-600" />
                                             ) : unlocked ? (
-                                              <Play size={16} className="text-stone-400" />
+                                              <Play size={16} className={isAccessed ? 'text-amber-400' : 'text-stone-400'} />
                                             ) : (
                                               <Lock size={16} className="text-stone-300" />
                                             )}
                                           </div>
                                           <div className="flex-1 min-w-0">
-                                            <p className={`text-sm font-sans ${isCompleted ? 'text-stone-500 line-through' : 'text-stone-700'}`}>{lesson.title}</p>
-                                            <p className="text-xs font-sans text-stone-400 mt-0.5">{lesson.description}</p>
+                                            <p className={`text-sm font-sans ${isCompleted ? 'text-stone-400 line-through' : 'text-stone-700'}`}>{lesson.title}</p>
+                                            {lesson.description && (
+                                              <p className="text-xs font-sans text-stone-400 mt-0.5">{lesson.description}</p>
+                                            )}
                                           </div>
                                           <div className="flex items-center gap-3 shrink-0">
                                             {lesson.duration && <span className="text-xs font-sans text-stone-400">{lesson.duration}</span>}
                                             {lesson.is_free && <span className="text-2xs font-sans font-medium text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-sm">Free</span>}
                                             {!unlocked && <span className="text-2xs font-sans text-stone-400 capitalize">{lesson.unlock_type}</span>}
+                                            {unlocked && !isCompleted && (
+                                              <button
+                                                onClick={() => handleMarkComplete(lesson, program.id, programDataIndex)}
+                                                disabled={isMarking}
+                                                className="flex items-center gap-1.5 text-xs font-sans font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1 rounded-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                              >
+                                                {isMarking ? (
+                                                  <Loader2 size={11} className="animate-spin" />
+                                                ) : (
+                                                  <CheckCircle size={11} />
+                                                )}
+                                                {isMarking ? 'Saving…' : 'Mark Complete'}
+                                              </button>
+                                            )}
+                                            {isCompleted && (
+                                              <span className="text-2xs font-sans text-amber-600 font-medium">✓ Done</span>
+                                            )}
                                           </div>
                                         </div>
                                       );
