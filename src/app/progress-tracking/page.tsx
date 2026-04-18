@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import StudentSidebar from '@/components/StudentSidebar';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { CheckCircle, Lock, Play, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { CheckCircle, Lock, Play, ChevronDown, ChevronUp, Loader2, RefreshCw } from 'lucide-react';
 
 interface LessonRow {
   id: string;
@@ -38,6 +38,13 @@ interface ProgramRow {
   duration: string;
 }
 
+interface ProgressRecord {
+  lesson_id: string;
+  is_completed: boolean;
+  progress_percent: number;
+  last_accessed_at: string | null;
+}
+
 interface ProgramData {
   program: ProgramRow;
   courses: CourseRow[];
@@ -53,9 +60,13 @@ export default function ProgressTrackingPage() {
   const [programDataList, setProgramDataList] = useState<ProgramData[]>([]);
   const [loading, setLoading] = useState(true);
   const [markingLesson, setMarkingLesson] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (silent = false) => {
     if (!user) return;
+    if (!silent) setLoading(true);
+    else setRefreshing(true);
+
     const supabase = createClient();
     try {
       const { data: enrollments } = await supabase
@@ -65,7 +76,7 @@ export default function ProgressTrackingPage() {
         .eq('enrollment_status', 'active');
 
       if (!enrollments || enrollments.length === 0) {
-        setLoading(false);
+        setProgramDataList([]);
         return;
       }
 
@@ -95,18 +106,21 @@ export default function ProgressTrackingPage() {
             .eq('program_id', programId)
             .eq('status', 'published')
             .order('sort_order', { ascending: true }),
+          // Fetch ALL progress records for this user+program (not just completed)
           supabase
             .from('progress_records')
-            .select('lesson_id, is_completed, last_accessed_at')
+            .select('lesson_id, is_completed, progress_percent, last_accessed_at')
             .eq('user_id', user.id)
             .eq('program_id', programId),
         ]);
 
+        const progressData: ProgressRecord[] = progressRes.data ?? [];
+
         const completedLessonIds = new Set<string>(
-          (progressRes.data ?? []).filter((p: any) => p.is_completed).map((p: any) => p.lesson_id)
+          progressData.filter((p) => p.is_completed).map((p) => p.lesson_id)
         );
         const accessedLessonIds = new Set<string>(
-          (progressRes.data ?? []).map((p: any) => p.lesson_id)
+          progressData.map((p) => p.lesson_id)
         );
 
         results.push({
@@ -124,6 +138,7 @@ export default function ProgressTrackingPage() {
       console.error('Progress tracking fetch error:', err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [user]);
 
@@ -131,13 +146,29 @@ export default function ProgressTrackingPage() {
     fetchData();
   }, [fetchData]);
 
-  // Auto-trigger last_accessed_at when a module is expanded (lesson opened)
-  const handleModuleExpand = async (modId: string, lessons: LessonRow[], programId: string, moduleId: string, courseId: string) => {
+  // Re-fetch when tab becomes visible again
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchData(true);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [fetchData]);
+
+  // Auto-trigger last_accessed_at when a module is expanded
+  const handleModuleExpand = async (
+    modId: string,
+    lessons: LessonRow[],
+    programId: string,
+    moduleId: string,
+    courseId: string
+  ) => {
     const isExpanding = expandedModule !== modId;
     setExpandedModule(isExpanding ? modId : null);
 
     if (isExpanding && user && lessons.length > 0) {
-      // Record access for the first unlocked, incomplete lesson
       const firstLesson = lessons[0];
       try {
         await fetch('/api/progress', {
@@ -179,16 +210,22 @@ export default function ProgressTrackingPage() {
       });
 
       if (res.ok) {
-        // Optimistically update local state
+        // Optimistically update local state immediately
         setProgramDataList(prev => {
           const updated = [...prev];
           const pd = { ...updated[programDataIndex] };
           const newCompleted = new Set(pd.completedLessonIds);
           newCompleted.add(lesson.id);
+          const newAccessed = new Set(pd.accessedLessonIds);
+          newAccessed.add(lesson.id);
           pd.completedLessonIds = newCompleted;
+          pd.accessedLessonIds = newAccessed;
           updated[programDataIndex] = pd;
           return updated;
         });
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.error('Mark complete failed:', errData);
       }
     } catch (err) {
       console.error('Mark complete error:', err);
@@ -202,11 +239,20 @@ export default function ProgressTrackingPage() {
       <StudentSidebar />
       <div className="flex-1 min-w-0">
         {/* Topbar */}
-        <div className="sticky top-0 z-30 bg-[#FAF8F4]/95 backdrop-blur-sm border-b border-stone-200/60 px-6 xl:px-8 h-16 flex items-center">
+        <div className="sticky top-0 z-30 bg-[#FAF8F4]/95 backdrop-blur-sm border-b border-stone-200/60 px-6 xl:px-8 h-16 flex items-center justify-between">
           <div>
             <p className="text-xs font-sans font-medium text-stone-400 uppercase tracking-widest">Learning</p>
             <p className="font-serif text-lg text-stone-800 leading-tight">Progress Tracking</p>
           </div>
+          <button
+            onClick={() => fetchData(true)}
+            disabled={refreshing}
+            className="flex items-center gap-1.5 text-xs font-sans text-stone-500 hover:text-stone-700 transition-colors disabled:opacity-50"
+            title="Refresh progress"
+          >
+            <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
+            {refreshing ? 'Refreshing…' : 'Refresh'}
+          </button>
         </div>
 
         <div className="p-6 xl:p-8 max-w-screen-xl mx-auto space-y-10">
@@ -258,6 +304,11 @@ export default function ProgressTrackingPage() {
 
                 {/* Courses & Modules */}
                 <div className="divide-y divide-stone-50">
+                  {courses.length === 0 && (
+                    <div className="px-8 py-6 text-center">
+                      <p className="text-sm font-sans text-stone-400">No published courses in this program yet.</p>
+                    </div>
+                  )}
                   {courses.map(course => {
                     const courseModules = modules.filter(m => m.course_id === course.id).sort((a, b) => a.sort_order - b.sort_order);
                     const courseLessons = lessons.filter(l => l.course_id === course.id);
@@ -269,13 +320,16 @@ export default function ProgressTrackingPage() {
                         <div className="flex items-center justify-between gap-4 mb-4">
                           <h3 className="font-serif text-lg text-stone-700">{course.title}</h3>
                           <div className="flex items-center gap-3 shrink-0">
-                            <span className="text-xs font-sans text-stone-400">{courseProgress}%</span>
+                            <span className="text-xs font-sans text-stone-400">{courseCompleted}/{courseLessons.length} lessons · {courseProgress}%</span>
                             <div className="w-24 h-1 bg-stone-100 rounded-full overflow-hidden">
-                              <div className="h-full bg-amber-500 rounded-full" style={{ width: `${courseProgress}%` }} />
+                              <div className="h-full bg-amber-500 rounded-full transition-all duration-500" style={{ width: `${courseProgress}%` }} />
                             </div>
                           </div>
                         </div>
                         <div className="space-y-3">
+                          {courseModules.length === 0 && (
+                            <p className="text-xs font-sans text-stone-400 pl-2">No published modules in this course yet.</p>
+                          )}
                           {courseModules.map(mod => {
                             const modLessons = lessons.filter(l => l.module_id === mod.id).sort((a, b) => a.sort_order - b.sort_order);
                             const modCompleted = modLessons.filter(l => completedLessonIds.has(l.id)).length;
@@ -307,9 +361,10 @@ export default function ProgressTrackingPage() {
                                       const isAccessed = accessedLessonIds.has(lesson.id);
                                       const isMarking = markingLesson === lesson.id;
                                       // Sequential unlock: first lesson always unlocked, rest unlock after previous is completed
-                                      const unlocked = lesson.unlock_type === 'immediate' || lesson.is_free || lessonIndex === 0
-                                        ? true
-                                        : lessonIndex > 0 ? completedLessonIds.has(modLessons[lessonIndex - 1].id) : true;
+                                      const unlocked =
+                                        lesson.unlock_type === 'immediate' || lesson.is_free || lessonIndex === 0
+                                          ? true
+                                          : completedLessonIds.has(modLessons[lessonIndex - 1].id);
 
                                       return (
                                         <div key={lesson.id} className={`flex items-center gap-4 px-5 py-3 ${!unlocked ? 'opacity-50' : ''}`}>
@@ -325,13 +380,19 @@ export default function ProgressTrackingPage() {
                                           <div className="flex-1 min-w-0">
                                             <p className={`text-sm font-sans ${isCompleted ? 'text-stone-400 line-through' : 'text-stone-700'}`}>{lesson.title}</p>
                                             {lesson.description && (
-                                              <p className="text-xs font-sans text-stone-400 mt-0.5">{lesson.description}</p>
+                                              <p className="text-xs font-sans text-stone-400 mt-0.5 truncate">{lesson.description}</p>
                                             )}
                                           </div>
                                           <div className="flex items-center gap-3 shrink-0">
                                             {lesson.duration && <span className="text-xs font-sans text-stone-400">{lesson.duration}</span>}
-                                            {lesson.is_free && <span className="text-2xs font-sans font-medium text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-sm">Free</span>}
-                                            {!unlocked && <span className="text-2xs font-sans text-stone-400 capitalize">{lesson.unlock_type}</span>}
+                                            {lesson.is_free && (
+                                              <span className="text-2xs font-sans font-medium text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-sm">Free</span>
+                                            )}
+                                            {!unlocked && (
+                                              <span className="text-2xs font-sans text-stone-400 capitalize flex items-center gap-1">
+                                                <Lock size={10} /> Locked
+                                              </span>
+                                            )}
                                             {unlocked && !isCompleted && (
                                               <button
                                                 onClick={() => handleMarkComplete(lesson, program.id, programDataIndex)}
@@ -347,13 +408,18 @@ export default function ProgressTrackingPage() {
                                               </button>
                                             )}
                                             {isCompleted && (
-                                              <span className="text-2xs font-sans text-amber-600 font-medium">✓ Done</span>
+                                              <span className="text-2xs font-sans text-amber-600 font-medium flex items-center gap-1">
+                                                <CheckCircle size={11} /> Done
+                                              </span>
                                             )}
                                           </div>
                                         </div>
                                       );
                                     })}
                                   </div>
+                                )}
+                                {isExpanded && modLessons.length === 0 && (
+                                  <div className="px-5 py-3 text-xs font-sans text-stone-400">No published lessons in this module yet.</div>
                                 )}
                               </div>
                             );
