@@ -93,7 +93,9 @@ function useMobileZigzagReveal(
 
     const render = () => {
       if (!isMobile()) {
-        animRef.current = requestAnimationFrame(render);
+        // Clear any previously drawn content and stop the loop on desktop
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
         return;
       }
 
@@ -176,9 +178,23 @@ function useMobileZigzagReveal(
 
     render();
 
+    // Also stop/restart when window is resized across the mobile/desktop breakpoint
+    const handleResize = () => {
+      if (!isMobile()) {
+        cancelAnimationFrame(animRef.current);
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      } else {
+        cancelAnimationFrame(animRef.current);
+        render();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+
     return () => {
       cancelAnimationFrame(animRef.current);
       resizeObserver.disconnect();
+      window.removeEventListener('resize', handleResize);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
