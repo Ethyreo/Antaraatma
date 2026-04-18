@@ -67,6 +67,8 @@ export default function CreateProgramModal({ onClose }: Props) {
       } else {
         toast.success(`Program "${data.title}" created as ${data.status}`);
         onClose();
+        // Reload page to refresh program list
+        window.location.reload();
       }
     } catch {
       toast.error('Network error. Please try again.');

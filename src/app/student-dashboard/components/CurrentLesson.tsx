@@ -1,10 +1,11 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Play, CheckCircle, Lock, ChevronRight } from 'lucide-react';
-import { toast } from 'sonner';
+
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import Icon from '@/components/ui/AppIcon';
+import Link from 'next/link';
+
 
 
 interface LessonItem {
@@ -12,6 +13,7 @@ interface LessonItem {
   title: string;
   duration: string | null;
   status: 'completed' | 'current' | 'locked';
+  courseId: string;
 }
 
 interface ModuleData {
@@ -22,6 +24,7 @@ interface ModuleData {
   completedLessons: number;
   totalLessons: number;
   lessons: LessonItem[];
+  programId: string;
 }
 
 const statusConfig = {
@@ -93,7 +96,7 @@ export default function CurrentLesson() {
         // Get lessons for current module
         const { data: lessons } = await supabase
           .from('lessons')
-          .select('id, title, duration, sort_order')
+          .select('id, title, duration, sort_order, course_id')
           .eq('module_id', currentMod.id)
           .eq('status', 'published')
           .order('sort_order', { ascending: true });
@@ -101,12 +104,12 @@ export default function CurrentLesson() {
         let foundCurrent = false;
         const lessonItems: LessonItem[] = (lessons ?? []).map((l) => {
           if (completedIds.has(l.id)) {
-            return { id: l.id, title: l.title, duration: l.duration, status: 'completed' };
+            return { id: l.id, title: l.title, duration: l.duration, status: 'completed', courseId: l.course_id };
           } else if (!foundCurrent) {
             foundCurrent = true;
-            return { id: l.id, title: l.title, duration: l.duration, status: 'current' };
+            return { id: l.id, title: l.title, duration: l.duration, status: 'current', courseId: l.course_id };
           } else {
-            return { id: l.id, title: l.title, duration: l.duration, status: 'locked' };
+            return { id: l.id, title: l.title, duration: l.duration, status: 'locked', courseId: l.course_id };
           }
         });
 
@@ -120,6 +123,7 @@ export default function CurrentLesson() {
           completedLessons: completedCount,
           totalLessons: lessonItems.length,
           lessons: lessonItems,
+          programId,
         });
       } catch (err) {
         console.error('CurrentLesson fetch error:', err);
@@ -131,8 +135,23 @@ export default function CurrentLesson() {
     fetchCurrentLesson();
   }, [user]);
 
-  const handleContinue = () => {
-    toast.success('Opening lesson player...');
+  const handleContinue = async (lesson: LessonItem) => {
+    if (!user || !moduleData) return;
+    try {
+      await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lesson_id: lesson.id,
+          module_id: moduleData.id,
+          course_id: lesson.courseId,
+          program_id: moduleData.programId,
+          action: 'access',
+        }),
+      });
+    } catch (err) {
+      console.error('Access tracking error:', err);
+    }
   };
 
   if (loading) {
@@ -179,7 +198,7 @@ export default function CurrentLesson() {
       <div className="divide-y divide-stone-100">
         {moduleData.lessons.map((lesson) => {
           const config = statusConfig[lesson.status];
-          const Icon = config.icon;
+          const LessonIcon = config.icon;
           const isCurrent = lesson.status === 'current';
 
           return (
@@ -190,7 +209,7 @@ export default function CurrentLesson() {
               }`}
             >
               <div className={`w-8 h-8 rounded-full ${config.bg} flex items-center justify-center shrink-0`}>
-                <Icon size={14} className={config.color} />
+                <LessonIcon size={14} className={config.color} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-sans font-500 truncate ${isCurrent ? 'text-amber-900' : 'text-stone-700'}`}>
@@ -199,13 +218,14 @@ export default function CurrentLesson() {
                 {lesson.duration && <p className="text-xs font-sans text-stone-400 mt-0.5">{lesson.duration}</p>}
               </div>
               {isCurrent && (
-                <button
-                  onClick={handleContinue}
+                <Link
+                  href="/progress-tracking"
+                  onClick={() => handleContinue(lesson)}
                   className="shrink-0 flex items-center gap-1.5 bg-amber-800 text-amber-50 px-3 py-1.5 text-xs font-sans font-500 rounded-sm hover:bg-amber-900 transition-colors active:scale-95"
                 >
                   Continue
                   <ChevronRight size={12} />
-                </button>
+                </Link>
               )}
               {lesson.status === 'completed' && (
                 <span className="text-2xs font-sans text-green-600 shrink-0">Done</span>

@@ -1,13 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
+function getAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
+
 export async function GET() {
   try {
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-
+    const supabaseAdmin = getAdmin();
     const { data, error } = await supabaseAdmin
       .from('leads')
       .select('*')
@@ -34,12 +37,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
     }
 
-    // Use service role key to bypass RLS entirely
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-
+    const supabaseAdmin = getAdmin();
     const { data, error } = await supabaseAdmin
       .from('leads')
       .insert({
@@ -58,6 +56,53 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ data }, { status: 200 });
+  } catch (err) {
+    console.error('[API /leads] Unexpected error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, ...updates } = body;
+    if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+
+    const supabaseAdmin = getAdmin();
+    const { data, error } = await supabaseAdmin
+      .from('leads')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[API /leads] Update error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ data }, { status: 200 });
+  } catch (err) {
+    console.error('[API /leads] Unexpected error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+
+    const supabaseAdmin = getAdmin();
+    const { error } = await supabaseAdmin.from('leads').delete().eq('id', id);
+
+    if (error) {
+      console.error('[API /leads] Delete error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
     console.error('[API /leads] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

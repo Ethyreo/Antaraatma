@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminSidebar from '@/components/AdminSidebar';
 import { createClient } from '@/lib/supabase/client';
-import { Search, Edit2, Trash2 } from 'lucide-react';
+import { Search, Trash2 } from 'lucide-react';
 
 interface Lead {
   id: string;
@@ -65,13 +65,29 @@ export default function AdminLeadsPage() {
   };
 
   const updateStatus = async (id: string, status: Lead['lead_status']) => {
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('leads')
-      .update({ lead_status: status })
-      .eq('id', id);
-    if (!error) {
-      setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, lead_status: status } : l)));
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, lead_status: status }),
+      });
+      if (res.ok) {
+        setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, lead_status: status } : l)));
+      }
+    } catch (err) {
+      console.error('[AdminLeads] Update status error:', err);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this lead? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`/api/leads?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setLeads((prev) => prev.filter((l) => l.id !== id));
+      }
+    } catch (err) {
+      console.error('[AdminLeads] Delete error:', err);
     }
   };
 
@@ -170,10 +186,11 @@ export default function AdminLeadsPage() {
                         </td>
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-2">
-                            <button className="text-stone-400 hover:text-amber-700 transition-colors">
-                              <Edit2 size={14} />
-                            </button>
-                            <button className="text-stone-400 hover:text-red-600 transition-colors">
+                            <button
+                              onClick={() => handleDelete(lead.id)}
+                              className="text-stone-400 hover:text-red-600 transition-colors"
+                              title="Delete lead"
+                            >
                               <Trash2 size={14} />
                             </button>
                           </div>

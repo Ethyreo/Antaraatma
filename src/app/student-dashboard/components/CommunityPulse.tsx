@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { MessageSquare, Heart, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import Link from 'next/link';
 
 interface CommunityPost {
   id: string;
@@ -58,10 +59,10 @@ export default function CommunityPulse() {
           <p className="section-label mb-0.5">Community</p>
           <p className="text-xs font-sans text-stone-500">Recent discussions</p>
         </div>
-        <button className="text-xs font-sans font-500 text-amber-700 hover:text-amber-800 transition-colors flex items-center gap-1">
+        <Link href="/community" className="text-xs font-sans font-500 text-amber-700 hover:text-amber-800 transition-colors flex items-center gap-1">
           Join community
           <ArrowRight size={11} />
-        </button>
+        </Link>
       </div>
       <div className="divide-y divide-stone-100">
         {loading ? (
