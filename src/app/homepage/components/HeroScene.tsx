@@ -2,221 +2,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
-// --- Mobile zigzag reveal animation ---
-// The reveal window travels in a zigzag (snake) path across the screen,
-// revealing the BG image underneath as it moves, then exits and repeats.
-
-function useMobileZigzagReveal(
-  canvasRef: React.RefObject<HTMLCanvasElement>,
-  containerRef: React.RefObject<HTMLDivElement>,
-  imgRef: React.RefObject<HTMLImageElement | null>,
-  imgLoadedRef: React.RefObject<boolean>
-) {
-  const animRef = useRef<number>(0);
-  const progressRef = useRef(0); // 0 → 1 across the full path
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
-
-    // Only run on mobile (touch devices / narrow screens)
-    const isMobile = () => window.innerWidth < 1024;
-    if (!isMobile()) return;
-
-    const resize = () => {
-      canvas.width = container.offsetWidth;
-      canvas.height = container.offsetHeight;
-    };
-    resize();
-    const resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(container);
-
-    // Build zigzag waypoints: start bottom-left, travel right, then next row left, etc.
-    // Each row is a horizontal band; the window zigzags across them.
-    const ROWS = 6; // number of horizontal passes
-    const WINDOW_W = 160; // reveal window width
-    const WINDOW_H = 110; // reveal window height
-    const SPEED = 0.0018; // progress per frame (controls overall speed)
-
-    const buildPath = (W: number, H: number) => {
-      const points: { x: number; y: number }[] = [];
-      const rowH = H / ROWS;
-      // Start just off-screen bottom-left
-      points.push({ x: -WINDOW_W, y: H + WINDOW_H });
-      for (let r = 0; r < ROWS; r++) {
-        const y = H - rowH * r - rowH / 2;
-        if (r % 2 === 0) {
-          // left → right
-          points.push({ x: -WINDOW_W, y });
-          points.push({ x: W + WINDOW_W, y });
-        } else {
-          // right → left
-          points.push({ x: W + WINDOW_W, y });
-          points.push({ x: -WINDOW_W, y });
-        }
-      }
-      // Exit top
-      points.push({ x: -WINDOW_W, y: -WINDOW_H * 2 });
-      return points;
-    };
-
-    // Interpolate along the path given progress 0→1
-    const getPos = (path: { x: number; y: number }[], t: number) => {
-      if (path.length < 2) return path[0];
-      // Compute total length for uniform speed
-      const segments: number[] = [];
-      let total = 0;
-      for (let i = 1; i < path.length; i++) {
-        const dx = path[i].x - path[i - 1].x;
-        const dy = path[i].y - path[i - 1].y;
-        const len = Math.sqrt(dx * dx + dy * dy);
-        segments.push(len);
-        total += len;
-      }
-      const target = t * total;
-      let acc = 0;
-      for (let i = 0; i < segments.length; i++) {
-        if (acc + segments[i] >= target) {
-          const local = (target - acc) / segments[i];
-          return {
-            x: path[i].x + (path[i + 1].x - path[i].x) * local,
-            y: path[i].y + (path[i + 1].y - path[i].y) * local,
-          };
-        }
-        acc += segments[i];
-      }
-      return path[path.length - 1];
-    };
-
-    let path = buildPath(canvas.width, canvas.height);
-
-    const render = () => {
-      if (!isMobile()) {
-        // Clear any previously drawn content and stop the loop on desktop
-        const ctx = canvas.getContext('2d');
-        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-        return;
-      }
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) { animRef.current = requestAnimationFrame(render); return; }
-
-      const W = canvas.width;
-      const H = canvas.height;
-
-      // Rebuild path if canvas size changed
-      if (path.length === 0 || path[1]?.y !== H - (H / ROWS) / 2) {
-        path = buildPath(W, H);
-      }
-
-      progressRef.current += SPEED;
-      if (progressRef.current > 1) progressRef.current = 0;
-
-      const pos = getPos(path, progressRef.current);
-      const cx = pos.x;
-      const cy = pos.y;
-
-      ctx.clearRect(0, 0, W, H);
-
-      if (imgLoadedRef.current && imgRef.current) {
-        const img = imgRef.current;
-
-        // Draw dark overlay
-        ctx.fillStyle = 'rgba(14,13,11,0.88)';
-        ctx.fillRect(0, 0, W, H);
-
-        // Clip to rounded reveal window
-        const rx = WINDOW_W / 2;
-        const ry = WINDOW_H / 2;
-        let r = 18; // corner radius
-
-        ctx.save();
-        ctx.beginPath();
-        // Rounded rect path
-        ctx.moveTo(cx - rx + r, cy - ry);
-        ctx.lineTo(cx + rx - r, cy - ry);
-        ctx.quadraticCurveTo(cx + rx, cy - ry, cx + rx, cy - ry + r);
-        ctx.lineTo(cx + rx, cy + ry - r);
-        ctx.quadraticCurveTo(cx + rx, cy + ry, cx + rx - r, cy + ry);
-        ctx.lineTo(cx - rx + r, cy + ry);
-        ctx.quadraticCurveTo(cx - rx, cy + ry, cx - rx, cy + ry - r);
-        ctx.lineTo(cx - rx, cy - ry + r);
-        ctx.quadraticCurveTo(cx - rx, cy - ry, cx - rx + r, cy - ry);
-        ctx.closePath();
-        ctx.clip();
-
-        // Draw image inside the clipped window
-        const maxW = W * 0.9;
-        const maxH = H * 0.9;
-        const scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight, 1);
-        const drawW = img.naturalWidth * scale;
-        const drawH = img.naturalHeight * scale;
-        const drawX = (W - drawW) / 2;
-        const drawY = (H - drawH) / 2;
-        ctx.drawImage(img, drawX, drawY, drawW, drawH);
-
-        // Subtle inner overlay to blend
-        ctx.fillStyle = 'rgba(14,13,11,0.18)';
-        ctx.fillRect(0, 0, W, H);
-
-        ctx.restore();
-
-        // Soft edge glow around the window
-        const edgeGrad = ctx.createRadialGradient(cx, cy, Math.min(rx, ry) * 0.8, cx, cy, Math.max(rx, ry) * 1.4);
-        edgeGrad.addColorStop(0, 'rgba(180,130,60,0.0)');
-        edgeGrad.addColorStop(0.7, 'rgba(180,130,60,0.04)');
-        edgeGrad.addColorStop(1, 'rgba(14,13,11,0.0)');
-        ctx.fillStyle = edgeGrad;
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, rx * 1.4, ry * 1.4, 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      animRef.current = requestAnimationFrame(render);
-    };
-
-    render();
-
-    // Also stop/restart when window is resized across the mobile/desktop breakpoint
-    const handleResize = () => {
-      if (!isMobile()) {
-        cancelAnimationFrame(animRef.current);
-        const ctx = canvas.getContext('2d');
-        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-      } else {
-        cancelAnimationFrame(animRef.current);
-        render();
-      }
-    };
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      cancelAnimationFrame(animRef.current);
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', handleResize);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-}
-
 export default function HeroScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: -999, y: -999 });
   const animFrameRef = useRef<number>(0);
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const imgLoadedRef = useRef(false);
   const [scrollY, setScrollY] = useState(0);
-  const [isMobileView, setIsMobileView] = useState(false);
 
   useEffect(() => {
-    const check = () => setIsMobileView(window.innerWidth < 1024);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
+    const timer = setTimeout(() => setLoaded(true), 80);
+    return () => clearTimeout(timer);
   }, []);
 
   // Smooth parallax on scroll
@@ -238,10 +36,7 @@ export default function HeroScene() {
     };
   }, []);
 
-  // Mobile zigzag reveal (uses mobileCanvasRef)
-  useMobileZigzagReveal(mobileCanvasRef, containerRef, imgRef, imgLoadedRef);
-
-  // Canvas spotlight render loop (desktop hover — uses canvasRef)
+  // Canvas spotlight render loop
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -372,17 +167,10 @@ export default function HeroScene() {
         aria-hidden="true"
       />
 
-      {/* Mobile zigzag reveal canvas — only visible on mobile (lg:hidden) */}
-      <canvas
-        ref={mobileCanvasRef}
-        className="absolute inset-0 pointer-events-none lg:hidden"
-        style={{ zIndex: 1, display: isMobileView ? undefined : 'none' }}
-      />
-
-      {/* Desktop Canvas spotlight layer — hidden on mobile */}
+      {/* Canvas spotlight layer */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 pointer-events-none hidden lg:block"
+        className="absolute inset-0 pointer-events-none"
         style={{ zIndex: 1 }}
       />
 
