@@ -210,10 +210,13 @@ export default function HeroScene() {
   const imgRef = useRef<HTMLImageElement | null>(null);
   const imgLoadedRef = useRef(false);
   const [scrollY, setScrollY] = useState(0);
+  const [isMobileView, setIsMobileView] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoaded(true), 80);
-    return () => clearTimeout(timer);
+    const check = () => setIsMobileView(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
   // Smooth parallax on scroll
@@ -373,7 +376,7 @@ export default function HeroScene() {
       <canvas
         ref={mobileCanvasRef}
         className="absolute inset-0 pointer-events-none lg:hidden"
-        style={{ zIndex: 1 }}
+        style={{ zIndex: 1, display: isMobileView ? undefined : 'none' }}
       />
 
       {/* Desktop Canvas spotlight layer — hidden on mobile */}
