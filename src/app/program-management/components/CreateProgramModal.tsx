@@ -65,6 +65,21 @@ export default function CreateProgramModal({ onClose }: Props) {
       if (!res.ok || json.error) {
         toast.error(json.error || 'Failed to create program.');
       } else {
+        const programId = json.data?.id;
+        // Auto-create a default course so modules can be added immediately
+        if (programId) {
+          await fetch('/api/courses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              program_id: programId,
+              title: `${data.title} — Course 1`,
+              description: '',
+              sort_order: 0,
+              status: data.status,
+            }),
+          });
+        }
         toast.success(`Program "${data.title}" created as ${data.status}`);
         onClose();
         // Reload page to refresh program list

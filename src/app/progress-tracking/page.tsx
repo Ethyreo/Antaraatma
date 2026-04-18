@@ -38,13 +38,6 @@ interface ProgramRow {
   duration: string;
 }
 
-interface ProgressRecord {
-  lesson_id: string;
-  is_completed: boolean;
-  progress_percent: number;
-  last_accessed_at: string | null;
-}
-
 interface ProgramData {
   program: ProgramRow;
   courses: CourseRow[];
@@ -114,7 +107,7 @@ export default function ProgressTrackingPage() {
             .eq('program_id', programId),
         ]);
 
-        const progressData: ProgressRecord[] = progressRes.data ?? [];
+        const progressData = progressRes.data ?? [];
 
         const completedLessonIds = new Set<string>(
           progressData.filter((p) => p.is_completed).map((p) => p.lesson_id)
@@ -177,7 +170,7 @@ export default function ProgressTrackingPage() {
           body: JSON.stringify({
             lesson_id: firstLesson.id,
             module_id: moduleId,
-            course_id: courseId,
+            course_id: courseId || null,
             program_id: programId,
             action: 'access',
           }),
@@ -203,7 +196,7 @@ export default function ProgressTrackingPage() {
         body: JSON.stringify({
           lesson_id: lesson.id,
           module_id: lesson.module_id,
-          course_id: lesson.course_id,
+          course_id: lesson.course_id || null,
           program_id: programId,
           action: 'complete',
         }),
@@ -233,6 +226,108 @@ export default function ProgressTrackingPage() {
       setMarkingLesson(null);
     }
   };
+
+  // Render a single module row with its lessons
+  function renderModule(
+    mod: ModuleRow,
+    modLessons: LessonRow[],
+    programId: string,
+    programDataIndex: number,
+    completedLessonIds: Set<string>,
+    accessedLessonIds: Set<string>,
+    courseId: string
+  ) {
+    const modCompleted = modLessons.filter(l => completedLessonIds.has(l.id)).length;
+    const modProgress = modLessons.length > 0 ? Math.round((modCompleted / modLessons.length) * 100) : 0;
+    const isExpanded = expandedModule === mod.id;
+
+    return (
+      <div key={mod.id} className="border border-stone-100 rounded-sm overflow-hidden">
+        <button
+          onClick={() => handleModuleExpand(mod.id, modLessons, programId, mod.id, courseId)}
+          className="w-full flex items-center justify-between gap-4 px-5 py-3.5 bg-stone-50/50 hover:bg-stone-50 transition-colors text-left"
+        >
+          <div className="flex items-center gap-3">
+            <div className={`w-2 h-2 rounded-full shrink-0 ${modProgress === 100 ? 'bg-amber-500' : modProgress > 0 ? 'bg-amber-300' : 'bg-stone-300'}`} />
+            <span className="text-sm font-sans font-medium text-stone-700">{mod.title}</span>
+            {mod.focus_area && (
+              <span className="text-2xs font-sans text-stone-400 bg-stone-100 px-2 py-0.5 rounded-sm">{mod.focus_area}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="text-xs font-sans text-stone-400">{modCompleted}/{modLessons.length}</span>
+            {isExpanded ? <ChevronUp size={14} className="text-stone-400" /> : <ChevronDown size={14} className="text-stone-400" />}
+          </div>
+        </button>
+        {isExpanded && modLessons.length > 0 && (
+          <div className="divide-y divide-stone-50">
+            {modLessons.map((lesson, lessonIndex) => {
+              const isCompleted = completedLessonIds.has(lesson.id);
+              const isAccessed = accessedLessonIds.has(lesson.id);
+              const isMarking = markingLesson === lesson.id;
+              const unlocked =
+                lesson.unlock_type === 'immediate' || lesson.is_free || lessonIndex === 0
+                  ? true
+                  : completedLessonIds.has(modLessons[lessonIndex - 1].id);
+
+              return (
+                <div key={lesson.id} className={`flex items-center gap-4 px-5 py-3 ${!unlocked ? 'opacity-50' : ''}`}>
+                  <div className="shrink-0">
+                    {isCompleted ? (
+                      <CheckCircle size={16} className="text-amber-600" />
+                    ) : unlocked ? (
+                      <Play size={16} className={isAccessed ? 'text-amber-400' : 'text-stone-400'} />
+                    ) : (
+                      <Lock size={16} className="text-stone-300" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-sans ${isCompleted ? 'text-stone-400 line-through' : 'text-stone-700'}`}>{lesson.title}</p>
+                    {lesson.description && (
+                      <p className="text-xs font-sans text-stone-400 mt-0.5 truncate">{lesson.description}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    {lesson.duration && <span className="text-xs font-sans text-stone-400">{lesson.duration}</span>}
+                    {lesson.is_free && (
+                      <span className="text-2xs font-sans font-medium text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-sm">Free</span>
+                    )}
+                    {!unlocked && (
+                      <span className="text-2xs font-sans text-stone-400 capitalize flex items-center gap-1">
+                        <Lock size={10} /> Locked
+                      </span>
+                    )}
+                    {unlocked && !isCompleted && (
+                      <button
+                        onClick={() => handleMarkComplete(lesson, programId, programDataIndex)}
+                        disabled={isMarking}
+                        className="flex items-center gap-1.5 text-xs font-sans font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1 rounded-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {isMarking ? (
+                          <Loader2 size={11} className="animate-spin" />
+                        ) : (
+                          <CheckCircle size={11} />
+                        )}
+                        {isMarking ? 'Saving…' : 'Mark Complete'}
+                      </button>
+                    )}
+                    {isCompleted && (
+                      <span className="text-2xs font-sans text-amber-600 font-medium flex items-center gap-1">
+                        <CheckCircle size={11} /> Done
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {isExpanded && modLessons.length === 0 && (
+          <div className="px-5 py-3 text-xs font-sans text-stone-400">No published lessons in this module yet.</div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-[#FAF8F4]">
@@ -277,6 +372,9 @@ export default function ProgressTrackingPage() {
             const programProgress = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
             const isCertEligible = programProgress === 100;
 
+            // Determine if we should use course-based or flat module layout
+            const hasCourses = courses.length > 0;
+
             return (
               <div key={program.id} className="bg-white border border-stone-200/80 rounded-sm overflow-hidden">
                 {/* Program Header */}
@@ -302,14 +400,33 @@ export default function ProgressTrackingPage() {
                   </div>
                 </div>
 
-                {/* Courses & Modules */}
+                {/* Content: Course-based or flat module layout */}
                 <div className="divide-y divide-stone-50">
-                  {courses.length === 0 && (
-                    <div className="px-8 py-6 text-center">
-                      <p className="text-sm font-sans text-stone-400">No published courses in this program yet.</p>
+                  {/* FLAT LAYOUT: No courses — show modules directly */}
+                  {!hasCourses && (
+                    <div className="px-8 py-5">
+                      {modules.length === 0 ? (
+                        <div className="text-center py-6">
+                          <p className="text-sm font-sans text-stone-400">No published modules in this program yet.</p>
+                          <p className="text-xs font-sans text-stone-300 mt-1">The admin is still building this program's content.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {modules
+                            .sort((a, b) => a.sort_order - b.sort_order)
+                            .map(mod => {
+                              const modLessons = lessons
+                                .filter(l => l.module_id === mod.id)
+                                .sort((a, b) => a.sort_order - b.sort_order);
+                              return renderModule(mod, modLessons, program.id, programDataIndex, completedLessonIds, accessedLessonIds, '');
+                            })}
+                        </div>
+                      )}
                     </div>
                   )}
-                  {courses.map(course => {
+
+                  {/* COURSE-BASED LAYOUT: Has courses */}
+                  {hasCourses && courses.map(course => {
                     const courseModules = modules.filter(m => m.course_id === course.id).sort((a, b) => a.sort_order - b.sort_order);
                     const courseLessons = lessons.filter(l => l.course_id === course.id);
                     const courseCompleted = courseLessons.filter(l => completedLessonIds.has(l.id)).length;
@@ -332,97 +449,7 @@ export default function ProgressTrackingPage() {
                           )}
                           {courseModules.map(mod => {
                             const modLessons = lessons.filter(l => l.module_id === mod.id).sort((a, b) => a.sort_order - b.sort_order);
-                            const modCompleted = modLessons.filter(l => completedLessonIds.has(l.id)).length;
-                            const modProgress = modLessons.length > 0 ? Math.round((modCompleted / modLessons.length) * 100) : 0;
-                            const isExpanded = expandedModule === mod.id;
-
-                            return (
-                              <div key={mod.id} className="border border-stone-100 rounded-sm overflow-hidden">
-                                <button
-                                  onClick={() => handleModuleExpand(mod.id, modLessons, program.id, mod.id, course.id)}
-                                  className="w-full flex items-center justify-between gap-4 px-5 py-3.5 bg-stone-50/50 hover:bg-stone-50 transition-colors text-left"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div className={`w-2 h-2 rounded-full shrink-0 ${modProgress === 100 ? 'bg-amber-500' : modProgress > 0 ? 'bg-amber-300' : 'bg-stone-300'}`} />
-                                    <span className="text-sm font-sans font-medium text-stone-700">{mod.title}</span>
-                                    {mod.focus_area && (
-                                      <span className="text-2xs font-sans text-stone-400 bg-stone-100 px-2 py-0.5 rounded-sm">{mod.focus_area}</span>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center gap-3 shrink-0">
-                                    <span className="text-xs font-sans text-stone-400">{modCompleted}/{modLessons.length}</span>
-                                    {isExpanded ? <ChevronUp size={14} className="text-stone-400" /> : <ChevronDown size={14} className="text-stone-400" />}
-                                  </div>
-                                </button>
-                                {isExpanded && modLessons.length > 0 && (
-                                  <div className="divide-y divide-stone-50">
-                                    {modLessons.map((lesson, lessonIndex) => {
-                                      const isCompleted = completedLessonIds.has(lesson.id);
-                                      const isAccessed = accessedLessonIds.has(lesson.id);
-                                      const isMarking = markingLesson === lesson.id;
-                                      // Sequential unlock: first lesson always unlocked, rest unlock after previous is completed
-                                      const unlocked =
-                                        lesson.unlock_type === 'immediate' || lesson.is_free || lessonIndex === 0
-                                          ? true
-                                          : completedLessonIds.has(modLessons[lessonIndex - 1].id);
-
-                                      return (
-                                        <div key={lesson.id} className={`flex items-center gap-4 px-5 py-3 ${!unlocked ? 'opacity-50' : ''}`}>
-                                          <div className="shrink-0">
-                                            {isCompleted ? (
-                                              <CheckCircle size={16} className="text-amber-600" />
-                                            ) : unlocked ? (
-                                              <Play size={16} className={isAccessed ? 'text-amber-400' : 'text-stone-400'} />
-                                            ) : (
-                                              <Lock size={16} className="text-stone-300" />
-                                            )}
-                                          </div>
-                                          <div className="flex-1 min-w-0">
-                                            <p className={`text-sm font-sans ${isCompleted ? 'text-stone-400 line-through' : 'text-stone-700'}`}>{lesson.title}</p>
-                                            {lesson.description && (
-                                              <p className="text-xs font-sans text-stone-400 mt-0.5 truncate">{lesson.description}</p>
-                                            )}
-                                          </div>
-                                          <div className="flex items-center gap-3 shrink-0">
-                                            {lesson.duration && <span className="text-xs font-sans text-stone-400">{lesson.duration}</span>}
-                                            {lesson.is_free && (
-                                              <span className="text-2xs font-sans font-medium text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-sm">Free</span>
-                                            )}
-                                            {!unlocked && (
-                                              <span className="text-2xs font-sans text-stone-400 capitalize flex items-center gap-1">
-                                                <Lock size={10} /> Locked
-                                              </span>
-                                            )}
-                                            {unlocked && !isCompleted && (
-                                              <button
-                                                onClick={() => handleMarkComplete(lesson, program.id, programDataIndex)}
-                                                disabled={isMarking}
-                                                className="flex items-center gap-1.5 text-xs font-sans font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1 rounded-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                                              >
-                                                {isMarking ? (
-                                                  <Loader2 size={11} className="animate-spin" />
-                                                ) : (
-                                                  <CheckCircle size={11} />
-                                                )}
-                                                {isMarking ? 'Saving…' : 'Mark Complete'}
-                                              </button>
-                                            )}
-                                            {isCompleted && (
-                                              <span className="text-2xs font-sans text-amber-600 font-medium flex items-center gap-1">
-                                                <CheckCircle size={11} /> Done
-                                              </span>
-                                            )}
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                )}
-                                {isExpanded && modLessons.length === 0 && (
-                                  <div className="px-5 py-3 text-xs font-sans text-stone-400">No published lessons in this module yet.</div>
-                                )}
-                              </div>
-                            );
+                            return renderModule(mod, modLessons, program.id, programDataIndex, completedLessonIds, accessedLessonIds, course.id);
                           })}
                         </div>
                       </div>
