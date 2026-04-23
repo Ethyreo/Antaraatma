@@ -350,7 +350,7 @@ export default function AdminStudentsPage() {
                           <p className="text-xs font-sans font-semibold text-stone-700">{program.progress_percent}%</p>
                           <p className="text-2xs font-sans text-stone-400">{program.completed_lessons}/{program.total_lessons} lessons</p>
                         </div>
-                        <div className="w-20 h-1.5 bg-stone-100 rounded-full overflow-hidden">
+                        <div className="w-24 h-3 bg-stone-200 rounded-full overflow-hidden border border-stone-300">
                           <div
                             className="h-full bg-amber-600 rounded-full transition-all duration-300"
                             style={{ width: `${program.progress_percent}%` }}
@@ -381,7 +381,7 @@ export default function AdminStudentsPage() {
                               <span className="text-2xs font-sans text-stone-400 shrink-0">
                                 {mod.completed_lessons}/{mod.total_lessons}
                               </span>
-                              <div className="w-16 h-1 bg-stone-100 rounded-full overflow-hidden shrink-0">
+                              <div className="w-20 h-2.5 bg-stone-200 rounded-full overflow-hidden shrink-0 border border-stone-300">
                                 <div
                                   className="h-full bg-amber-500 rounded-full transition-all"
                                   style={{ width: mod.total_lessons > 0 ? `${Math.round((mod.completed_lessons / mod.total_lessons) * 100)}%` : '0%' }}
