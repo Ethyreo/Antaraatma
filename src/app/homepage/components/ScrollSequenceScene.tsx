@@ -208,11 +208,6 @@ export default function ScrollSequenceScene() {
     };
   }, [locked]);
 
-  const ringRadius = 46;
-  const orbitalAngle = progress * Math.PI * 2;
-  const dotX = 50 + ringRadius * Math.cos(orbitalAngle - Math.PI / 2);
-  const dotY = 50 + ringRadius * Math.sin(orbitalAngle - Math.PI / 2);
-
   return (
     <div
       ref={sectionRef}
@@ -261,100 +256,115 @@ export default function ScrollSequenceScene() {
       {/* Main layout — vertically centered */}
       <div className="relative z-10 flex flex-col flex-1 items-center justify-center px-6">
 
-        {/* ── Orbital ring display ── */}
+        {/* ── Step progress display ── */}
         <div
-          className="relative mb-10 flex-shrink-0"
-          style={{
-            width: 'clamp(180px, 24vw, 280px)',
-            height: 'clamp(180px, 24vw, 280px)',
-          }}
+          className="relative mb-10 flex-shrink-0 flex flex-col items-center"
+          style={{ width: 'clamp(260px, 36vw, 420px)' }}
         >
-          <svg
-            className="absolute inset-0 w-full h-full"
-            viewBox="0 0 100 100"
-            style={{ overflow: 'visible' }}
-          >
-            <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(180,130,55,0.08)" strokeWidth="0.5" />
-            <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(180,130,55,0.05)" strokeWidth="0.4" />
-            <circle cx="50" cy="50" r="22" fill="none" stroke="rgba(180,130,55,0.04)" strokeWidth="0.3" />
-
-            <circle
-              cx="50" cy="50" r="46"
-              fill="none"
-              stroke="rgba(180,130,55,0.32)"
-              strokeWidth="0.9"
-              strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 46}`}
-              strokeDashoffset={`${2 * Math.PI * 46 * (1 - progress)}`}
-              transform="rotate(-90 50 50)"
-              style={{ transition: 'stroke-dashoffset 0.08s linear' }}
-            />
-
-            {[0, 1, 2]?.map((i) => {
-              const angle = (i / 3) * Math.PI * 2 - Math.PI / 2;
-              const mx = 50 + 46 * Math.cos(angle);
-              const my = 50 + 46 * Math.sin(angle);
-              const isActive = i <= activeZone;
-              return (
-                <g key={i}>
-                  <circle
-                    cx={mx} cy={my} r="2.4"
-                    fill={isActive ? 'rgba(180,130,55,0.75)' : 'rgba(180,130,55,0.12)'}
-                    style={{ transition: 'fill 0.5s ease' }}
-                  />
-                  <circle
-                    cx={mx} cy={my} r="4.5"
-                    fill="none"
-                    stroke={isActive ? 'rgba(180,130,55,0.18)' : 'transparent'}
-                    strokeWidth="0.5"
-                    style={{ transition: 'stroke 0.5s ease' }}
-                  />
-                </g>
-              );
-            })}
-
-            <circle
-              cx={dotX} cy={dotY} r="2"
-              fill="rgba(200,155,70,0.95)"
-              style={{ transition: 'cx 0.08s linear, cy 0.08s linear' }}
-            />
-            <circle
-              cx={dotX} cy={dotY} r="4"
-              fill="rgba(200,155,70,0.15)"
-              style={{ transition: 'cx 0.08s linear, cy 0.08s linear' }}
-            />
-
-            <circle
-              cx="50" cy="50"
-              r={`${7 + progress * 8}`}
-              fill={`rgba(180,130,55,${0.04 + progress * 0.09})`}
-              style={{ transition: 'r 0.12s ease, fill 0.12s ease' }}
-            />
-          </svg>
-
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
+          {/* Stage number + label */}
+          <div className="flex flex-col items-center mb-6">
             <span
               className="font-serif"
               style={{
-                fontSize: 'clamp(2.4rem, 5vw, 4rem)',
-                color: `rgba(232,224,208,${0.1 + progress * 0.3})`,
+                fontSize: 'clamp(2.8rem, 5vw, 4.2rem)',
+                color: 'rgba(232,224,208,0.85)',
                 lineHeight: 1,
                 letterSpacing: '-0.03em',
-                transition: 'color 0.4s ease',
               }}
             >
-              {String(activeZone + 1)?.padStart(2, '0')}
+              {String(activeZone + 1).padStart(2, '0')}
             </span>
             <span
-              className="font-sans uppercase mt-1"
+              className="font-sans uppercase mt-2"
               style={{
-                fontSize: '0.48rem',
-                color: 'rgba(180,130,55,0.35)',
-                letterSpacing: '0.24em',
+                fontSize: '0.6rem',
+                color: 'rgba(180,130,55,0.55)',
+                letterSpacing: '0.22em',
               }}
             >
               of 03
             </span>
+          </div>
+
+          {/* Linear progress track */}
+          <div className="w-full flex flex-col gap-3">
+            {/* Track bar */}
+            <div
+              style={{
+                width: '100%',
+                height: '2px',
+                background: 'rgba(180,130,55,0.12)',
+                borderRadius: '2px',
+                position: 'relative',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  height: '100%',
+                  width: `${progress * 100}%`,
+                  background: 'rgba(180,130,55,0.6)',
+                  borderRadius: '2px',
+                  transition: 'width 0.12s linear',
+                }}
+              />
+              {/* Step dots on track */}
+              {[0, 1, 2].map((i) => {
+                const isPast = i < activeZone;
+                const isActive = i === activeZone;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: `${(i / 2) * 100}%`,
+                      transform: 'translate(-50%, -50%)',
+                      width: isActive ? '8px' : '6px',
+                      height: isActive ? '8px' : '6px',
+                      borderRadius: '50%',
+                      background: isActive
+                        ? 'rgba(200,155,70,0.95)'
+                        : isPast
+                        ? 'rgba(180,130,55,0.55)'
+                        : 'rgba(180,130,55,0.15)',
+                      border: isActive ? '1.5px solid rgba(200,155,70,0.4)' : 'none',
+                      transition: 'background 0.4s ease, width 0.3s ease, height 0.3s ease',
+                    }}
+                  />
+                );
+              })}
+            </div>
+
+            {/* Stage labels under track */}
+            <div className="flex justify-between w-full">
+              {zones.map((zone, i) => {
+                const isPast = i < activeZone;
+                const isActive = i === activeZone;
+                return (
+                  <span
+                    key={zone.phase}
+                    className="font-sans uppercase"
+                    style={{
+                      fontSize: '0.52rem',
+                      letterSpacing: '0.18em',
+                      color: isActive
+                        ? 'rgba(180,130,55,0.8)'
+                        : isPast
+                        ? 'rgba(232,224,208,0.3)'
+                        : 'rgba(232,224,208,0.12)',
+                      transition: 'color 0.4s ease',
+                      textAlign: i === 0 ? 'left' : i === 2 ? 'right' : 'center',
+                      flex: 1,
+                    }}
+                  >
+                    {zone.label}
+                  </span>
+                );
+              })}
+            </div>
           </div>
         </div>
 
