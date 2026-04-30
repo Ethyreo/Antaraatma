@@ -77,23 +77,23 @@ export default function AuthForm() {
 
       {/* Logo (mobile only) */}
       <div className="flex items-center gap-2 mb-10 lg:hidden">
-        <div className="w-7 h-7 rounded-sm bg-amber-700 flex items-center justify-center">
-          <span className="font-serif text-amber-100 text-sm">V</span>
+        <div className="w-7 h-7 rounded-sm flex items-center justify-center" style={{ background: '#1A6B6B' }}>
+          <span className="font-serif text-sm" style={{ color: '#F4EFE6', fontWeight: 300 }}>A</span>
         </div>
-        <span className="font-serif text-lg text-stone-800 tracking-tight">VijayHeals</span>
+        <span className="font-serif text-lg tracking-[0.08em]" style={{ color: '#1A6B6B', fontWeight: 300 }}>ANTARAATMA</span>
       </div>
 
       {/* Tab switcher */}
-      <div className="flex border border-stone-200 rounded-sm p-0.5 mb-8 bg-stone-50">
+      <div className="flex rounded-sm p-0.5 mb-8" style={{ border: '1px solid rgba(168,216,206,0.5)', background: 'rgba(212,237,232,0.3)' }}>
         {(['login', 'signup'] as const).map((t) => (
           <button
             key={`tab-${t}`}
             onClick={() => setTab(t)}
-            className={`flex-1 py-2 text-sm font-sans font-500 rounded-sm transition-all duration-200 ${
-              tab === t
-                ? 'bg-white text-stone-800 shadow-card'
-                : 'text-stone-500 hover:text-stone-700'
-            }`}
+            className="flex-1 py-2 text-sm font-sans rounded-sm transition-all duration-200"
+            style={tab === t
+              ? { background: 'white', color: '#1A6B6B', fontWeight: 600, boxShadow: '0 1px 3px rgba(26,107,107,0.08)' }
+              : { color: 'rgba(36,44,44,0.5)', fontWeight: 400 }
+            }
           >
             {t === 'login' ? 'Sign In' : 'Create Account'}
           </button>
@@ -104,7 +104,7 @@ export default function AuthForm() {
       {tab === 'login' && (
         <form onSubmit={loginForm.handleSubmit(handleLoginSubmit)} className="space-y-5">
           <div>
-            <label className="block text-xs font-sans font-500 text-stone-700 mb-1.5" htmlFor="login-email">
+            <label className="block text-xs font-sans mb-1.5" style={{ color: '#242C2C', fontWeight: 500 }} htmlFor="login-email">
               Email address
             </label>
             <input
@@ -118,16 +118,16 @@ export default function AuthForm() {
               })}
             />
             {loginForm.formState.errors.email && (
-              <p className="text-xs text-red-600 mt-1">{loginForm.formState.errors.email.message}</p>
+              <p className="text-xs mt-1" style={{ color: '#c0392b' }}>{loginForm.formState.errors.email.message}</p>
             )}
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-sans font-500 text-stone-700" htmlFor="login-password">
+              <label className="text-xs font-sans" style={{ color: '#242C2C', fontWeight: 500 }} htmlFor="login-password">
                 Password
               </label>
-              <button type="button" className="text-xs font-sans text-amber-700 hover:text-amber-800 transition-colors">
+              <button type="button" className="text-xs font-sans transition-colors" style={{ color: '#1A6B6B', fontWeight: 500 }}>
                 Forgot password?
               </button>
             </div>
@@ -142,14 +142,15 @@ export default function AuthForm() {
               <button
                 type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                style={{ color: 'rgba(36,44,44,0.4)' }}
                 aria-label={showPass ? 'Hide password' : 'Show password'}
               >
                 {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
             {loginForm.formState.errors.password && (
-              <p className="text-xs text-red-600 mt-1">{loginForm.formState.errors.password.message}</p>
+              <p className="text-xs mt-1" style={{ color: '#c0392b' }}>{loginForm.formState.errors.password.message}</p>
             )}
           </div>
 
@@ -157,16 +158,20 @@ export default function AuthForm() {
             <input
               id="remember"
               type="checkbox"
-              className="w-3.5 h-3.5 rounded-sm border-stone-300 accent-amber-700"
+              className="w-3.5 h-3.5 rounded-sm"
+              style={{ accentColor: '#1A6B6B' }}
               {...loginForm.register('remember')}
             />
-            <label htmlFor="remember" className="text-xs font-sans text-stone-600">Remember me for 30 days</label>
+            <label htmlFor="remember" className="text-xs font-sans" style={{ color: 'rgba(36,44,44,0.6)', fontWeight: 400 }}>Remember me for 30 days</label>
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2 bg-amber-800 text-amber-50 py-3 text-sm font-sans font-500 tracking-wide rounded-sm transition-all duration-200 hover:bg-amber-900 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 py-3 text-sm font-sans tracking-wide rounded-sm transition-all duration-200 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+            style={{ background: '#1A6B6B', color: '#F4EFE6', fontWeight: 600 }}
+            onMouseEnter={e => { if (!isLoading) (e.currentTarget.style.background = '#155858'); }}
+            onMouseLeave={e => { if (!isLoading) (e.currentTarget.style.background = '#1A6B6B'); }}
           >
             {isLoading ? (
               <>
@@ -181,21 +186,21 @@ export default function AuthForm() {
             )}
           </button>
 
-          <p className="text-xs font-sans text-stone-400 text-center">
-            New to VijayHeals?{' '}
-            <button type="button" onClick={() => setTab('signup')} className="text-amber-700 font-500 hover:text-amber-800 transition-colors">
+          <p className="text-xs font-sans text-center" style={{ color: 'rgba(36,44,44,0.45)', fontWeight: 400 }}>
+            New to Antaraatma?{' '}
+            <button type="button" onClick={() => setTab('signup')} className="transition-colors" style={{ color: '#1A6B6B', fontWeight: 600 }}>
               Create an account
             </button>
           </p>
 
           {/* Testing Accounts */}
-          <div className="mt-6 p-3 bg-stone-50 border border-stone-200 rounded-sm">
-            <p className="text-xs font-sans font-medium text-stone-500 mb-2 uppercase tracking-wide">🧪 Test Accounts</p>
+          <div className="mt-6 p-3 rounded-sm" style={{ background: 'rgba(212,237,232,0.3)', border: '1px solid rgba(168,216,206,0.5)' }}>
+            <p className="text-xs font-sans uppercase tracking-wide mb-2" style={{ color: '#3A7A5A', fontWeight: 600 }}>🧪 Test Accounts</p>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-sans font-medium text-stone-700">Admin</p>
-                  <p className="text-xs font-sans text-stone-500">admin@vijayheals.com</p>
+                  <p className="text-xs font-sans" style={{ color: '#242C2C', fontWeight: 500 }}>Admin</p>
+                  <p className="text-xs font-sans" style={{ color: 'rgba(36,44,44,0.5)', fontWeight: 400 }}>admin@vijayheals.com</p>
                 </div>
                 <button
                   type="button"
@@ -203,15 +208,16 @@ export default function AuthForm() {
                     loginForm.setValue('email', 'admin@vijayheals.com');
                     loginForm.setValue('password', 'Admin@123');
                   }}
-                  className="text-xs font-sans text-amber-700 hover:text-amber-800 border border-amber-200 hover:border-amber-300 px-2 py-1 rounded-sm transition-colors"
+                  className="text-xs font-sans px-2 py-1 rounded-sm transition-colors"
+                  style={{ color: '#1A6B6B', border: '1px solid rgba(26,107,107,0.3)', fontWeight: 500 }}
                 >
                   Use
                 </button>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-sans font-medium text-stone-700">Student</p>
-                  <p className="text-xs font-sans text-stone-500">student@vijayheals.com</p>
+                  <p className="text-xs font-sans" style={{ color: '#242C2C', fontWeight: 500 }}>Student</p>
+                  <p className="text-xs font-sans" style={{ color: 'rgba(36,44,44,0.5)', fontWeight: 400 }}>student@vijayheals.com</p>
                 </div>
                 <button
                   type="button"
@@ -219,29 +225,30 @@ export default function AuthForm() {
                     loginForm.setValue('email', 'student@vijayheals.com');
                     loginForm.setValue('password', 'Student@123');
                   }}
-                  className="text-xs font-sans text-amber-700 hover:text-amber-800 border border-amber-200 hover:border-amber-300 px-2 py-1 rounded-sm transition-colors"
+                  className="text-xs font-sans px-2 py-1 rounded-sm transition-colors"
+                  style={{ color: '#1A6B6B', border: '1px solid rgba(26,107,107,0.3)', fontWeight: 500 }}
                 >
                   Use
                 </button>
               </div>
             </div>
-            <p className="text-xs font-sans text-stone-400 mt-2">Password: <span className="font-mono">Admin@123</span> / <span className="font-mono">Student@123</span></p>
+            <p className="text-xs font-sans mt-2" style={{ color: 'rgba(36,44,44,0.4)', fontWeight: 400 }}>Password: <span className="font-mono">Admin@123</span> / <span className="font-mono">Student@123</span></p>
           </div>
         </form>
       )}
 
-      {/* Signup Form — Student enrollment flow */}
+      {/* Signup Form */}
       {tab === 'signup' && (
         <div>
-          <div className="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-sm">
-            <p className="text-xs font-sans text-amber-800 leading-relaxed">
-              <span className="font-medium">Enrollment required:</span> You can only sign up if your email has been registered by an admin. Contact your program coordinator if you need access.
+          <div className="mb-5 p-3 rounded-sm" style={{ background: 'rgba(26,107,107,0.06)', border: '1px solid rgba(26,107,107,0.2)' }}>
+            <p className="text-xs font-sans leading-relaxed" style={{ color: '#1A6B6B', fontWeight: 400 }}>
+              <span style={{ fontWeight: 600 }}>Enrollment required:</span> You can only sign up if your email has been registered by an admin. Contact your program coordinator if you need access.
             </p>
           </div>
           <StudentSignupForm />
-          <p className="mt-5 text-center text-xs font-sans text-stone-500">
+          <p className="mt-5 text-center text-xs font-sans" style={{ color: 'rgba(36,44,44,0.5)', fontWeight: 400 }}>
             Already have an account?{' '}
-            <button onClick={() => setTab('login')} className="text-amber-700 font-500 hover:text-amber-800 transition-colors">
+            <button onClick={() => setTab('login')} className="transition-colors" style={{ color: '#1A6B6B', fontWeight: 600 }}>
               Sign in
             </button>
           </p>

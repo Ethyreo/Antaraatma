@@ -40,11 +40,14 @@ export default function ResourceVaultPage() {
   const programs = mockPrograms.filter(p => p.status === 'published');
 
   return (
-    <div className="flex min-h-screen bg-[#FAF8F4]">
+    <div className="flex min-h-screen" style={{ background: '#F4EFE6' }}>
       <StudentSidebar />
       <div className="flex-1 min-w-0">
         {/* Topbar */}
-        <div className="sticky top-0 z-30 bg-[#FAF8F4]/95 backdrop-blur-sm border-b border-stone-200/60 px-6 xl:px-8 h-16 flex items-center">
+        <div
+          className="sticky top-0 z-30 backdrop-blur-sm px-6 xl:px-8 h-16 flex items-center"
+          style={{ background: 'rgba(244,239,230,0.96)', borderBottom: '1px solid rgba(168,216,206,0.3)' }}
+        >
           <div>
             <p className="text-xs font-sans font-medium text-stone-400 uppercase tracking-widest">Learning</p>
             <p className="font-serif text-lg text-stone-800 leading-tight">Resource Vault</p>

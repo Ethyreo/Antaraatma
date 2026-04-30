@@ -161,7 +161,7 @@ export default function AdminShipmentsPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#FAF8F4]">
+    <div className="flex min-h-screen" style={{ background: '#F4EFE6' }}>
       <AdminSidebar />
       <div className="flex-1 min-w-0">
         <div className="sticky top-0 z-30 bg-[#FAF8F4]/95 backdrop-blur-sm border-b border-stone-200/60 px-6 xl:px-8 h-16 flex items-center justify-between">

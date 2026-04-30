@@ -9,10 +9,10 @@ const CURRENT_USER_ID = 'user-student-1';
 const CATEGORIES: CommunityCategory[] = ['Gratitude', 'Good Karma', 'Reflection', 'Healing Win'];
 
 const categoryColors: Record<CommunityCategory, string> = {
-  'Gratitude': 'text-amber-700 bg-amber-50 border-amber-200',
-  'Good Karma': 'text-sage bg-green-50 border-green-200',
-  'Reflection': 'text-stone-600 bg-stone-100 border-stone-200',
-  'Healing Win': 'text-amber-800 bg-amber-100 border-amber-300',
+  'Gratitude': 'text-teal-depth bg-pale-mist border-mint-mist',
+  'Good Karma': 'text-sage-forest bg-pale-mist border-mint-mist',
+  'Reflection': 'text-deep-night bg-warm-pearl border-mint-mist',
+  'Healing Win': 'text-teal-depth bg-pale-mist border-aqua-light',
 };
 
 function timeAgo(dateStr: string) {
@@ -60,11 +60,14 @@ export default function CommunityPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#FAF8F4]">
+    <div className="flex min-h-screen" style={{ background: '#F4EFE6' }}>
       <StudentSidebar />
       <div className="flex-1 min-w-0">
         {/* Topbar */}
-        <div className="sticky top-0 z-30 bg-[#FAF8F4]/95 backdrop-blur-sm border-b border-stone-200/60 px-6 xl:px-8 h-16 flex items-center justify-between">
+        <div
+          className="sticky top-0 z-30 backdrop-blur-sm px-6 xl:px-8 h-16 flex items-center justify-between"
+          style={{ background: 'rgba(244,239,230,0.96)', borderBottom: '1px solid rgba(168,216,206,0.3)' }}
+        >
           <div>
             <p className="text-xs font-sans font-medium text-stone-400 uppercase tracking-widest">Community</p>
             <p className="font-serif text-lg text-stone-800 leading-tight">Talk to Uni</p>

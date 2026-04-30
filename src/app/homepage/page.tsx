@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export default function HomepagePage() {
   return (
     <main
-      style={{ background: '#0e0d0b' }}
+      style={{ background: '#1A2828' }}
       className="overflow-x-hidden"
     >
       <PublicNav />

@@ -23,99 +23,127 @@ export default function ClosingScene() {
     <section
       ref={sectionRef}
       className="relative overflow-hidden"
-      style={{ background: '#0e0d0b', paddingTop: 'clamp(6rem, 14vw, 12rem)', paddingBottom: 'clamp(6rem, 14vw, 12rem)' }}
+      style={{ background: '#1A2828', paddingTop: 'clamp(6rem, 14vw, 12rem)', paddingBottom: 'clamp(6rem, 14vw, 12rem)' }}
     >
-      {/* Ambient glow — centered, very subtle */}
+      {/* Sacred geometry — lotus mandala watermark */}
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+        <svg width="500" height="500" viewBox="0 0 500 500" fill="none" opacity="0.05" aria-hidden="true">
+          <circle cx="250" cy="250" r="50" stroke="#5FBDBD" strokeWidth="0.8"/>
+          <circle cx="250" cy="250" r="100" stroke="#5FBDBD" strokeWidth="0.8"/>
+          <circle cx="250" cy="250" r="150" stroke="#5FBDBD" strokeWidth="0.8"/>
+          <circle cx="250" cy="250" r="200" stroke="#5FBDBD" strokeWidth="0.8"/>
+          <circle cx="250" cy="250" r="240" stroke="#5FBDBD" strokeWidth="0.8"/>
+          <line x1="250" y1="10" x2="250" y2="490" stroke="#5FBDBD" strokeWidth="0.5"/>
+          <line x1="10" y1="250" x2="490" y2="250" stroke="#5FBDBD" strokeWidth="0.5"/>
+          <line x1="80" y1="80" x2="420" y2="420" stroke="#5FBDBD" strokeWidth="0.5"/>
+          <line x1="420" y1="80" x2="80" y2="420" stroke="#5FBDBD" strokeWidth="0.5"/>
+          <circle cx="250" cy="250" r="5" fill="#C4A052" opacity="0.8"/>
+        </svg>
+      </div>
+
+      {/* Ambient teal glow */}
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 55% 45% at 50% 55%, rgba(180,130,55,0.06) 0%, transparent 65%)' }} />
-      {/* Grain */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.022]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
-          backgroundSize: '128px 128px',
-        }}
-      />
-      {/* Centered composition */}
+        style={{ background: 'radial-gradient(ellipse 55% 45% at 50% 55%, rgba(26,107,107,0.08) 0%, transparent 65%)' }} />
+
       <div className="editorial-container relative z-10 flex flex-col items-center text-center">
-        {/* Headline */}
+        {/* Sacred Gold rule */}
+        <div className="flex items-center gap-4 mb-12"
+          style={{
+            opacity: visible ? 1 : 0,
+            transition: 'opacity 0.8s ease',
+          }}
+        >
+          <div className="w-12 h-px" style={{ background: '#C4A052', opacity: 0.5 }} />
+          <span className="text-xs font-sans uppercase tracking-[0.2em]" style={{ color: '#C4A052', opacity: 0.7, fontWeight: 600 }}>
+            Dr. Vijay Singla · Antaraatma
+          </span>
+          <div className="w-12 h-px" style={{ background: '#C4A052', opacity: 0.5 }} />
+        </div>
+
+        {/* Headline — Raleway 200 weight */}
         <h2
           className="font-serif text-balance mx-auto mb-10"
           style={{
             fontSize: 'clamp(2.8rem, 6vw, 5.5rem)',
-            color: 'rgba(232,224,208,0.88)',
-            lineHeight: 1.0,
-            maxWidth: '14ch',
+            color: 'rgba(244,239,230,0.88)',
+            lineHeight: 1.05,
+            fontWeight: 200,
+            letterSpacing: '0.05em',
+            maxWidth: '16ch',
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 1s ease, transform 1s ease',
+            transition: 'opacity 1s ease 0.1s, transform 1s ease 0.1s',
           }}
         >
           The first step<br />
           costs nothing.
         </h2>
 
+        {/* Pull quote style */}
         <p
-          className="font-sans font-light leading-relaxed mb-16 mx-auto"
+          className="font-serif leading-relaxed mb-6 mx-auto"
           style={{
-            fontSize: 'clamp(0.9rem, 1.3vw, 1.05rem)',
-            color: 'rgba(232,224,208,0.3)',
-            maxWidth: '36ch',
+            fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
+            color: 'rgba(95,189,189,0.55)',
+            maxWidth: '40ch',
+            fontStyle: 'italic',
+            fontWeight: 300,
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(14px)',
             transition: 'opacity 1s ease 0.2s, transform 1s ease 0.2s',
           }}
         >
+          &ldquo;Your soul does not need to be fixed. It needs to be heard.&rdquo;
+        </p>
+
+        <p
+          className="font-sans font-light leading-relaxed mb-16 mx-auto"
+          style={{
+            fontSize: 'clamp(0.9rem, 1.3vw, 1.05rem)',
+            color: 'rgba(244,239,230,0.28)',
+            maxWidth: '36ch',
+            fontWeight: 300,
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'translateY(0)' : 'translateY(14px)',
+            transition: 'opacity 1s ease 0.3s, transform 1s ease 0.3s',
+          }}
+        >
           One hour. No commitment. A genuine beginning.
         </p>
 
-        {/* CTAs — centered */}
+        {/* CTAs */}
         <div
           className="flex flex-col sm:flex-row items-center justify-center gap-8"
           style={{
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(12px)',
-            transition: 'opacity 1s ease 0.38s, transform 1s ease 0.38s',
+            transition: 'opacity 1s ease 0.42s, transform 1s ease 0.42s',
           }}
         >
           <Link
             href="/awareness-session"
-            className="group inline-flex items-center gap-3 text-sm font-sans tracking-wide"
-            style={{
-              color: 'rgba(212,168,85,0.85)',
-              transition: 'color 0.25s ease',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#d4a855')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(212,168,85,0.85)')}
+            className="inline-flex items-center gap-3 px-8 py-3.5 text-sm font-sans tracking-wide rounded-sm transition-all duration-300"
+            style={{ background: '#1A6B6B', color: '#F4EFE6', fontWeight: 600, letterSpacing: '0.06em' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#155858')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#1A6B6B')}
           >
             Join the Free Awareness Session
-            <span
-              style={{ display: 'inline-block', transition: 'transform 0.25s ease', opacity: 0.6 }}
-              ref={el => {
-                if (!el) return;
-                el?.closest('a')?.addEventListener('mouseenter', () => { el.style.transform = 'translateX(4px)'; });
-                el?.closest('a')?.addEventListener('mouseleave', () => { el.style.transform = 'translateX(0)'; });
-              }}
-            >→</span>
           </Link>
           <Link
             href="/programs-overview"
-            className="inline-flex items-center gap-3 text-sm font-sans tracking-wide"
-            style={{
-              color: 'rgba(220,210,195,0.25)',
-              transition: 'color 0.25s ease',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(220,210,195,0.5)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(220,210,195,0.25)')}
+            className="inline-flex items-center gap-3 text-sm font-sans tracking-wide transition-all duration-300"
+            style={{ color: 'rgba(168,216,206,0.35)', fontWeight: 400 }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(168,216,206,0.65)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(168,216,206,0.35)')}
           >
-            View All Programs
+            View All Programs →
           </Link>
         </div>
 
-        {/* Reassurance */}
         <p
           className="mt-12 text-xs font-sans uppercase tracking-widest"
           style={{
-            color: 'rgba(232,224,208,0.12)',
+            color: 'rgba(244,239,230,0.1)',
             opacity: visible ? 1 : 0,
             transition: 'opacity 1s ease 0.6s',
           }}

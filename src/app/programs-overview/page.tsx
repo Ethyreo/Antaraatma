@@ -8,7 +8,7 @@ import ProgramsFAQ from './components/ProgramsFAQ';
 
 export default function ProgramsOverviewPage() {
   return (
-    <main className="bg-[#FAF8F4] min-h-screen">
+    <main style={{ background: '#F4EFE6' }} className="min-h-screen">
       <PublicNav />
       <ProgramsHero />
       <ProgramsJourneyExplainer />
