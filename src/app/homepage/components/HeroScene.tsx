@@ -67,21 +67,23 @@ export default function HeroScene() {
         const drawX = (W - drawW) / 2;
         const drawY = (H - drawH) / 2;
 
-        ctx.fillStyle = 'rgba(26,40,40,0.85)';
-        ctx.fillRect(0, 0, W, H);
+        // Removed: dark background fill that was changing the section colour
+        // ctx.fillStyle = 'rgba(26,40,40,0.85)';
+        // ctx.fillRect(0, 0, W, H);
 
         ctx.save();
         ctx.beginPath();
         ctx.arc(mx, my, RADIUS, 0, Math.PI * 2);
         ctx.clip();
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
-        ctx.fillStyle = 'rgba(26,40,40,0.18)';
-        ctx.fillRect(0, 0, W, H);
+        // Removed: dark tint inside clip that was also darkening the section
+        // ctx.fillStyle = 'rgba(26,40,40,0.18)';
+        // ctx.fillRect(0, 0, W, H);
         ctx.restore();
 
         const grad = ctx.createRadialGradient(mx, my, RADIUS * 0.72, mx, my, RADIUS);
-        grad.addColorStop(0, 'rgba(26,40,40,0)');
-        grad.addColorStop(1, 'rgba(26,40,40,0.92)');
+        grad.addColorStop(0, 'rgba(244,239,230,0)');
+        grad.addColorStop(1, 'rgba(244,239,230,0.85)');
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(mx, my, RADIUS, 0, Math.PI * 2);
