@@ -19,10 +19,10 @@ const cards = [
         <circle cx="14" cy="14" r="2" fill="currentColor" />
       </svg>
     ),
-    accent: '#b4822a',
-    accentLight: 'rgba(180,130,42,0.08)',
-    accentBorder: 'rgba(180,130,42,0.28)',
-    textAccent: '#b4822a',
+    accent: '#1A6B6B',
+    accentLight: 'rgba(26,107,107,0.08)',
+    accentBorder: 'rgba(26,107,107,0.28)',
+    textAccent: '#1A6B6B',
   },
   {
     number: '02',
@@ -38,10 +38,10 @@ const cards = [
         <path d="M8 8 L20 20 M20 8 L8 20" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeOpacity="0.4" />
       </svg>
     ),
-    accent: '#4a7c6f',
-    accentLight: 'rgba(74,124,111,0.07)',
-    accentBorder: 'rgba(74,124,111,0.26)',
-    textAccent: '#4a7c6f',
+    accent: '#1A6B6B',
+    accentLight: 'rgba(26,107,107,0.07)',
+    accentBorder: 'rgba(26,107,107,0.26)',
+    textAccent: '#1A6B6B',
   },
   {
     number: '03',
@@ -56,10 +56,10 @@ const cards = [
         <path d="M14 3 L17 11 L26 11 L19 16.5 L21.5 25 L14 20 L6.5 25 L9 16.5 L2 11 L11 11 Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" fill="none" />
       </svg>
     ),
-    accent: '#6b5b9e',
-    accentLight: 'rgba(107,91,158,0.07)',
-    accentBorder: 'rgba(107,91,158,0.26)',
-    textAccent: '#6b5b9e',
+    accent: '#1A6B6B',
+    accentLight: 'rgba(26,107,107,0.07)',
+    accentBorder: 'rgba(26,107,107,0.26)',
+    textAccent: '#1A6B6B',
   },
 ];
 
@@ -129,7 +129,7 @@ export default function PathwaySliderSection() {
       ref={sectionRef}
       className="relative overflow-hidden"
       style={{
-        background: '#111009',
+        background: '#F4EFE6',
         paddingTop: 'clamp(5rem, 12vw, 9rem)',
         paddingBottom: 'clamp(6rem, 14vw, 11rem)',
       }}
@@ -138,7 +138,7 @@ export default function PathwaySliderSection() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 80% 50% at 50% 30%, rgba(180,130,42,0.05) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 80% 50% at 50% 30%, rgba(26,107,107,0.06) 0%, transparent 70%)',
         }}
       />
 
@@ -154,7 +154,7 @@ export default function PathwaySliderSection() {
         >
           <p
             className="text-xs font-sans uppercase tracking-[0.22em] mb-6 inline-block"
-            style={{ color: 'rgba(180,130,55,0.55)' }}
+            style={{ color: 'rgba(26,107,107,0.7)' }}
           >
             Program Architecture
           </p>
@@ -162,17 +162,17 @@ export default function PathwaySliderSection() {
             className="font-serif text-balance mx-auto"
             style={{
               fontSize: 'clamp(2rem, 4.5vw, 3.6rem)',
-              color: '#f5f0e8',
+              color: '#1A2828',
               lineHeight: 1.05,
               maxWidth: '22ch',
             }}
           >
             One ascending path.<br />
-            <span style={{ color: 'rgba(245,240,232,0.28)' }}>Three distinct thresholds.</span>
+            <span style={{ color: 'rgba(36,44,44,0.28)' }}>Three distinct thresholds.</span>
           </h2>
           <p
             className="font-sans font-light leading-relaxed text-balance mx-auto mt-6"
-            style={{ color: 'rgba(245,240,232,0.38)', fontSize: '0.875rem', maxWidth: '46ch' }}
+            style={{ color: 'rgba(36,44,44,0.42)', fontSize: '0.875rem', maxWidth: '46ch' }}
           >
             Each stage builds on the last — from awareness to action to lasting transformation.
           </p>
@@ -220,17 +220,25 @@ export default function PathwaySliderSection() {
           </div>
 
           {/* Mobile slider */}
-          <div className="lg:hidden overflow-hidden">
+          <div className="lg:hidden" style={{ overflow: 'hidden', width: '100%' }}>
             <div
               style={{
                 display: 'flex',
-                transform: `translateX(calc(-${active * 100}% - ${active * 16}px))`,
+                width: `${cards.length * 100}%`,
+                transform: `translateX(calc(-${active * (100 / cards.length)}%))`,
                 transition: isDragging ? 'none' : 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
-                gap: '16px',
               }}
             >
               {cards.map((card, i) => (
-                <div key={card.label} style={{ minWidth: '100%', flexShrink: 0, display: 'flex', justifyContent: 'center', padding: '0 8px', boxSizing: 'border-box' }}>
+                <div
+                  key={card.label}
+                  style={{
+                    width: `${100 / cards.length}%`,
+                    flexShrink: 0,
+                    boxSizing: 'border-box',
+                    padding: '0 12px',
+                  }}
+                >
                   <SliderCard card={card} index={i} visible={visible} isActive={i === active} />
                 </div>
               ))}
@@ -248,7 +256,7 @@ export default function PathwaySliderSection() {
                   width: i === active ? '28px' : '8px',
                   height: '8px',
                   borderRadius: '4px',
-                  background: i === active ? cards[active].accent : 'rgba(245,240,232,0.15)',
+                  background: i === active ? cards[active].accent : 'rgba(36,44,44,0.15)',
                   border: 'none',
                   cursor: 'pointer',
                   transition: 'all 0.35s ease',
@@ -268,8 +276,8 @@ export default function PathwaySliderSection() {
               className="font-sans text-xs uppercase tracking-[0.14em] px-4 py-2 rounded-full"
               style={{
                 background: 'transparent',
-                border: `1px solid ${i === active ? card.accent : 'rgba(245,240,232,0.1)'}`,
-                color: i === active ? card.accent : 'rgba(245,240,232,0.3)',
+                border: `1px solid ${i === active ? card.accent : 'rgba(36,44,44,0.12)'}`,
+                color: i === active ? card.accent : 'rgba(36,44,44,0.35)',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
               }}
@@ -318,8 +326,8 @@ function SliderCard({
       style={{
         width: '100%',
         boxSizing: 'border-box',
-        background: hovered ? card.accentLight : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${hovered ? card.accentBorder : 'rgba(245,240,232,0.09)'}`,
+        background: hovered ? card.accentLight : 'rgba(255,255,255,0.55)',
+        border: `1px solid ${hovered ? card.accentBorder : 'rgba(36,44,44,0.08)'}`,
         borderRadius: '16px',
         padding: '1.1rem',
         display: 'flex',
@@ -334,8 +342,8 @@ function SliderCard({
           : `translateY(36px) scale(0.97)`,
         transition: `opacity 0.75s ease ${index * 0.15}s, transform ${hovered ? '0.35s ease' : `0.75s ease ${index * 0.15}s`}, background 0.3s ease, border-color 0.3s ease, box-shadow 0.35s ease`,
         boxShadow: hovered
-          ? `0 14px 40px rgba(0,0,0,0.4), 0 0 0 1px ${card.accentBorder}`
-          : '0 4px 16px rgba(0,0,0,0.2)',
+          ? `0 14px 40px rgba(36,44,44,0.12), 0 0 0 1px ${card.accentBorder}`
+          : '0 4px 16px rgba(36,44,44,0.06)',
         minHeight: '260px',
       }}
     >
@@ -346,7 +354,7 @@ function SliderCard({
           style={{
             fontSize: '2rem',
             lineHeight: 1,
-            color: hovered ? card.accent : 'rgba(245,240,232,0.1)',
+            color: hovered ? card.accent : 'rgba(36,44,44,0.12)',
             transition: 'color 0.35s ease',
             fontVariantNumeric: 'tabular-nums',
           }}
@@ -355,7 +363,7 @@ function SliderCard({
         </span>
         <span
           style={{
-            color: hovered ? card.accent : 'rgba(245,240,232,0.25)',
+            color: hovered ? card.accent : 'rgba(36,44,44,0.3)',
             transition: 'color 0.35s ease, transform 0.35s ease',
             transform: hovered ? 'rotate(12deg) scale(1.1)' : 'rotate(0deg) scale(1)',
             display: 'inline-flex',
@@ -375,7 +383,7 @@ function SliderCard({
         </p>
         <p
           className="font-sans text-xs"
-          style={{ color: 'rgba(245,240,232,0.3)' }}
+          style={{ color: 'rgba(36,44,44,0.38)' }}
         >
           {card.tagline}
         </p>
@@ -385,7 +393,7 @@ function SliderCard({
       <div
         style={{
           height: '1px',
-          background: hovered ? card.accentBorder : 'rgba(245,240,232,0.07)',
+          background: hovered ? card.accentBorder : 'rgba(36,44,44,0.07)',
           transition: 'background 0.35s ease',
         }}
       />
@@ -395,7 +403,7 @@ function SliderCard({
         className="font-serif text-balance"
         style={{
           fontSize: 'clamp(0.9rem, 1.3vw, 1.1rem)',
-          color: '#f5f0e8',
+          color: '#1A2828',
           lineHeight: 1.3,
           flex: 1,
         }}
@@ -408,7 +416,7 @@ function SliderCard({
         className="font-sans font-light leading-relaxed"
         style={{
           fontSize: '0.78rem',
-          color: 'rgba(245,240,232,0.42)',
+          color: 'rgba(36,44,44,0.45)',
           lineHeight: 1.65,
         }}
       >
@@ -420,7 +428,7 @@ function SliderCard({
         href={card.href}
         className="inline-flex items-center gap-2 font-sans font-medium text-sm mt-auto"
         style={{
-          color: hovered ? card.accent : 'rgba(245,240,232,0.35)',
+          color: hovered ? card.accent : 'rgba(36,44,44,0.38)',
           transition: 'color 0.3s ease',
           textDecoration: 'none',
         }}

@@ -69,12 +69,12 @@ export default function EcosystemScene() {
       ref={sectionRef}
       className="relative overflow-hidden"
       style={{
-        background: '#FAF8F4',
+        background: '#F4EFE6',
         paddingTop: 'clamp(6rem, 14vw, 11rem)',
         paddingBottom: 'clamp(6rem, 14vw, 11rem)',
       }}
     >
-      {/* Grain */}
+      {/* Pale Mist grain */}
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.016]"
         style={{
@@ -82,6 +82,18 @@ export default function EcosystemScene() {
           backgroundSize: '128px 128px',
         }}
       />
+
+      {/* Botanical watermark — left side */}
+      <div className="absolute left-0 bottom-0 pointer-events-none opacity-[0.06]" aria-hidden="true">
+        <svg width="300" height="400" viewBox="0 0 300 400" fill="none">
+          <path d="M150 390 Q130 320 110 250 Q90 180 130 120 Q170 60 150 20" stroke="#3A7A5A" strokeWidth="1" fill="none"/>
+          <path d="M150 280 Q110 260 90 230 Q70 200 95 175" stroke="#3A7A5A" strokeWidth="0.8" fill="none"/>
+          <path d="M150 240 Q190 220 210 190 Q230 160 205 135" stroke="#3A7A5A" strokeWidth="0.8" fill="none"/>
+          <ellipse cx="90" cy="175" rx="25" ry="15" stroke="#3A7A5A" strokeWidth="0.8" transform="rotate(-25 90 175)"/>
+          <ellipse cx="205" cy="135" rx="25" ry="15" stroke="#3A7A5A" strokeWidth="0.8" transform="rotate(25 205 135)"/>
+        </svg>
+      </div>
+
       <div className="editorial-container relative z-10">
         {/* Header */}
         <div
@@ -94,7 +106,7 @@ export default function EcosystemScene() {
         >
           <p
             className="text-xs font-sans uppercase tracking-[0.2em] mb-10 inline-block"
-            style={{ color: 'rgba(180,130,55,0.5)' }}
+            style={{ color: '#3A7A5A', fontWeight: 600 }}
           >
             The Ecosystem
           </p>
@@ -102,71 +114,72 @@ export default function EcosystemScene() {
             className="font-serif text-balance mx-auto"
             style={{
               fontSize: 'clamp(2.2rem, 5vw, 4rem)',
-              color: '#1c1a17',
-              lineHeight: 1.0,
-              maxWidth: '18ch',
+              color: '#1A6B6B',
+              lineHeight: 1.05,
+              fontWeight: 300,
+              letterSpacing: '0.04em',
+              maxWidth: '20ch',
             }}
           >
             Everything you need<br />
-            <span style={{ color: 'rgba(28,26,23,0.22)' }}>to heal — in one place.</span>
+            <span style={{ color: 'rgba(26,107,107,0.25)' }}>to heal — in one place.</span>
           </h2>
         </div>
 
         {/* Ecosystem list */}
-        <div style={{ borderTop: '1px solid rgba(28,26,23,0.07)' }}>
+        <div style={{ borderTop: '1px solid rgba(26,107,107,0.1)' }}>
           {ecosystemItems?.map((item, i) => (
             <Link
               key={item?.label}
               href={item?.href}
               className="grid grid-cols-1 lg:grid-cols-12 gap-0 block"
               style={{
-                borderBottom: '1px solid rgba(28,26,23,0.07)',
+                borderBottom: '1px solid rgba(26,107,107,0.1)',
                 opacity: itemVisible[i] ? 1 : 0,
                 transform: itemVisible[i] ? 'translateY(0)' : 'translateY(14px)',
                 transition: `opacity 0.7s ease, transform 0.7s ease, background 0.25s ease`,
                 textDecoration: 'none',
               }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = 'rgba(28,26,23,0.025)';
+                (e.currentTarget as HTMLElement).style.background = 'rgba(168,216,206,0.12)';
               }}
               onMouseLeave={e => {
                 (e.currentTarget as HTMLElement).style.background = 'transparent';
               }}
             >
-              <div
-                className="lg:col-span-4 py-8 lg:py-10"
-              >
+              <div className="lg:col-span-4 py-8 lg:py-10">
                 <h3
                   className="font-serif"
                   style={{
                     fontSize: 'clamp(1.1rem, 1.8vw, 1.5rem)',
-                    color: '#1c1a17',
-                    transition: 'color 0.22s ease',
+                    color: '#1A6B6B',
+                    fontWeight: 300,
+                    letterSpacing: '0.04em',
                   }}
                 >
                   {item?.label}
                 </h3>
                 <p
                   className="text-xs font-sans uppercase tracking-widest mt-1"
-                  style={{ color: 'rgba(28,26,23,0.22)' }}
+                  style={{ color: 'rgba(26,107,107,0.35)', fontWeight: 600 }}
                 >
                   {item?.tag}
                 </p>
               </div>
               <div
                 className="lg:col-span-7 lg:col-start-6 py-8 lg:py-10 flex items-center justify-between"
-                style={{ borderLeft: '1px solid rgba(28,26,23,0.07)' }}
+                style={{ borderLeft: '1px solid rgba(26,107,107,0.08)' }}
               >
                 <p
                   className="font-sans font-light leading-relaxed max-w-[50ch] lg:pl-12"
-                  style={{ fontSize: '0.875rem', color: 'rgba(28,26,23,0.35)' }}
+                  style={{ fontSize: '0.875rem', color: 'rgba(36,44,44,0.45)', fontWeight: 300 }}
                 >
                   {item?.description}
                 </p>
                 <span
                   className="hidden lg:block ml-8 text-sm font-sans"
                   style={{
-                    color: 'rgba(28,26,23,0.2)',
+                    color: 'rgba(26,107,107,0.25)',
                     display: 'inline-block',
                     transition: 'transform 0.22s ease, color 0.22s ease',
                   }}
@@ -176,11 +189,11 @@ export default function EcosystemScene() {
                     if (!parent) return;
                     const enter = () => {
                       el.style.transform = 'translateX(5px)';
-                      el.style.color = 'rgba(28,26,23,0.5)';
+                      el.style.color = '#1A6B6B';
                     };
                     const leave = () => {
                       el.style.transform = 'translateX(0)';
-                      el.style.color = 'rgba(28,26,23,0.2)';
+                      el.style.color = 'rgba(26,107,107,0.25)';
                     };
                     parent.addEventListener('mouseenter', enter);
                     parent.addEventListener('mouseleave', leave);

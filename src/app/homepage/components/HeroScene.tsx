@@ -17,26 +17,21 @@ export default function HeroScene() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Smooth parallax on scroll
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
+    const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Preload the image
   useEffect(() => {
     const img = new window.Image();
-    img.src = '/assets/images/Blue_White_Modern_Buy_1_Get_1_Promotion_Instagram_Post-1775409089496.png';
+    img.src = '/assets/images/WhatsApp_Image_2026-04-28_at_4.03.01_PM-removebg-preview-1777641830144.png';
     img.onload = () => {
       imgRef.current = img;
       imgLoadedRef.current = true;
     };
   }, []);
 
-  // Canvas spotlight render loop
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -64,8 +59,6 @@ export default function HeroScene() {
 
       if (imgLoadedRef.current && imgRef.current && isHovering) {
         const img = imgRef.current;
-
-        // Draw image centered, fit to viewport (object-contain style — no stretching)
         const maxW = W * 0.85;
         const maxH = H * 0.85;
         const scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight, 1);
@@ -74,32 +67,31 @@ export default function HeroScene() {
         const drawX = (W - drawW) / 2;
         const drawY = (H - drawH) / 2;
 
-        ctx.fillStyle = 'rgba(14,13,11,0.82)';
-        ctx.fillRect(0, 0, W, H);
+        // Removed: dark background fill that was changing the section colour
+        // ctx.fillStyle = 'rgba(26,40,40,0.85)';
+        // ctx.fillRect(0, 0, W, H);
 
         ctx.save();
         ctx.beginPath();
         ctx.arc(mx, my, RADIUS, 0, Math.PI * 2);
         ctx.clip();
-
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
-
-        ctx.fillStyle = 'rgba(14,13,11,0.22)';
-        ctx.fillRect(0, 0, W, H);
-
+        // Removed: dark tint inside clip that was also darkening the section
+        // ctx.fillStyle = 'rgba(26,40,40,0.18)';
+        // ctx.fillRect(0, 0, W, H);
         ctx.restore();
 
         const grad = ctx.createRadialGradient(mx, my, RADIUS * 0.72, mx, my, RADIUS);
-        grad.addColorStop(0, 'rgba(14,13,11,0)');
-        grad.addColorStop(1, 'rgba(14,13,11,0.92)');
+        grad.addColorStop(0, 'rgba(244,239,230,0)');
+        grad.addColorStop(1, 'rgba(244,239,230,0.85)');
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(mx, my, RADIUS, 0, Math.PI * 2);
         ctx.fill();
 
         const glowGrad = ctx.createRadialGradient(mx, my, 0, mx, my, RADIUS * 0.9);
-        glowGrad.addColorStop(0, 'rgba(180,130,60,0.07)');
-        glowGrad.addColorStop(1, 'rgba(180,130,60,0)');
+        glowGrad.addColorStop(0, 'rgba(26,107,107,0.1)');
+        glowGrad.addColorStop(1, 'rgba(26,107,107,0)');
         ctx.fillStyle = glowGrad;
         ctx.beginPath();
         ctx.arc(mx, my, RADIUS * 0.9, 0, Math.PI * 2);
@@ -127,9 +119,7 @@ export default function HeroScene() {
       containerRef.current.style.setProperty('--my', `${y * 100}%`);
       mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
-    const handleMouseLeave = () => {
-      mouseRef.current = { x: -999, y: -999 };
-    };
+    const handleMouseLeave = () => { mouseRef.current = { x: -999, y: -999 }; };
     const el = containerRef.current;
     el?.addEventListener('mousemove', handleMouseMove as EventListener);
     el?.addEventListener('mouseleave', handleMouseLeave);
@@ -139,7 +129,6 @@ export default function HeroScene() {
     };
   }, []);
 
-  // Parallax offset for content (subtle, GPU-accelerated)
   const parallaxOffset = scrollY * 0.18;
 
   return (
@@ -147,16 +136,15 @@ export default function HeroScene() {
       ref={containerRef}
       className="relative min-h-screen flex flex-col overflow-hidden"
       style={{
-        background: '#0e0d0b',
+        background: '#F4EFE6',
         '--mx': '30%',
         '--my': '40%',
       } as React.CSSProperties}
     >
-      {/* Centered background image — always present, revealed by canvas spotlight */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/assets/images/Blue_White_Modern_Buy_1_Get_1_Promotion_Instagram_Post-1775409089496.png"
-        alt="Chakra meditation energy visualization"
+        src="/assets/images/WhatsApp_Image_2026-04-28_at_4.03.01_PM-removebg-preview-1777641830144.png"
+        alt="Meditation figure healing visualization"
         className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
         style={{
           opacity: 0.0,
@@ -167,19 +155,14 @@ export default function HeroScene() {
         aria-hidden="true"
       />
 
-      {/* Canvas spotlight layer */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 pointer-events-none"
-        style={{ zIndex: 1 }}
-      />
+      <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }} />
 
-      {/* Cursor-reactive ambient */}
+      {/* Cursor-reactive ambient — teal glow */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           zIndex: 2,
-          background: 'radial-gradient(ellipse 55% 45% at var(--mx) var(--my), rgba(180,130,60,0.06) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 55% 45% at var(--mx) var(--my), rgba(26,107,107,0.06) 0%, transparent 70%)',
           transition: 'background 0.15s ease',
         }}
       />
@@ -187,9 +170,9 @@ export default function HeroScene() {
       {/* Static ambient layers */}
       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 2 }}>
         <div className="absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse 70% 55% at 12% 18%, rgba(160,120,50,0.04) 0%, transparent 55%)' }} />
+          style={{ background: 'radial-gradient(ellipse 70% 55% at 12% 18%, rgba(95,189,189,0.07) 0%, transparent 55%)' }} />
         <div className="absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse 45% 65% at 88% 82%, rgba(90,100,80,0.025) 0%, transparent 55%)' }} />
+          style={{ background: 'radial-gradient(ellipse 45% 65% at 88% 82%, rgba(196,160,82,0.05) 0%, transparent 55%)' }} />
       </div>
 
       {/* Grain */}
@@ -202,9 +185,23 @@ export default function HeroScene() {
         }}
       />
 
-      {/* Main content — centered, constrained, staged reveal, parallax */}
+      {/* Sacred geometry watermark — concentric circles */}
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ zIndex: 2 }}>
+        <svg width="600" height="600" viewBox="0 0 600 600" fill="none" opacity="0.06" aria-hidden="true">
+          <circle cx="300" cy="300" r="60" stroke="#1A6B6B" strokeWidth="0.8"/>
+          <circle cx="300" cy="300" r="120" stroke="#1A6B6B" strokeWidth="0.8"/>
+          <circle cx="300" cy="300" r="180" stroke="#1A6B6B" strokeWidth="0.8"/>
+          <circle cx="300" cy="300" r="240" stroke="#1A6B6B" strokeWidth="0.8"/>
+          <circle cx="300" cy="300" r="290" stroke="#1A6B6B" strokeWidth="0.8"/>
+          <line x1="300" y1="10" x2="300" y2="590" stroke="#1A6B6B" strokeWidth="0.5"/>
+          <line x1="10" y1="300" x2="590" y2="300" stroke="#1A6B6B" strokeWidth="0.5"/>
+          <circle cx="300" cy="300" r="4" fill="#C4A052" opacity="0.6"/>
+        </svg>
+      </div>
+
+      {/* Main content */}
       <div
-        className="relative flex flex-col flex-1 justify-center items-center text-center pt-32 pb-24 px-6"
+        className="relative flex flex-col flex-1 justify-center items-center text-center pt-20 pb-16 px-6"
         style={{
           zIndex: 10,
           transform: `translateY(${-parallaxOffset}px) translateZ(0)`,
@@ -214,10 +211,11 @@ export default function HeroScene() {
         <div className="max-w-2xl w-full mx-auto">
           {/* Eyebrow */}
           <p
-            className="font-sans uppercase tracking-[0.22em] mb-14"
+            className="font-sans uppercase tracking-[0.22em] mb-8"
             style={{
               fontSize: '0.62rem',
-              color: 'rgba(180,130,55,0.45)',
+              color: 'rgba(26,107,107,0.55)',
+              fontWeight: 600,
               opacity: loaded ? 1 : 0,
               transform: loaded ? 'translateY(0)' : 'translateY(10px)',
               transition: 'opacity 0.9s ease 0.1s, transform 0.9s ease 0.1s',
@@ -226,95 +224,111 @@ export default function HeroScene() {
             Naturopathy · Healing · Transformation
           </p>
 
-          {/* Headline */}
+          {/* Headline — Raleway light weight */}
           <h1
-            className="font-serif leading-[1.0] mb-10 text-balance"
+            className="font-serif leading-[1.0] mb-7 text-balance"
             style={{
-              fontSize: 'clamp(3rem, 7vw, 6.5rem)',
-              color: '#e8e0d0',
+              fontSize: 'clamp(2rem, 4.5vw, 3.8rem)',
+              color: '#1A2828',
+              fontWeight: 200,
+              letterSpacing: '0.06em',
               opacity: loaded ? 1 : 0,
               transform: loaded ? 'translateY(0)' : 'translateY(18px)',
               transition: 'opacity 1s ease 0.28s, transform 1s ease 0.28s',
             }}
           >
             Enter stillness.<br />
-            <span style={{ color: 'rgba(200,155,70,0.55)' }}>Begin healing.</span>
+            <span style={{ color: '#1A6B6B' }}>Begin healing.</span>
           </h1>
 
           {/* Subtext */}
           <p
-            className="font-sans font-light leading-relaxed mb-20 mx-auto"
+            className="font-sans font-light leading-relaxed mb-12 mx-auto"
             style={{
               fontSize: 'clamp(0.9rem, 1.4vw, 1.05rem)',
-              color: 'rgba(220,210,195,0.32)',
-              maxWidth: '36ch',
+              color: 'rgba(36,44,44,0.45)',
+              maxWidth: '38ch',
+              fontWeight: 300,
               opacity: loaded ? 1 : 0,
               transform: loaded ? 'translateY(0)' : 'translateY(14px)',
-              transition: 'opacity 1s ease 0.48s, transform 1s ease 0.48s',
+              transition: 'opacity 1s ease 0.46s, transform 1s ease 0.46s',
             }}
           >
-            A guided journey from awareness to complete transformation.
+            You are not broken. You are becoming. Dr. Vijay Singla walks beside you — through a structured pathway grounded in naturopathy and your body&apos;s innate wisdom.
           </p>
 
           {/* CTAs */}
           <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-8"
+            className="flex flex-col sm:flex-row items-center justify-center gap-6"
             style={{
               opacity: loaded ? 1 : 0,
               transform: loaded ? 'translateY(0)' : 'translateY(12px)',
-              transition: 'opacity 1s ease 0.65s, transform 1s ease 0.65s',
+              transition: 'opacity 1s ease 0.62s, transform 1s ease 0.62s',
             }}
           >
             <Link
               href="/awareness-session"
-              className="font-sans text-sm tracking-wide transition-all duration-300 group"
-              style={{ color: 'rgba(200,155,70,0.85)' }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#d4a855'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(200,155,70,0.85)'; }}
+              className="inline-flex items-center gap-3 px-8 py-3.5 text-sm font-sans tracking-wide rounded-sm transition-all duration-300"
+              style={{
+                background: '#1A6B6B',
+                color: '#F4EFE6',
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = '#155858')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#1A6B6B')}
             >
-              Join the Free Awareness Session
-              <span
-                className="inline-block ml-2 transition-transform duration-300 group-hover:translate-x-1"
-              >→</span>
+              Begin Your Journey
             </Link>
             <Link
               href="/programs-overview"
-              className="font-sans text-sm tracking-wide transition-all duration-300"
-              style={{ color: 'rgba(220,210,195,0.28)' }}
-              onMouseEnter={e => { e.currentTarget.style.color = 'rgba(220,210,195,0.55)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(220,210,195,0.28)'; }}
+              className="inline-flex items-center gap-3 px-8 py-3.5 text-sm font-sans tracking-wide rounded-sm transition-all duration-300"
+              style={{
+                border: '1px solid rgba(26,107,107,0.3)',
+                color: 'rgba(26,107,107,0.7)',
+                fontWeight: 400,
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(26,107,107,0.6)';
+                (e.currentTarget as HTMLElement).style.color = '#1A6B6B';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(26,107,107,0.3)';
+                (e.currentTarget as HTMLElement).style.color = 'rgba(26,107,107,0.7)';
+              }}
             >
-              Explore the Journey
+              Explore Programs
             </Link>
+          </div>
+
+          {/* Stats */}
+          <div
+            className="mt-12 pt-6 grid grid-cols-3 gap-6"
+            style={{
+              borderTop: '1px solid rgba(26,107,107,0.12)',
+              opacity: loaded ? 1 : 0,
+              transition: 'opacity 1s ease 0.8s',
+            }}
+          >
+            {[
+              { value: '2,400+', label: 'Students Healed' },
+              { value: '94%', label: 'Completion Rate' },
+              { value: '12 yrs', label: 'Clinical Practice' },
+            ]?.map((stat) => (
+              <div key={`hero-stat-${stat?.label}`} className="text-center">
+                <p className="font-serif tabular-nums" style={{ fontSize: '1.5rem', color: '#1A6B6B', fontWeight: 300 }}>{stat?.value}</p>
+                <p className="text-xs font-sans uppercase tracking-widest mt-1" style={{ color: 'rgba(26,107,107,0.4)', fontWeight: 600 }}>{stat?.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <div
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        style={{
-          zIndex: 10,
-          opacity: loaded ? (scrollY > 50 ? 0 : 0.35) : 0,
-          transition: 'opacity 0.6s ease 1.2s',
-        }}
-      >
-        <div
-          style={{
-            width: '1px',
-            height: '40px',
-            background: 'linear-gradient(to bottom, rgba(180,130,55,0.5), transparent)',
-            animation: 'scrollPulse 2s ease-in-out infinite',
-          }}
-        />
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
+        <div className="w-px h-8 animate-pulse-soft" style={{ background: '#1A6B6B' }} />
+        <span className="text-2xs font-sans tracking-[0.15em] uppercase" style={{ color: '#1A6B6B' }}>Scroll</span>
       </div>
-
-      <style>{`
-        @keyframes scrollPulse {
-          0%, 100% { opacity: 0.3; transform: scaleY(1); }
-          50% { opacity: 0.7; transform: scaleY(1.15); }
-        }
-      `}</style>
     </section>
   );
 }

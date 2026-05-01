@@ -1,18 +1,19 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import StudentSidebar from '@/components/StudentSidebar';
 import { mockCommunityPosts, mockUsers } from '@/lib/data/mockData';
 import type { CommunityCategory } from '@/lib/data/types';
 import { Heart, MessageCircle, Pin, Plus, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const CURRENT_USER_ID = 'user-student-1';
 const CATEGORIES: CommunityCategory[] = ['Gratitude', 'Good Karma', 'Reflection', 'Healing Win'];
 
 const categoryColors: Record<CommunityCategory, string> = {
-  'Gratitude': 'text-amber-700 bg-amber-50 border-amber-200',
-  'Good Karma': 'text-sage bg-green-50 border-green-200',
-  'Reflection': 'text-stone-600 bg-stone-100 border-stone-200',
-  'Healing Win': 'text-amber-800 bg-amber-100 border-amber-300',
+  'Gratitude': 'text-teal-depth bg-pale-mist border-mint-mist',
+  'Good Karma': 'text-sage-forest bg-pale-mist border-mint-mist',
+  'Reflection': 'text-deep-night bg-warm-pearl border-mint-mist',
+  'Healing Win': 'text-teal-depth bg-pale-mist border-aqua-light',
 };
 
 function timeAgo(dateStr: string) {
@@ -24,11 +25,28 @@ function timeAgo(dateStr: string) {
 }
 
 export default function CommunityPage() {
+  const router = useRouter();
+  const [authChecked, setAuthChecked] = React.useState(false);
+  const [authed, setAuthed] = React.useState(false);
   const [activeCategory, setActiveCategory] = useState<CommunityCategory | null>(null);
   const [showNewPost, setShowNewPost] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', body: '', category: 'Gratitude' as CommunityCategory });
   const [posts, setPosts] = useState(mockCommunityPosts);
   const [reactions, setReactions] = useState<Record<string, boolean>>({});
+
+  React.useEffect(() => {
+    import('@/lib/supabase/client').then(({ createClient }) => {
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user) {
+          router.replace('/sign-up-login?redirectTo=/community');
+        } else {
+          setAuthed(true);
+        }
+        setAuthChecked(true);
+      });
+    });
+  }, [router]);
 
   const filtered = activeCategory ? posts.filter(p => p.category === activeCategory) : posts;
   const pinned = filtered.filter(p => p.isPinned);
@@ -59,12 +77,26 @@ export default function CommunityPage() {
     setShowNewPost(false);
   };
 
+  if (!authChecked || !authed) {
+    return (
+      <div className="flex min-h-screen items-center justify-center" style={{ background: '#F4EFE6' }}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: '#1A6B6B', borderTopColor: 'transparent' }} />
+          <p className="text-sm font-sans text-stone-500">Verifying session…</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen bg-[#FAF8F4]">
+    <div className="flex min-h-screen" style={{ background: '#F4EFE6' }}>
       <StudentSidebar />
       <div className="flex-1 min-w-0">
         {/* Topbar */}
-        <div className="sticky top-0 z-30 bg-[#FAF8F4]/95 backdrop-blur-sm border-b border-stone-200/60 px-6 xl:px-8 h-16 flex items-center justify-between">
+        <div
+          className="sticky top-0 z-30 backdrop-blur-sm px-6 xl:px-8 h-16 flex items-center justify-between"
+          style={{ background: 'rgba(244,239,230,0.96)', borderBottom: '1px solid rgba(168,216,206,0.3)' }}
+        >
           <div>
             <p className="text-xs font-sans font-medium text-stone-400 uppercase tracking-widest">Community</p>
             <p className="font-serif text-lg text-stone-800 leading-tight">Talk to Uni</p>

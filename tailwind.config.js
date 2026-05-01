@@ -8,8 +8,10 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['DM Serif Display', 'Georgia', 'serif'],
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+        serif: ['Raleway', 'Georgia', 'serif'],
+        sans: ['Nunito', 'system-ui', 'sans-serif'],
+        raleway: ['Raleway', 'Georgia', 'serif'],
+        nunito: ['Nunito', 'system-ui', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -41,6 +43,16 @@ module.exports = {
           foreground: 'hsl(var(--destructive-foreground))',
         },
         ring: 'hsl(var(--ring))',
+        // Antaraatma Brand Palette
+        'teal-depth': '#1A6B6B',
+        'sage-forest': '#3A7A5A',
+        'aqua-light': '#5FBDBD',
+        'mint-mist': '#A8D8CE',
+        'sacred-gold': '#C4A052',
+        'warm-pearl': '#F4EFE6',
+        'pale-mist': '#D4EDE8',
+        'deep-night': '#242C2C',
+        // Legacy aliases for backward compat
         gold: 'hsl(var(--gold))',
         earth: 'hsl(var(--earth))',
         sage: 'hsl(var(--sage))',
@@ -56,9 +68,9 @@ module.exports = {
       },
       fontSize: {
         '2xs': ['0.65rem', { lineHeight: '1rem' }],
-        'display-xl': ['clamp(3rem, 6vw, 5.5rem)', { lineHeight: '1.05', letterSpacing: '-0.02em' }],
-        'display-lg': ['clamp(2.25rem, 4vw, 3.75rem)', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-        'display-md': ['clamp(1.75rem, 3vw, 2.5rem)', { lineHeight: '1.15', letterSpacing: '-0.01em' }],
+        'display-xl': ['clamp(3rem, 6vw, 5.5rem)', { lineHeight: '1.05', letterSpacing: '0.04em' }],
+        'display-lg': ['clamp(2.25rem, 4vw, 3.75rem)', { lineHeight: '1.1', letterSpacing: '0.04em' }],
+        'display-md': ['clamp(1.75rem, 3vw, 2.5rem)', { lineHeight: '1.15', letterSpacing: '0.04em' }],
       },
       borderRadius: {
         sm: '2px',
@@ -68,10 +80,10 @@ module.exports = {
         xl: '12px',
       },
       boxShadow: {
-        'card': '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
-        'card-hover': '0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)',
-        'modal': '0 20px 60px rgba(0,0,0,0.15)',
-        'sidebar': '1px 0 0 hsl(35 20% 88%)',
+        'card': '0 1px 3px rgba(26,107,107,0.06), 0 1px 2px rgba(26,107,107,0.04)',
+        'card-hover': '0 4px 12px rgba(26,107,107,0.10), 0 2px 4px rgba(26,107,107,0.06)',
+        'modal': '0 20px 60px rgba(36,44,44,0.15)',
+        'sidebar': '1px 0 0 rgba(168,216,206,0.3)',
       },
       maxWidth: {
         'reading': '68ch',

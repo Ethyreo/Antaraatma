@@ -28,23 +28,23 @@ export default function CheckoutPage() {
   };
 
   return (
-    <main className="bg-[#FAF8F4] min-h-screen">
+    <main style={{ background: '#F4EFE6' }} className="min-h-screen">
       <PublicNav />
       <section className="pt-32 pb-20">
         <div className="editorial-container">
           <div className="max-w-2xl mx-auto">
             <div className="flex items-center gap-3 mb-10">
-              <div className="w-8 h-px bg-amber-700/40" />
+              <div className="w-8 h-px" style={{ background: '#1A6B6B', opacity: 0.4 }} />
               <span className="section-label">Enrollment</span>
             </div>
 
             {step === 'success' ? (
-              <div className="bg-white border border-stone-200/80 rounded-sm p-12 text-center">
-                <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto mb-6">
-                  <Check size={28} className="text-amber-700" />
+              <div className="bg-white rounded-sm p-12 text-center" style={{ border: '1px solid rgba(168,216,206,0.5)' }}>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'rgba(26,107,107,0.08)', border: '1px solid rgba(26,107,107,0.2)' }}>
+                  <Check size={28} style={{ color: '#1A6B6B' }} />
                 </div>
-                <h2 className="font-serif text-2xl text-stone-800 mb-4">Enrollment Confirmed</h2>
-                <p className="text-base font-sans font-light text-stone-500 mb-8">
+                <h2 className="font-serif text-2xl mb-4" style={{ color: '#1A6B6B', fontWeight: 300, letterSpacing: '0.04em' }}>Enrollment Confirmed</h2>
+                <p className="text-base font-sans font-light mb-8" style={{ color: 'rgba(36,44,44,0.5)', fontWeight: 300 }}>
                   Welcome to {program?.title}. Your access has been activated. Check your email for login details.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">

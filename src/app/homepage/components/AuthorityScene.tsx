@@ -37,24 +37,30 @@ export default function AuthorityScene() {
       ref={sectionRef}
       className="relative overflow-hidden"
       style={{
-        background: '#111009',
+        background: '#F4EFE6',
         paddingTop: 'clamp(6rem, 14vw, 11rem)',
         paddingBottom: 'clamp(6rem, 14vw, 11rem)',
       }}
     >
-      {/* Ambient */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse 45% 55% at 92% 25%, rgba(100,110,90,0.03) 0%, transparent 60%)',
-        }}
-      />
+      {/* Botanical line art watermark */}
+      <div className="absolute right-0 top-0 pointer-events-none opacity-[0.06]" aria-hidden="true">
+        <svg width="400" height="600" viewBox="0 0 400 600" fill="none">
+          <path d="M200 580 Q180 500 160 420 Q140 340 180 280 Q220 220 200 140 Q180 60 200 20" stroke="#3A7A5A" strokeWidth="1" fill="none"/>
+          <path d="M200 420 Q160 400 130 370 Q100 340 120 300" stroke="#3A7A5A" strokeWidth="0.8" fill="none"/>
+          <path d="M200 380 Q240 360 260 330 Q280 300 260 270" stroke="#3A7A5A" strokeWidth="0.8" fill="none"/>
+          <path d="M200 300 Q155 285 135 255 Q115 225 140 200" stroke="#3A7A5A" strokeWidth="0.8" fill="none"/>
+          <path d="M200 260 Q245 245 265 215 Q285 185 260 160" stroke="#3A7A5A" strokeWidth="0.8" fill="none"/>
+          <ellipse cx="130" cy="300" rx="30" ry="18" stroke="#3A7A5A" strokeWidth="0.8" transform="rotate(-30 130 300)"/>
+          <ellipse cx="260" cy="270" rx="30" ry="18" stroke="#3A7A5A" strokeWidth="0.8" transform="rotate(30 260 270)"/>
+        </svg>
+      </div>
+
       <div className="editorial-container relative z-10">
         {/* Dr. Vijay header */}
         <div
           className="text-center mb-16 lg:mb-24 pb-16 lg:pb-24"
           style={{
-            borderBottom: '1px solid rgba(255,255,255,0.05)',
+            borderBottom: '1px solid rgba(36,44,44,0.08)',
             opacity: headerVisible ? 1 : 0,
             transform: headerVisible ? 'translateY(0)' : 'translateY(20px)',
             transition: 'opacity 1s ease, transform 1s ease',
@@ -62,7 +68,7 @@ export default function AuthorityScene() {
         >
           <p
             className="text-xs font-sans uppercase tracking-[0.2em] mb-10 inline-block"
-            style={{ color: 'rgba(180,130,55,0.45)' }}
+            style={{ color: 'rgba(26,107,107,0.6)', fontWeight: 600 }}
           >
             About Dr. Vijay
           </p>
@@ -70,9 +76,11 @@ export default function AuthorityScene() {
             className="font-serif text-balance mx-auto"
             style={{
               fontSize: 'clamp(1.9rem, 3.8vw, 3.2rem)',
-              color: 'rgba(232,224,208,0.9)',
-              lineHeight: 1.0,
-              maxWidth: '20ch',
+              color: 'rgba(36,44,44,0.88)',
+              lineHeight: 1.05,
+              fontWeight: 300,
+              letterSpacing: '0.04em',
+              maxWidth: '22ch',
             }}
           >
             12 years of clinical practice.
@@ -81,9 +89,11 @@ export default function AuthorityScene() {
             className="font-serif text-balance mt-1 mx-auto"
             style={{
               fontSize: 'clamp(1.9rem, 3.8vw, 3.2rem)',
-              color: 'rgba(232,224,208,0.18)',
-              lineHeight: 1.0,
-              maxWidth: '20ch',
+              color: 'rgba(36,44,44,0.18)',
+              lineHeight: 1.05,
+              fontWeight: 300,
+              letterSpacing: '0.04em',
+              maxWidth: '22ch',
             }}
           >
             2,400+ students transformed.
@@ -91,7 +101,7 @@ export default function AuthorityScene() {
 
           <p
             className="font-sans font-light leading-relaxed mt-10 mx-auto"
-            style={{ fontSize: '0.9rem', color: 'rgba(232,224,208,0.32)', maxWidth: '56ch' }}
+            style={{ fontSize: '0.9rem', color: 'rgba(36,44,44,0.42)', maxWidth: '56ch', fontWeight: 300 }}
           >
             Dr. Vijay Singla developed a structured healing methodology addressing the physical, emotional, and energetic dimensions of illness — creating lasting transformation rather than temporary relief.
           </p>
@@ -99,7 +109,7 @@ export default function AuthorityScene() {
           {/* Stats */}
           <div
             className="flex items-center justify-center gap-12 mt-12 pt-10"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
+            style={{ borderTop: '1px solid rgba(36,44,44,0.07)' }}
           >
             {[
               { value: '94%', label: 'Completion Rate' },
@@ -109,13 +119,13 @@ export default function AuthorityScene() {
               <div key={stat?.label} className="text-center">
                 <p
                   className="font-serif tabular-nums"
-                  style={{ fontSize: '1.5rem', color: 'rgba(232,224,208,0.62)' }}
+                  style={{ fontSize: '1.5rem', color: '#1A6B6B', fontWeight: 300 }}
                 >
                   {stat?.value}
                 </p>
                 <p
                   className="text-xs font-sans uppercase tracking-widest mt-1"
-                  style={{ color: 'rgba(232,224,208,0.18)' }}
+                  style={{ color: 'rgba(36,44,44,0.3)', fontWeight: 600 }}
                 >
                   {stat?.label}
                 </p>
@@ -129,7 +139,8 @@ export default function AuthorityScene() {
           <p
             className="text-xs font-sans uppercase tracking-[0.2em] mb-16 text-center"
             style={{
-              color: 'rgba(180,130,55,0.45)',
+              color: 'rgba(26,107,107,0.6)',
+              fontWeight: 600,
               opacity: headerVisible ? 1 : 0,
               transition: 'opacity 1s ease 0.2s',
             }}
@@ -137,38 +148,38 @@ export default function AuthorityScene() {
             Student Transformations
           </p>
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ borderTop: '1px solid rgba(36,44,44,0.07)' }}>
             {testimonials?.map((t, i) => (
               <div
                 key={t?.id}
                 className="grid grid-cols-1 lg:grid-cols-12 gap-0 py-12"
                 style={{
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
+                  borderBottom: '1px solid rgba(36,44,44,0.07)',
                   opacity: testimonialVisible[i] ? 1 : 0,
                   transform: testimonialVisible[i] ? 'translateY(0)' : 'translateY(16px)',
                   transition: `opacity 0.8s ease, transform 0.8s ease`,
                 }}
               >
                 <div className="lg:col-span-3 mb-5 lg:mb-0">
-                  <p
-                    className="font-sans font-medium text-sm"
-                    style={{ color: 'rgba(232,224,208,0.45)' }}
-                  >
+                  <p className="font-sans font-medium text-sm" style={{ color: 'rgba(36,44,44,0.55)', fontWeight: 500 }}>
                     {t?.name}
                   </p>
                   {t?.role && (
-                    <p className="text-xs font-sans mt-0.5" style={{ color: 'rgba(232,224,208,0.18)' }}>
+                    <p className="text-xs font-sans mt-0.5" style={{ color: 'rgba(36,44,44,0.28)', fontWeight: 400 }}>
                       {t?.role}
                     </p>
                   )}
                 </div>
                 <div className="lg:col-span-9 lg:pl-12">
+                  {/* Pull quote style — Raleway italic */}
                   <p
                     className="font-serif text-balance leading-relaxed"
                     style={{
                       fontSize: 'clamp(1rem, 1.6vw, 1.28rem)',
-                      color: 'rgba(232,224,208,0.5)',
+                      color: '#1A6B6B',
                       fontStyle: 'italic',
+                      fontWeight: 300,
+                      opacity: 0.7,
                     }}
                   >
                     &ldquo;{t?.content}&rdquo;

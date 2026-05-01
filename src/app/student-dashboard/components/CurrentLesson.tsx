@@ -1,27 +1,31 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Play, CheckCircle, Lock, ChevronRight } from 'lucide-react';
-import { toast } from 'sonner';
-import Icon from '@/components/ui/AppIcon';
+
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
 
 
-// Backend integration point: fetch from /api/student/current-lesson?studentId=current
-const currentModule = {
-  id: 'module-005',
-  title: 'Nutrition & Detoxification',
-  moduleNumber: 5,
-  totalModules: 8,
-  completedLessons: 3,
-  totalLessons: 6,
-  lessons: [
-    { id: 'lesson-5-1', title: 'The Liver as Your Master Detoxifier', duration: '18 min', status: 'completed' },
-    { id: 'lesson-5-2', title: 'Nutritional Foundations of Cellular Cleansing', duration: '22 min', status: 'completed' },
-    { id: 'lesson-5-3', title: 'Foods That Burden vs. Foods That Heal', duration: '26 min', status: 'completed' },
-    { id: 'lesson-5-4', title: 'The 7-Day Gentle Detox Protocol', duration: '31 min', status: 'current' },
-    { id: 'lesson-5-5', title: 'Understanding Herxheimer Reactions', duration: '19 min', status: 'locked' },
-    { id: 'lesson-5-6', title: 'Sustaining Detox Beyond the Program', duration: '24 min', status: 'locked' },
-  ],
-};
+
+interface LessonItem {
+  id: string;
+  title: string;
+  duration: string | null;
+  status: 'completed' | 'current' | 'locked';
+  courseId: string;
+}
+
+interface ModuleData {
+  id: string;
+  title: string;
+  moduleNumber: number;
+  totalModules: number;
+  completedLessons: number;
+  totalLessons: number;
+  lessons: LessonItem[];
+  programId: string;
+}
 
 const statusConfig = {
   completed: { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50', label: 'Completed' },
@@ -30,46 +34,171 @@ const statusConfig = {
 };
 
 export default function CurrentLesson() {
-  const handleContinue = () => {
-    toast.success('Opening lesson player...');
+  const { user } = useAuth();
+  const [moduleData, setModuleData] = useState<ModuleData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+
+    async function fetchCurrentLesson() {
+      try {
+        // Get active enrollment
+        const { data: enrollment } = await supabase
+          .from('enrollments')
+          .select('program_id')
+          .eq('user_id', user.id)
+          .eq('enrollment_status', 'active')
+          .order('enrolled_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (!enrollment) { setLoading(false); return; }
+
+        const programId = enrollment.program_id;
+
+        // Get all modules
+        const { data: modules } = await supabase
+          .from('modules')
+          .select('id, title, sort_order')
+          .eq('program_id', programId)
+          .eq('status', 'published')
+          .order('sort_order', { ascending: true });
+
+        if (!modules?.length) { setLoading(false); return; }
+
+        // Get completed lessons
+        const { data: progressRecords } = await supabase
+          .from('progress_records')
+          .select('lesson_id')
+          .eq('user_id', user.id)
+          .eq('program_id', programId)
+          .eq('is_completed', true);
+
+        const completedIds = new Set(progressRecords?.map((p) => p.lesson_id) ?? []);
+
+        // Find current module (first with incomplete lessons)
+        let currentModuleIdx = 0;
+        for (let i = 0; i < modules.length; i++) {
+          const { data: mLessons } = await supabase
+            .from('lessons')
+            .select('id')
+            .eq('module_id', modules[i].id)
+            .eq('status', 'published');
+          const allDone = mLessons?.every((l) => completedIds.has(l.id));
+          if (!allDone) { currentModuleIdx = i; break; }
+          if (i === modules.length - 1) currentModuleIdx = i;
+        }
+
+        const currentMod = modules[currentModuleIdx];
+
+        // Get lessons for current module
+        const { data: lessons } = await supabase
+          .from('lessons')
+          .select('id, title, duration, sort_order, course_id')
+          .eq('module_id', currentMod.id)
+          .eq('status', 'published')
+          .order('sort_order', { ascending: true });
+
+        let foundCurrent = false;
+        const lessonItems: LessonItem[] = (lessons ?? []).map((l) => {
+          if (completedIds.has(l.id)) {
+            return { id: l.id, title: l.title, duration: l.duration, status: 'completed', courseId: l.course_id };
+          } else if (!foundCurrent) {
+            foundCurrent = true;
+            return { id: l.id, title: l.title, duration: l.duration, status: 'current', courseId: l.course_id };
+          } else {
+            return { id: l.id, title: l.title, duration: l.duration, status: 'locked', courseId: l.course_id };
+          }
+        });
+
+        const completedCount = lessonItems.filter((l) => l.status === 'completed').length;
+
+        setModuleData({
+          id: currentMod.id,
+          title: currentMod.title,
+          moduleNumber: currentModuleIdx + 1,
+          totalModules: modules.length,
+          completedLessons: completedCount,
+          totalLessons: lessonItems.length,
+          lessons: lessonItems,
+          programId,
+        });
+      } catch (err) {
+        console.error('CurrentLesson fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCurrentLesson();
+  }, [user]);
+
+  const handleContinue = async (lesson: LessonItem) => {
+    if (!user || !moduleData) return;
+    try {
+      await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lesson_id: lesson.id,
+          module_id: moduleData.id,
+          course_id: lesson.courseId,
+          program_id: moduleData.programId,
+          action: 'access',
+        }),
+      });
+    } catch (err) {
+      console.error('Access tracking error:', err);
+    }
   };
+
+  if (loading) {
+    return <div className="card-base p-6 animate-pulse bg-stone-100" style={{ height: 300 }} />;
+  }
+
+  if (!moduleData) {
+    return (
+      <div className="card-base p-6 text-center">
+        <p className="text-sm font-sans text-stone-500">No active enrollment. Enroll in a program to start learning.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="card-base overflow-hidden">
-      {/* Header */}
       <div className="p-6 border-b border-stone-100 flex items-start justify-between gap-4">
         <div>
           <p className="section-label mb-1">Continue Learning</p>
-          <h3 className="font-serif text-xl text-stone-900">{currentModule.title}</h3>
+          <h3 className="font-serif text-xl text-stone-900">{moduleData.title}</h3>
           <p className="text-xs font-sans text-stone-500 mt-1">
-            Module {currentModule.moduleNumber} of {currentModule.totalModules} ·{' '}
-            {currentModule.completedLessons}/{currentModule.totalLessons} lessons done
+            Module {moduleData.moduleNumber} of {moduleData.totalModules} ·{' '}
+            {moduleData.completedLessons}/{moduleData.totalLessons} lessons done
           </p>
         </div>
         <div className="text-right shrink-0">
           <div className="w-12 h-12 rounded-full bg-stone-50 flex items-center justify-center">
             <span className="font-serif text-sm text-stone-700 tabular-nums">
-              {Math.round((currentModule.completedLessons / currentModule.totalLessons) * 100)}%
+              {moduleData.totalLessons > 0 ? Math.round((moduleData.completedLessons / moduleData.totalLessons) * 100) : 0}%
             </span>
           </div>
         </div>
       </div>
 
-      {/* Module progress bar */}
       <div className="px-6 py-3 bg-stone-50 border-b border-stone-100">
         <div className="w-full bg-stone-200 rounded-full h-1">
           <div
             className="bg-amber-600 h-1 rounded-full transition-all duration-700"
-            style={{ width: `${(currentModule.completedLessons / currentModule.totalLessons) * 100}%` }}
+            style={{ width: `${moduleData.totalLessons > 0 ? (moduleData.completedLessons / moduleData.totalLessons) * 100 : 0}%` }}
           />
         </div>
       </div>
 
-      {/* Lessons list */}
       <div className="divide-y divide-stone-100">
-        {currentModule.lessons.map((lesson) => {
-          const config = statusConfig[lesson.status as keyof typeof statusConfig];
-          const Icon = config.icon;
+        {moduleData.lessons.map((lesson) => {
+          const config = statusConfig[lesson.status];
+          const LessonIcon = config.icon;
           const isCurrent = lesson.status === 'current';
 
           return (
@@ -80,22 +209,23 @@ export default function CurrentLesson() {
               }`}
             >
               <div className={`w-8 h-8 rounded-full ${config.bg} flex items-center justify-center shrink-0`}>
-                <Icon size={14} className={config.color} />
+                <LessonIcon size={14} className={config.color} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-sans font-500 truncate ${isCurrent ? 'text-amber-900' : 'text-stone-700'}`}>
                   {lesson.title}
                 </p>
-                <p className="text-xs font-sans text-stone-400 mt-0.5">{lesson.duration}</p>
+                {lesson.duration && <p className="text-xs font-sans text-stone-400 mt-0.5">{lesson.duration}</p>}
               </div>
               {isCurrent && (
-                <button
-                  onClick={handleContinue}
+                <Link
+                  href="/progress-tracking"
+                  onClick={() => handleContinue(lesson)}
                   className="shrink-0 flex items-center gap-1.5 bg-amber-800 text-amber-50 px-3 py-1.5 text-xs font-sans font-500 rounded-sm hover:bg-amber-900 transition-colors active:scale-95"
                 >
                   Continue
                   <ChevronRight size={12} />
-                </button>
+                </Link>
               )}
               {lesson.status === 'completed' && (
                 <span className="text-2xs font-sans text-green-600 shrink-0">Done</span>

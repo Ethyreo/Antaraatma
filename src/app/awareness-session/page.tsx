@@ -5,6 +5,7 @@ import PublicFooter from '@/components/PublicFooter';
 import { getProgramById, getModulesByProgram, getFeaturedTestimonials, getFAQsByProgram } from '@/lib/data/mockData';
 import { ArrowRight, Check, ChevronDown, ChevronUp } from 'lucide-react';
 
+
 export default function AwarenessSessionPage() {
   const program = getProgramById('prog-awareness');
   const modules = getModulesByProgram('prog-awareness');
@@ -14,13 +15,43 @@ export default function AwarenessSessionPage() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Backend integration point: POST /api/leads — create lead record
-    await new Promise(r => setTimeout(r, 1200));
+    setSubmitError(null);
+
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || null,
+          source: 'Awareness Session',
+          lead_status: 'new',
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setSubmitError('Registration failed: ' + (result.error || 'Unknown error'));
+        setLoading(false);
+        return;
+      }
+
+      console.log('[AwarenessSession] Lead inserted successfully:', result.data);
+    } catch (err) {
+      console.error('[AwarenessSession] Unexpected error:', err);
+      setSubmitError('An unexpected error occurred. Please try again.');
+      setLoading(false);
+      return;
+    }
+
     setLoading(false);
     setSubmitted(true);
   };
@@ -28,22 +59,22 @@ export default function AwarenessSessionPage() {
   if (!program) return null;
 
   return (
-    <main className="bg-[#FAF8F4] min-h-screen">
+    <main style={{ background: '#F4EFE6' }} className="min-h-screen">
       <PublicNav />
 
       {/* Hero */}
-      <section className="pt-32 pb-20 bg-[#FAF8F4]">
+      <section className="pt-32 pb-20" style={{ background: '#F4EFE6' }}>
         <div className="editorial-container">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
             <div className="lg:col-span-7">
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-8 h-px bg-amber-700/40" />
+                <div className="w-8 h-px" style={{ background: '#1A6B6B', opacity: 0.4 }} />
                 <span className="section-label">Free · 1 Hour · Online</span>
               </div>
-              <h1 className="font-serif text-display-lg text-stone-900 text-balance leading-[1.08] mb-8">
+              <h1 className="font-serif text-display-lg text-balance leading-[1.08] mb-8" style={{ color: '#1A6B6B', fontWeight: 300, letterSpacing: '0.04em' }}>
                 The Awareness Session
               </h1>
-              <p className="text-lg font-sans font-light text-stone-500 leading-relaxed max-w-prose mb-10 text-balance">
+              <p className="text-lg font-sans font-light leading-relaxed max-w-prose mb-10 text-balance" style={{ color: 'rgba(36,44,44,0.55)', fontWeight: 300 }}>
                 A free, live 1-hour session with Dr. Vijay Singla. Understand why your body holds illness, discover your primary healing blocks, and receive a personalised next-step recommendation.
               </p>
               <div className="flex flex-wrap gap-6 mb-10">
@@ -54,8 +85,8 @@ export default function AwarenessSessionPage() {
                   'Limited seats',
                 ].map(item => (
                   <div key={item} className="flex items-center gap-2">
-                    <Check size={14} className="text-amber-700" />
-                    <span className="text-sm font-sans text-stone-600">{item}</span>
+                    <Check size={14} style={{ color: '#1A6B6B' }} />
+                    <span className="text-sm font-sans" style={{ color: 'rgba(36,44,44,0.65)', fontWeight: 400 }}>{item}</span>
                   </div>
                 ))}
               </div>
@@ -63,65 +94,46 @@ export default function AwarenessSessionPage() {
 
             {/* Lead Capture Form */}
             <div className="lg:col-span-5">
-              <div className="bg-white border border-stone-200 rounded-sm p-8 shadow-card">
+              <div className="bg-white rounded-sm p-8 shadow-card" style={{ border: '1px solid rgba(168,216,206,0.5)' }}>
                 {submitted ? (
                   <div className="text-center py-8">
-                    <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto mb-6">
-                      <Check size={24} className="text-amber-700" />
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'rgba(26,107,107,0.08)', border: '1px solid rgba(26,107,107,0.2)' }}>
+                      <Check size={24} style={{ color: '#1A6B6B' }} />
                     </div>
-                    <h3 className="font-serif text-xl text-stone-800 mb-3">You&apos;re registered</h3>
-                    <p className="text-sm font-sans font-light text-stone-500 leading-relaxed">
+                    <h3 className="font-serif text-xl mb-3" style={{ color: '#1A6B6B', fontWeight: 300 }}>You&apos;re registered</h3>
+                    <p className="text-sm font-sans font-light leading-relaxed" style={{ color: 'rgba(36,44,44,0.5)', fontWeight: 300 }}>
                       Check your email for session details. We look forward to seeing you.
                     </p>
                   </div>
                 ) : (
                   <>
-                    <h3 className="font-serif text-xl text-stone-800 mb-2">Reserve your seat</h3>
-                    <p className="text-sm font-sans font-light text-stone-500 mb-6">Next session: 12 April 2026 · Online</p>
+                    <h3 className="font-serif text-xl mb-2" style={{ color: '#1A6B6B', fontWeight: 300 }}>Reserve your seat</h3>
+                    <p className="text-sm font-sans font-light mb-6" style={{ color: 'rgba(36,44,44,0.45)', fontWeight: 300 }}>Next session: 12 April 2026 · Online</p>
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
-                        <label className="block text-xs font-sans font-medium text-stone-700 mb-1.5">Full name</label>
-                        <input
-                          type="text"
-                          required
-                          className="input-base"
-                          placeholder="Your full name"
-                          value={formData.name}
-                          onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
-                        />
+                        <label className="block text-xs font-sans mb-1.5" style={{ color: '#242C2C', fontWeight: 500 }}>Full name</label>
+                        <input type="text" required className="input-base" placeholder="Your full name" value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))} />
                       </div>
                       <div>
-                        <label className="block text-xs font-sans font-medium text-stone-700 mb-1.5">Email address</label>
-                        <input
-                          type="email"
-                          required
-                          className="input-base"
-                          placeholder="you@example.com"
-                          value={formData.email}
-                          onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
-                        />
+                        <label className="block text-xs font-sans mb-1.5" style={{ color: '#242C2C', fontWeight: 500 }}>Email address</label>
+                        <input type="email" required className="input-base" placeholder="you@example.com" value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))} />
                       </div>
                       <div>
-                        <label className="block text-xs font-sans font-medium text-stone-700 mb-1.5">
-                          Phone <span className="text-stone-400 font-normal">(optional)</span>
+                        <label className="block text-xs font-sans mb-1.5" style={{ color: '#242C2C', fontWeight: 500 }}>
+                          Phone <span style={{ color: 'rgba(36,44,44,0.4)', fontWeight: 400 }}>(optional)</span>
                         </label>
-                        <input
-                          type="tel"
-                          className="input-base"
-                          placeholder="+91 98765 43210"
-                          value={formData.phone}
-                          onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))}
-                        />
+                        <input type="tel" className="input-base" placeholder="+91 98765 43210" value={formData.phone} onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))} />
                       </div>
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full btn-primary justify-center py-3.5 disabled:opacity-60"
-                      >
+                      <button type="submit" disabled={loading} className="w-full btn-primary justify-center py-3.5 disabled:opacity-60">
                         {loading ? 'Registering...' : 'Reserve My Seat — Free'}
                         {!loading && <ArrowRight size={15} />}
                       </button>
-                      <p className="text-xs font-sans text-stone-400 text-center">Free · No credit card · Cancel anytime</p>
+                      {submitError && (
+                        <p className="text-xs font-sans text-center px-3 py-2 rounded-sm" style={{ color: '#c0392b', background: 'rgba(192,57,43,0.06)', border: '1px solid rgba(192,57,43,0.2)' }}>
+                          {submitError}
+                        </p>
+                      )}
+                      <p className="text-xs font-sans text-center" style={{ color: 'rgba(36,44,44,0.35)', fontWeight: 400 }}>Free · No credit card · Cancel anytime</p>
                     </form>
                   </>
                 )}
@@ -132,21 +144,21 @@ export default function AwarenessSessionPage() {
       </section>
 
       {/* What Naturopathy Means */}
-      <section className="py-20 bg-stone-50 border-y border-stone-200/60">
+      <section className="py-20" style={{ background: '#D4EDE8', borderTop: '1px solid rgba(26,107,107,0.1)', borderBottom: '1px solid rgba(26,107,107,0.1)' }}>
         <div className="editorial-container">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-8 h-px bg-amber-700/40" />
+              <div className="w-8 h-px" style={{ background: '#1A6B6B', opacity: 0.4 }} />
               <span className="section-label">What is Naturopathy</span>
             </div>
-            <h2 className="font-serif text-display-md text-stone-900 text-balance leading-[1.1] mb-8">
+            <h2 className="font-serif text-display-md text-balance leading-[1.1] mb-8" style={{ color: '#1A6B6B', fontWeight: 300, letterSpacing: '0.04em' }}>
               Not alternative medicine.<br />
-              <span className="text-stone-500">Root-cause medicine.</span>
+              <span style={{ color: 'rgba(26,107,107,0.35)' }}>Root-cause medicine.</span>
             </h2>
-            <p className="text-base font-sans font-light text-stone-500 leading-relaxed mb-6">
+            <p className="text-base font-sans font-light leading-relaxed mb-6" style={{ color: 'rgba(36,44,44,0.55)', fontWeight: 300 }}>
               Naturopathy is a system of healthcare that works with the body&apos;s innate healing intelligence — not against it. Rather than suppressing symptoms, it asks why the body is creating them.
             </p>
-            <p className="text-base font-sans font-light text-stone-500 leading-relaxed">
+            <p className="text-base font-sans font-light leading-relaxed" style={{ color: 'rgba(36,44,44,0.55)', fontWeight: 300 }}>
               Using nutrition, breathwork, lifestyle modification, and energetic practices, naturopathy addresses the physical, emotional, and energetic layers of illness simultaneously — creating conditions for genuine, lasting healing.
             </p>
           </div>
@@ -154,20 +166,20 @@ export default function AwarenessSessionPage() {
       </section>
 
       {/* Session Curriculum */}
-      <section className="py-24 bg-[#FAF8F4]">
+      <section className="py-24" style={{ background: '#F4EFE6' }}>
         <div className="editorial-container">
           <div className="flex items-center gap-3 mb-12">
-            <div className="w-8 h-px bg-amber-700/40" />
+            <div className="w-8 h-px" style={{ background: '#1A6B6B', opacity: 0.4 }} />
             <span className="section-label">Session Curriculum</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {modules.map((mod, i) => (
-              <div key={mod.id} className="bg-white border border-stone-200/80 rounded-sm p-8">
-                <span className="font-serif text-3xl text-stone-200 block mb-4">{String(i + 1).padStart(2, '0')}</span>
-                <h3 className="font-serif text-lg text-stone-800 mb-3">{mod.title}</h3>
-                <p className="text-sm font-sans font-light text-stone-500 leading-relaxed">{mod.description}</p>
+              <div key={mod.id} className="bg-white rounded-sm p-8" style={{ border: '1px solid rgba(168,216,206,0.5)' }}>
+                <span className="font-serif text-3xl block mb-4" style={{ color: 'rgba(26,107,107,0.15)', fontWeight: 300 }}>{String(i + 1).padStart(2, '0')}</span>
+                <h3 className="font-serif text-lg mb-3" style={{ color: '#1A6B6B', fontWeight: 300, letterSpacing: '0.04em' }}>{mod.title}</h3>
+                <p className="text-sm font-sans font-light leading-relaxed" style={{ color: 'rgba(36,44,44,0.5)', fontWeight: 300 }}>{mod.description}</p>
                 {mod.focusArea && (
-                  <span className="inline-block mt-4 text-2xs font-sans font-medium text-amber-700 uppercase tracking-widest bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-sm">{mod.focusArea}</span>
+                  <span className="inline-block mt-4 text-2xs font-sans uppercase tracking-widest px-2 py-0.5 rounded-sm" style={{ color: '#3A7A5A', background: 'rgba(58,122,90,0.08)', border: '1px solid rgba(58,122,90,0.2)', fontWeight: 600 }}>{mod.focusArea}</span>
                 )}
               </div>
             ))}
@@ -176,34 +188,36 @@ export default function AwarenessSessionPage() {
       </section>
 
       {/* Takeaways */}
-      <section className="py-20 bg-stone-50 border-t border-stone-200/60">
+      <section className="py-20" style={{ background: '#D4EDE8', borderTop: '1px solid rgba(26,107,107,0.1)' }}>
         <div className="editorial-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-8 h-px bg-amber-700/40" />
+                <div className="w-8 h-px" style={{ background: '#1A6B6B', opacity: 0.4 }} />
                 <span className="section-label">What You Will Leave With</span>
               </div>
-              <h2 className="font-serif text-display-md text-stone-900 text-balance leading-[1.1] mb-8">
+              <h2 className="font-serif text-display-md text-balance leading-[1.1] mb-8" style={{ color: '#1A6B6B', fontWeight: 300, letterSpacing: '0.04em' }}>
                 One hour. Lasting clarity.
               </h2>
               <div className="space-y-4">
                 {program.outcomes.map(outcome => (
                   <div key={outcome} className="flex items-start gap-4">
-                    <div className="w-5 h-5 rounded-sm bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0 mt-0.5">
-                      <Check size={11} className="text-amber-700" />
+                    <div className="w-5 h-5 rounded-sm flex items-center justify-center shrink-0 mt-0.5" style={{ background: 'rgba(26,107,107,0.08)', border: '1px solid rgba(26,107,107,0.2)' }}>
+                      <Check size={11} style={{ color: '#1A6B6B' }} />
                     </div>
-                    <p className="text-base font-sans font-light text-stone-600 leading-relaxed">{outcome}</p>
+                    <p className="text-base font-sans font-light leading-relaxed" style={{ color: 'rgba(36,44,44,0.65)', fontWeight: 300 }}>{outcome}</p>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="bg-white border border-stone-200/80 rounded-sm p-10">
-              <p className="font-serif text-xl text-stone-800 mb-6 text-balance leading-snug">
+            {/* Pull quote card — Style 01 Dark Teal */}
+            <div className="rounded-sm p-10" style={{ background: '#1A6B6B' }}>
+              <div className="w-10 h-px mb-6" style={{ background: '#C4A052', opacity: 0.7 }} />
+              <p className="font-serif text-xl text-balance leading-snug mb-6" style={{ color: '#F4EFE6', fontStyle: 'italic', fontWeight: 300 }}>
                 &ldquo;The Awareness Session gave me more clarity about my health in one hour than years of doctor visits.&rdquo;
               </p>
-              <p className="text-sm font-sans font-medium text-stone-600">Meena Joshi</p>
-              <p className="text-xs font-sans text-stone-400 mt-0.5">Awareness Session Attendee</p>
+              <p className="text-sm font-sans" style={{ color: 'rgba(244,239,230,0.7)', fontWeight: 500 }}>Meena Joshi</p>
+              <p className="text-xs font-sans mt-0.5" style={{ color: 'rgba(244,239,230,0.4)', fontWeight: 400 }}>Awareness Session Attendee</p>
             </div>
           </div>
         </div>

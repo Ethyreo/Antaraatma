@@ -1,323 +1,564 @@
 'use client';
-import React, { useState } from 'react';
-import { ChevronRight, Plus, Edit2, Eye, Trash2, GripVertical, Video, FileText, ToggleRight, ToggleLeft } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ChevronRight, Plus, Trash2, GripVertical, Video, FileText, ToggleRight, ToggleLeft, X, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { createClient } from '@/lib/supabase/client';
 
-// Backend integration point: fetch from /api/admin/programs/:programId/modules
-const moduleData: Record<string, {
+interface LessonRow {
   id: string;
   title: string;
-  order: number;
+  duration: string | null;
   status: string;
-  lessonsCount: number;
-  duration: string;
-  lessons: { id: string; title: string; type: string; duration: string; status: string; order: number }[];
-}[]> = {
-  'prog-foundation': [
-    {
-      id: 'mod-f1', title: 'Introduction to Naturopathy', order: 1, status: 'published', lessonsCount: 4, duration: '62 min',
-      lessons: [
-        { id: 'les-f1-1', title: 'What is Naturopathy?', type: 'video', duration: '14 min', status: 'published', order: 1 },
-        { id: 'les-f1-2', title: 'The Six Principles of Naturopathic Medicine', type: 'video', duration: '18 min', status: 'published', order: 2 },
-        { id: 'les-f1-3', title: 'Understanding Your Body Constitution', type: 'video', duration: '16 min', status: 'published', order: 3 },
-        { id: 'les-f1-4', title: 'Module 1 Assessment', type: 'resource', duration: '14 min', status: 'published', order: 4 },
-      ],
-    },
-    {
-      id: 'mod-f2', title: 'Gut Health & Microbiome', order: 2, status: 'published', lessonsCount: 5, duration: '88 min',
-      lessons: [
-        { id: 'les-f2-1', title: 'The Gut as Your Second Brain', type: 'video', duration: '21 min', status: 'published', order: 1 },
-        { id: 'les-f2-2', title: 'Mapping Your Microbiome', type: 'video', duration: '19 min', status: 'published', order: 2 },
-        { id: 'les-f2-3', title: 'Foods That Heal the Gut Lining', type: 'video', duration: '22 min', status: 'published', order: 3 },
-        { id: 'les-f2-4', title: 'Gut Healing 30-Day Protocol', type: 'resource', duration: '15 min', status: 'published', order: 4 },
-        { id: 'les-f2-5', title: 'Module 2 Assessment', type: 'resource', duration: '11 min', status: 'published', order: 5 },
-      ],
-    },
-    {
-      id: 'mod-f3', title: 'Sleep & Circadian Healing', order: 3, status: 'published', lessonsCount: 4, duration: '72 min',
-      lessons: [
-        { id: 'les-f3-1', title: 'The Healing Window: 10pm–2am', type: 'video', duration: '17 min', status: 'published', order: 1 },
-        { id: 'les-f3-2', title: 'Cortisol, Melatonin, and Sleep Architecture', type: 'video', duration: '24 min', status: 'published', order: 2 },
-        { id: 'les-f3-3', title: 'Sleep Optimisation Protocol', type: 'resource', duration: '18 min', status: 'published', order: 3 },
-        { id: 'les-f3-4', title: 'Module 3 Assessment', type: 'resource', duration: '13 min', status: 'published', order: 4 },
-      ],
-    },
-    {
-      id: 'mod-f4', title: 'Movement as Medicine', order: 4, status: 'published', lessonsCount: 4, duration: '68 min',
-      lessons: [
-        { id: 'les-f4-1', title: 'Why Conventional Exercise Often Harms', type: 'video', duration: '16 min', status: 'published', order: 1 },
-        { id: 'les-f4-2', title: 'Lymphatic Movement Practices', type: 'video', duration: '20 min', status: 'published', order: 2 },
-        { id: 'les-f4-3', title: 'Morning Movement Sequence (Video Practice)', type: 'video', duration: '22 min', status: 'published', order: 3 },
-        { id: 'les-f4-4', title: 'Module 4 Assessment', type: 'resource', duration: '10 min', status: 'published', order: 4 },
-      ],
-    },
-    {
-      id: 'mod-f5', title: 'Nutrition & Detoxification', order: 5, status: 'published', lessonsCount: 6, duration: '140 min',
-      lessons: [
-        { id: 'les-f5-1', title: 'The Liver as Your Master Detoxifier', type: 'video', duration: '18 min', status: 'published', order: 1 },
-        { id: 'les-f5-2', title: 'Nutritional Foundations of Cellular Cleansing', type: 'video', duration: '22 min', status: 'published', order: 2 },
-        { id: 'les-f5-3', title: 'Foods That Burden vs. Foods That Heal', type: 'video', duration: '26 min', status: 'published', order: 3 },
-        { id: 'les-f5-4', title: 'The 7-Day Gentle Detox Protocol', type: 'video', duration: '31 min', status: 'published', order: 4 },
-        { id: 'les-f5-5', title: 'Understanding Herxheimer Reactions', type: 'video', duration: '19 min', status: 'draft', order: 5 },
-        { id: 'les-f5-6', title: 'Sustaining Detox Beyond the Program', type: 'video', duration: '24 min', status: 'draft', order: 6 },
-      ],
-    },
-    {
-      id: 'mod-f6', title: 'Mental Clarity & Emotional Healing', order: 6, status: 'draft', lessonsCount: 5, duration: '0 min',
-      lessons: [],
-    },
-    {
-      id: 'mod-f7', title: 'Hormonal Balance', order: 7, status: 'draft', lessonsCount: 5, duration: '0 min',
-      lessons: [],
-    },
-    {
-      id: 'mod-f8', title: 'Final Integration & Certification', order: 8, status: 'draft', lessonsCount: 3, duration: '0 min',
-      lessons: [],
-    },
-  ],
-  'prog-awareness': [
-    {
-      id: 'mod-a1', title: 'Awareness Session — Live Program', order: 1, status: 'published', lessonsCount: 1, duration: '90 min',
-      lessons: [
-        { id: 'les-a1-1', title: 'Live Awareness Session with Dr. Vijay', type: 'video', duration: '90 min', status: 'published', order: 1 },
-      ],
-    },
-  ],
-  'prog-mastery': [
-    {
-      id: 'mod-m1', title: 'Mastery Foundation & Orientation', order: 1, status: 'published', lessonsCount: 4, duration: '80 min',
-      lessons: [
-        { id: 'les-m1-1', title: 'The Mastery Pathway Overview', type: 'video', duration: '22 min', status: 'published', order: 1 },
-        { id: 'les-m1-2', title: 'Your Personal Healing Assessment', type: 'resource', duration: '30 min', status: 'published', order: 2 },
-        { id: 'les-m1-3', title: '1:1 Intake Consultation', type: 'video', duration: '16 min', status: 'published', order: 3 },
-        { id: 'les-m1-4', title: 'Setting Your Healing Intentions', type: 'resource', duration: '12 min', status: 'published', order: 4 },
-      ],
-    },
-  ],
-};
+  sort_order: number;
+  video_url: string | null;
+}
 
-const lessonTypeConfig = {
-  video: { icon: Video, color: 'text-blue-500 bg-blue-50' },
-  resource: { icon: FileText, color: 'text-amber-600 bg-amber-50' },
-};
-
-const statusBadge: Record<string, string> = {
-  published: 'bg-green-100 text-green-700',
-  draft: 'bg-stone-100 text-stone-600',
-};
+interface ModuleRow {
+  id: string;
+  title: string;
+  sort_order: number;
+  status: string;
+  lessons: LessonRow[];
+}
 
 interface Props {
   programId: string;
 }
 
+const statusBadge: Record<string, string> = {
+  published: 'bg-green-100 text-green-700',
+  draft: 'bg-stone-100 text-stone-600',
+  archived: 'bg-red-100 text-red-600',
+};
+
 export default function ModuleTree({ programId }: Props) {
-  const modules = moduleData[programId] ?? [];
-  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set(['mod-f5']));
-  const [lessonStatuses, setLessonStatuses] = useState<Record<string, string>>(() => {
-    const map: Record<string, string> = {};
-    modules.forEach((m) => m.lessons.forEach((l) => { map[l.id] = l.status; }));
-    return map;
-  });
+  const [modules, setModules] = useState<ModuleRow[]>([]);
+  const [programTitle, setProgramTitle] = useState('Program');
+  const [courseId, setCourseId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+  const [lessonStatuses, setLessonStatuses] = useState<Record<string, string>>({});
+
+  // Add Module Modal
+  const [showAddModule, setShowAddModule] = useState(false);
+  const [moduleForm, setModuleForm] = useState({ title: '', description: '', focus_area: '', status: 'draft' });
+  const [savingModule, setSavingModule] = useState(false);
+  const [moduleError, setModuleError] = useState('');
+
+  // Add Lesson Modal
+  const [showAddLesson, setShowAddLesson] = useState(false);
+  const [addLessonModuleId, setAddLessonModuleId] = useState<string | null>(null);
+  const [lessonForm, setLessonForm] = useState({ title: '', description: '', duration: '', video_url: '', status: 'draft' });
+  const [savingLesson, setSavingLesson] = useState(false);
+  const [lessonError, setLessonError] = useState('');
+
+  const fetchModules = async () => {
+    if (!programId) return;
+    setLoading(true);
+    const supabase = createClient();
+    try {
+      const { data: prog } = await supabase
+        .from('programs')
+        .select('title')
+        .eq('id', programId)
+        .maybeSingle();
+      if (prog) setProgramTitle(prog.title);
+
+      // Get first course for this program (needed for module/lesson creation)
+      const { data: courses } = await supabase
+        .from('courses')
+        .select('id')
+        .eq('program_id', programId)
+        .order('sort_order', { ascending: true })
+        .limit(1);
+      if (courses?.[0]) setCourseId(courses[0].id);
+
+      const { data: mods } = await supabase
+        .from('modules')
+        .select('id, title, sort_order, status')
+        .eq('program_id', programId)
+        .order('sort_order', { ascending: true });
+
+      if (!mods) { setLoading(false); return; }
+
+      const { data: allLessons } = await supabase
+        .from('lessons')
+        .select('id, title, duration, status, sort_order, video_url, module_id')
+        .eq('program_id', programId)
+        .order('sort_order', { ascending: true });
+
+      const lessonsByModule: Record<string, LessonRow[]> = {};
+      (allLessons ?? []).forEach((l: any) => {
+        if (!lessonsByModule[l.module_id]) lessonsByModule[l.module_id] = [];
+        lessonsByModule[l.module_id].push(l);
+      });
+
+      const enriched: ModuleRow[] = mods.map((m) => ({
+        ...m,
+        lessons: lessonsByModule[m.id] ?? [],
+      }));
+
+      setModules(enriched);
+
+      const statusMap: Record<string, string> = {};
+      (allLessons ?? []).forEach((l: any) => { statusMap[l.id] = l.status; });
+      setLessonStatuses(statusMap);
+
+      if (enriched.length > 0) {
+        setExpandedModules(new Set([enriched[0].id]));
+      }
+    } catch (err) {
+      console.error('ModuleTree fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchModules();
+  }, [programId]);
 
   const toggleModule = (id: string) => {
     setExpandedModules((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
   };
 
-  const toggleLessonStatus = (id: string, title: string) => {
-    setLessonStatuses((prev) => {
-      const next = prev[id] === 'published' ? 'draft' : 'published';
+  const toggleLessonStatus = async (id: string, title: string) => {
+    const supabase = createClient();
+    const next = lessonStatuses[id] === 'published' ? 'draft' : 'published';
+    try {
+      const { error } = await supabase.from('lessons').update({ status: next }).eq('id', id);
+      if (error) throw error;
+      setLessonStatuses((prev) => ({ ...prev, [id]: next }));
       toast.success(`"${title}" set to ${next}`);
-      return { ...prev, [id]: next };
-    });
+    } catch {
+      toast.error('Failed to update lesson status');
+    }
   };
 
-  const programTitle = {
-    'prog-foundation': 'Foundation Course',
-    'prog-awareness': 'Awareness Session',
-    'prog-mastery': 'Transformation Mastery',
-  }[programId] ?? 'Program';
+  const handleAddModule = async () => {
+    if (!moduleForm.title.trim()) { setModuleError('Title is required.'); return; }
+    if (!courseId) { setModuleError('No course found for this program. Create a course first.'); return; }
+    setSavingModule(true);
+    setModuleError('');
+    try {
+      const res = await fetch('/api/modules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: moduleForm.title,
+          description: moduleForm.description,
+          focus_area: moduleForm.focus_area || null,
+          program_id: programId,
+          course_id: courseId,
+          sort_order: modules.length,
+          status: moduleForm.status,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        setModuleError(json.error || 'Failed to create module.');
+      } else {
+        toast.success(`Module "${moduleForm.title}" created!`);
+        setShowAddModule(false);
+        setModuleForm({ title: '', description: '', focus_area: '', status: 'draft' });
+        await fetchModules();
+      }
+    } catch {
+      setModuleError('Network error. Please try again.');
+    } finally {
+      setSavingModule(false);
+    }
+  };
+
+  const handleDeleteModule = async (id: string, title: string) => {
+    if (!confirm(`Delete module "${title}"? All lessons inside will also be deleted.`)) return;
+    try {
+      const res = await fetch(`/api/modules?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setModules(prev => prev.filter(m => m.id !== id));
+        toast.success(`Module "${title}" deleted.`);
+      }
+    } catch {
+      toast.error('Failed to delete module.');
+    }
+  };
+
+  const openAddLesson = (moduleId: string) => {
+    setAddLessonModuleId(moduleId);
+    setLessonForm({ title: '', description: '', duration: '', video_url: '', status: 'draft' });
+    setLessonError('');
+    setShowAddLesson(true);
+  };
+
+  const handleAddLesson = async () => {
+    if (!lessonForm.title.trim()) { setLessonError('Title is required.'); return; }
+    if (!addLessonModuleId || !courseId) { setLessonError('Module or course not found.'); return; }
+    setSavingLesson(true);
+    setLessonError('');
+    try {
+      const mod = modules.find(m => m.id === addLessonModuleId);
+      const sortOrder = mod?.lessons.length ?? 0;
+      const res = await fetch('/api/lessons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: lessonForm.title,
+          description: lessonForm.description,
+          duration: lessonForm.duration || null,
+          video_url: lessonForm.video_url || null,
+          module_id: addLessonModuleId,
+          course_id: courseId,
+          program_id: programId,
+          sort_order: sortOrder,
+          status: lessonForm.status,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        setLessonError(json.error || 'Failed to create lesson.');
+      } else {
+        toast.success(`Lesson "${lessonForm.title}" created!`);
+        setShowAddLesson(false);
+        setAddLessonModuleId(null);
+        await fetchModules();
+      }
+    } catch {
+      setLessonError('Network error. Please try again.');
+    } finally {
+      setSavingLesson(false);
+    }
+  };
+
+  const handleDeleteLesson = async (id: string, title: string) => {
+    if (!confirm(`Delete lesson "${title}"?`)) return;
+    try {
+      const res = await fetch(`/api/lessons?id=${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setModules(prev => prev.map(m => ({
+          ...m,
+          lessons: m.lessons.filter(l => l.id !== id),
+        })));
+        toast.success(`Lesson "${title}" deleted.`);
+      }
+    } catch {
+      toast.error('Failed to delete lesson.');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="card-base overflow-hidden">
+        <div className="p-5 border-b border-stone-100 animate-pulse">
+          <div className="h-4 bg-stone-200 rounded w-1/3 mb-2" />
+          <div className="h-3 bg-stone-100 rounded w-1/4" />
+        </div>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-3 px-5 py-4 border-b border-stone-100 animate-pulse">
+            <div className="h-4 bg-stone-200 rounded flex-1" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div className="card-base overflow-hidden">
-      {/* Header */}
-      <div className="p-5 border-b border-stone-100 flex items-center justify-between bg-amber-50/30">
-        <div>
-          <p className="section-label mb-0.5">Module & Lesson Tree</p>
-          <p className="font-serif text-base text-stone-900">{programTitle}</p>
-          <p className="text-xs font-sans text-stone-500 mt-0.5">{modules.length} modules · Click to expand lessons</p>
+    <>
+      <div className="card-base overflow-hidden">
+        <div className="p-5 border-b border-stone-100 flex items-center justify-between bg-amber-50/30">
+          <div>
+            <p className="section-label mb-0.5">Module & Lesson Tree</p>
+            <p className="font-serif text-base text-stone-900">{programTitle}</p>
+            <p className="text-xs font-sans text-stone-500 mt-0.5">{modules.length} modules · Click to expand lessons</p>
+          </div>
+          <button
+            className="flex items-center gap-1.5 bg-amber-800 text-amber-50 text-xs font-sans font-500 px-3 py-1.5 rounded-sm hover:bg-amber-900 transition-all active:scale-95"
+            onClick={() => { setShowAddModule(true); setModuleError(''); }}
+          >
+            <Plus size={12} />
+            Add Module
+          </button>
         </div>
-        <button
-          className="flex items-center gap-1.5 bg-amber-800 text-amber-50 text-xs font-sans font-500 px-3 py-1.5 rounded-sm hover:bg-amber-900 transition-all active:scale-95"
-          onClick={() => toast.success('Opening new module form...')}
-        >
-          <Plus size={12} />
-          Add Module
-        </button>
-      </div>
 
-      {/* Module list */}
-      <div className="divide-y divide-stone-100">
-        {modules.map((mod) => {
-          const isExpanded = expandedModules.has(mod.id);
-          return (
-            <div key={mod.id}>
-              {/* Module row */}
-              <div
-                className={`flex items-center gap-3 px-5 py-4 cursor-pointer transition-colors group ${
-                  isExpanded ? 'bg-amber-50/40' : 'hover:bg-stone-50'
-                }`}
-                onClick={() => toggleModule(mod.id)}
-              >
-                <GripVertical size={14} className="text-stone-300 cursor-grab shrink-0" />
-                <ChevronRight
-                  size={14}
-                  className={`text-amber-600 transition-transform shrink-0 ${isExpanded ? 'rotate-90' : ''}`}
-                />
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-sans font-600 text-stone-400 tabular-nums w-5">
-                    {String(mod.order).padStart(2, '0')}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-sans font-500 text-stone-800">{mod.title}</p>
-                  <p className="text-xs font-sans text-stone-400 mt-0.5">
-                    {mod.lessonsCount} lessons
-                    {mod.duration !== '0 min' && ` · ${mod.duration}`}
-                  </p>
-                </div>
-                <span className={`status-badge ${statusBadge[mod.status] ?? 'bg-stone-100 text-stone-600'} shrink-0`}>
-                  {mod.status}
-                </span>
-                <div
-                  className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    className="p-1.5 text-stone-400 hover:text-amber-700 hover:bg-amber-50 rounded-sm transition-colors"
-                    title={`Edit ${mod.title}`}
-                    onClick={() => toast.success(`Editing module: ${mod.title}`)}
+        {modules.length === 0 ? (
+          <div className="p-8 text-center">
+            <p className="text-sm font-sans text-stone-400">No modules yet for this program.</p>
+            <button
+              onClick={() => { setShowAddModule(true); setModuleError(''); }}
+              className="mt-3 text-xs font-sans font-500 text-amber-700 hover:text-amber-800 transition-colors"
+            >
+              + Add first module
+            </button>
+          </div>
+        ) : (
+          <div className="divide-y divide-stone-100">
+            {modules.map((mod) => {
+              const isExpanded = expandedModules.has(mod.id);
+              return (
+                <div key={mod.id}>
+                  <div
+                    className={`flex items-center gap-3 px-5 py-4 cursor-pointer transition-colors group ${isExpanded ? 'bg-amber-50/40' : 'hover:bg-stone-50'}`}
+                    onClick={() => toggleModule(mod.id)}
                   >
-                    <Edit2 size={12} />
-                  </button>
-                  <button
-                    className="p-1.5 text-stone-400 hover:text-blue-600 hover:bg-blue-50 rounded-sm transition-colors"
-                    title={`Preview ${mod.title}`}
-                  >
-                    <Eye size={12} />
-                  </button>
-                  <button
-                    className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-sm transition-colors"
-                    title={`Delete ${mod.title} — this cannot be undone`}
-                    onClick={() => toast.error(`Delete module: ${mod.title}?`)}
-                  >
-                    <Trash2 size={12} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Lessons sub-list */}
-              {isExpanded && (
-                <div className="bg-stone-50/60 border-t border-stone-100">
-                  {mod.lessons.length === 0 ? (
-                    <div className="px-16 py-6 text-center">
-                      <p className="text-xs font-sans text-stone-400">No lessons yet in this module.</p>
+                    <GripVertical size={14} className="text-stone-300 cursor-grab shrink-0" />
+                    <ChevronRight size={14} className={`text-amber-600 transition-transform shrink-0 ${isExpanded ? 'rotate-90' : ''}`} />
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs font-sans font-600 text-stone-400 tabular-nums w-5">
+                        {String(mod.sort_order).padStart(2, '0')}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-sans font-500 text-stone-800">{mod.title}</p>
+                      <p className="text-xs font-sans text-stone-400 mt-0.5">{mod.lessons.length} lessons</p>
+                    </div>
+                    <span className={`status-badge ${statusBadge[mod.status] ?? 'bg-stone-100 text-stone-600'} shrink-0`}>
+                      {mod.status}
+                    </span>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                       <button
-                        className="mt-2 text-xs font-sans font-500 text-amber-700 hover:text-amber-800"
-                        onClick={() => toast.success(`Adding lesson to ${mod.title}`)}
+                        className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-sm transition-colors"
+                        title={`Delete ${mod.title}`}
+                        onClick={() => handleDeleteModule(mod.id, mod.title)}
                       >
-                        + Add first lesson
+                        <Trash2 size={12} />
                       </button>
                     </div>
-                  ) : (
-                    <>
-                      <div className="divide-y divide-stone-100/80">
-                        {mod.lessons.map((lesson) => {
-                          const typeConf = lessonTypeConfig[lesson.type as keyof typeof lessonTypeConfig] ?? lessonTypeConfig.video;
-                          const LessonIcon = typeConf.icon;
-                          const currentStatus = lessonStatuses[lesson.id] ?? lesson.status;
-                          return (
-                            <div
-                              key={lesson.id}
-                              className="flex items-center gap-3 pl-16 pr-5 py-3 hover:bg-stone-100/60 transition-colors group"
-                            >
-                              <GripVertical size={12} className="text-stone-200 cursor-grab shrink-0" />
-                              <span className="text-xs font-sans text-stone-400 tabular-nums w-4 shrink-0">
-                                {String(lesson.order).padStart(2, '0')}
-                              </span>
-                              <div className={`w-6 h-6 rounded-sm flex items-center justify-center shrink-0 ${typeConf.color.split(' ')[1]}`}>
-                                <LessonIcon size={11} className={typeConf.color.split(' ')[0]} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-sans font-500 text-stone-700 truncate">{lesson.title}</p>
-                                <p className="text-2xs font-sans text-stone-400">{lesson.type} · {lesson.duration}</p>
-                              </div>
-                              <span className={`status-badge text-2xs ${statusBadge[currentStatus] ?? 'bg-stone-100 text-stone-600'}`}>
-                                {currentStatus}
-                              </span>
+                  </div>
+
+                  {isExpanded && (
+                    <div className="bg-stone-50/60 border-t border-stone-100">
+                      {mod.lessons.length === 0 ? (
+                        <div className="px-16 py-6 text-center">
+                          <p className="text-xs font-sans text-stone-400">No lessons yet in this module.</p>
+                          <button
+                            className="mt-2 text-xs font-sans font-500 text-amber-700 hover:text-amber-800"
+                            onClick={() => openAddLesson(mod.id)}
+                          >
+                            + Add first lesson
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-stone-100/80">
+                          {mod.lessons.map((lesson) => {
+                            const isVideo = !!lesson.video_url;
+                            const LessonIcon = isVideo ? Video : FileText;
+                            const iconColor = isVideo ? 'text-blue-500 bg-blue-50' : 'text-amber-600 bg-amber-50';
+                            const currentStatus = lessonStatuses[lesson.id] ?? lesson.status;
+                            const [ic, bg] = iconColor.split(' ');
+                            return (
                               <div
-                                className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                key={lesson.id}
+                                className="flex items-center gap-3 pl-16 pr-5 py-3 hover:bg-stone-100/60 transition-colors group"
                               >
-                                <button
-                                  onClick={() => toggleLessonStatus(lesson.id, lesson.title)}
-                                  className="p-1 text-stone-400 hover:text-amber-700 rounded-sm transition-colors"
-                                  title={`Toggle ${lesson.title} status`}
-                                >
-                                  {currentStatus === 'published'
-                                    ? <ToggleRight size={14} className="text-green-600" />
-                                    : <ToggleLeft size={14} />}
-                                </button>
-                                <button
-                                  className="p-1 text-stone-400 hover:text-amber-700 rounded-sm transition-colors"
-                                  title={`Edit ${lesson.title}`}
-                                  onClick={() => toast.success(`Editing: ${lesson.title}`)}
-                                >
-                                  <Edit2 size={11} />
-                                </button>
-                                <button
-                                  className="p-1 text-stone-400 hover:text-red-600 rounded-sm transition-colors"
-                                  title={`Delete ${lesson.title} — this cannot be undone`}
-                                  onClick={() => toast.error(`Delete: ${lesson.title}?`)}
-                                >
-                                  <Trash2 size={11} />
-                                </button>
+                                <GripVertical size={12} className="text-stone-200 cursor-grab shrink-0" />
+                                <span className="text-xs font-sans text-stone-400 tabular-nums w-4 shrink-0">
+                                  {String(lesson.sort_order).padStart(2, '0')}
+                                </span>
+                                <div className={`w-6 h-6 rounded-sm flex items-center justify-center shrink-0 ${bg}`}>
+                                  <LessonIcon size={11} className={ic} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-sans font-500 text-stone-700 truncate">{lesson.title}</p>
+                                  {lesson.duration && <p className="text-2xs font-sans text-stone-400">{lesson.duration}</p>}
+                                </div>
+                                <span className={`status-badge text-2xs ${statusBadge[currentStatus] ?? 'bg-stone-100 text-stone-600'}`}>
+                                  {currentStatus}
+                                </span>
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    onClick={() => toggleLessonStatus(lesson.id, lesson.title)}
+                                    className="p-1 text-stone-400 hover:text-amber-700 hover:bg-amber-50 rounded-sm transition-colors"
+                                    title="Toggle status"
+                                  >
+                                    {currentStatus === 'published' ? <ToggleRight size={13} className="text-green-600" /> : <ToggleLeft size={13} />}
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteLesson(lesson.id, lesson.title)}
+                                    className="p-1 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-sm transition-colors"
+                                    title="Delete lesson"
+                                  >
+                                    <Trash2 size={11} />
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="pl-16 pr-5 py-3 border-t border-stone-100/80">
-                        <button
-                          className="flex items-center gap-1.5 text-xs font-sans font-500 text-amber-700 hover:text-amber-800 transition-colors"
-                          onClick={() => toast.success(`Adding lesson to ${mod.title}`)}
-                        >
-                          <Plus size={11} />
-                          Add lesson to {mod.title}
-                        </button>
-                      </div>
-                    </>
+                            );
+                          })}
+                          <div className="pl-16 pr-5 py-3">
+                            <button
+                              onClick={() => openAddLesson(mod.id)}
+                              className="text-xs font-sans font-500 text-amber-700 hover:text-amber-800 transition-colors flex items-center gap-1"
+                            >
+                              <Plus size={11} />
+                              Add lesson
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-stone-100 bg-stone-50/30">
-        <button
-          className="flex items-center gap-1.5 text-xs font-sans font-500 text-amber-700 hover:text-amber-800 transition-colors"
-          onClick={() => toast.success('Opening new module form...')}
-        >
-          <Plus size={11} />
-          Add another module to {programTitle}
-        </button>
-      </div>
-    </div>
+      {/* Add Module Modal */}
+      {showAddModule && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-stone-900/50 backdrop-blur-sm" onClick={() => setShowAddModule(false)} />
+          <div className="relative bg-white rounded-sm shadow-xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="font-serif text-lg text-stone-900">Add Module</p>
+              <button onClick={() => setShowAddModule(false)} className="p-1.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-sm transition-colors"><X size={16} /></button>
+            </div>
+            {moduleError && (
+              <div className="flex items-center gap-2 text-xs font-sans text-red-600 bg-red-50 border border-red-200 rounded-sm px-3 py-2">
+                <AlertCircle size={13} />{moduleError}
+              </div>
+            )}
+            <div>
+              <label className="block text-xs font-sans font-medium text-stone-500 uppercase tracking-widest mb-1.5">Module Title *</label>
+              <input
+                type="text"
+                value={moduleForm.title}
+                onChange={e => setModuleForm(f => ({ ...f, title: e.target.value }))}
+                className="w-full px-3 py-2 text-sm font-sans border border-stone-200 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700"
+                placeholder="e.g. Introduction to Healing"
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-sans font-medium text-stone-500 uppercase tracking-widest mb-1.5">Description</label>
+              <textarea
+                value={moduleForm.description}
+                onChange={e => setModuleForm(f => ({ ...f, description: e.target.value }))}
+                rows={2}
+                className="w-full px-3 py-2 text-sm font-sans border border-stone-200 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700 resize-none"
+                placeholder="Brief module description…"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-sans font-medium text-stone-500 uppercase tracking-widest mb-1.5">Focus Area (optional)</label>
+              <input
+                type="text"
+                value={moduleForm.focus_area}
+                onChange={e => setModuleForm(f => ({ ...f, focus_area: e.target.value }))}
+                className="w-full px-3 py-2 text-sm font-sans border border-stone-200 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700"
+                placeholder="e.g. Physical, Emotional, Nutrition"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-sans font-medium text-stone-500 uppercase tracking-widest mb-1.5">Status</label>
+              <select
+                value={moduleForm.status}
+                onChange={e => setModuleForm(f => ({ ...f, status: e.target.value }))}
+                className="w-full px-3 py-2 text-sm font-sans border border-stone-200 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700"
+              >
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-stone-100">
+              <button onClick={() => setShowAddModule(false)} className="text-xs font-sans font-medium px-4 py-2 rounded-sm border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 transition-colors">Cancel</button>
+              <button
+                onClick={handleAddModule}
+                disabled={savingModule}
+                className="btn-primary text-xs py-2 px-5 flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {savingModule && <Loader2 size={12} className="animate-spin" />}
+                Create Module
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Lesson Modal */}
+      {showAddLesson && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-stone-900/50 backdrop-blur-sm" onClick={() => setShowAddLesson(false)} />
+          <div className="relative bg-white rounded-sm shadow-xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="font-serif text-lg text-stone-900">Add Lesson</p>
+              <button onClick={() => setShowAddLesson(false)} className="p-1.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-sm transition-colors"><X size={16} /></button>
+            </div>
+            {lessonError && (
+              <div className="flex items-center gap-2 text-xs font-sans text-red-600 bg-red-50 border border-red-200 rounded-sm px-3 py-2">
+                <AlertCircle size={13} />{lessonError}
+              </div>
+            )}
+            <div>
+              <label className="block text-xs font-sans font-medium text-stone-500 uppercase tracking-widest mb-1.5">Lesson Title *</label>
+              <input
+                type="text"
+                value={lessonForm.title}
+                onChange={e => setLessonForm(f => ({ ...f, title: e.target.value }))}
+                className="w-full px-3 py-2 text-sm font-sans border border-stone-200 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700"
+                placeholder="e.g. Morning Reset Protocol"
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-sans font-medium text-stone-500 uppercase tracking-widest mb-1.5">Description</label>
+              <textarea
+                value={lessonForm.description}
+                onChange={e => setLessonForm(f => ({ ...f, description: e.target.value }))}
+                rows={2}
+                className="w-full px-3 py-2 text-sm font-sans border border-stone-200 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700 resize-none"
+                placeholder="Brief lesson description…"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-sans font-medium text-stone-500 uppercase tracking-widest mb-1.5">Duration</label>
+                <input
+                  type="text"
+                  value={lessonForm.duration}
+                  onChange={e => setLessonForm(f => ({ ...f, duration: e.target.value }))}
+                  className="w-full px-3 py-2 text-sm font-sans border border-stone-200 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700"
+                  placeholder="e.g. 30 min"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-sans font-medium text-stone-500 uppercase tracking-widest mb-1.5">Status</label>
+                <select
+                  value={lessonForm.status}
+                  onChange={e => setLessonForm(f => ({ ...f, status: e.target.value }))}
+                  className="w-full px-3 py-2 text-sm font-sans border border-stone-200 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-sans font-medium text-stone-500 uppercase tracking-widest mb-1.5">Video URL (optional)</label>
+              <input
+                type="text"
+                value={lessonForm.video_url}
+                onChange={e => setLessonForm(f => ({ ...f, video_url: e.target.value }))}
+                className="w-full px-3 py-2 text-sm font-sans border border-stone-200 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700"
+                placeholder="https://…"
+              />
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-stone-100">
+              <button onClick={() => setShowAddLesson(false)} className="text-xs font-sans font-medium px-4 py-2 rounded-sm border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 transition-colors">Cancel</button>
+              <button
+                onClick={handleAddLesson}
+                disabled={savingLesson}
+                className="btn-primary text-xs py-2 px-5 flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {savingLesson && <Loader2 size={12} className="animate-spin" />}
+                Create Lesson
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

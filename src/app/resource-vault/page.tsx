@@ -1,5 +1,6 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import StudentSidebar from '@/components/StudentSidebar';
 import { mockResources, mockPrograms, getAccessibleResources } from '@/lib/data/mockData';
 import { Search, Download, Lock, BookOpen, Headphones, Video, FileText } from 'lucide-react';
@@ -17,15 +18,32 @@ const typeIcons: Record<ResourceType, React.ReactNode> = {
 };
 
 export default function ResourceVaultPage() {
+  const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authed, setAuthed] = useState(false);
+  const [search, setSearch] = useState('');
+  const [activeType, setActiveType] = useState<string | null>(null);
+  const [activeProgram, setActiveProgram] = useState<string | null>(null);
+
+  useEffect(() => {
+    import('@/lib/supabase/client').then(({ createClient }) => {
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user) {
+          router.replace('/sign-up-login?redirectTo=/resource-vault');
+        } else {
+          setAuthed(true);
+        }
+        setAuthChecked(true);
+      });
+    });
+  }, [router]);
+
   const accessible = getAccessibleResources(CURRENT_USER_ID);
   const accessibleIds = new Set(accessible.map(r => r.id));
   const allPublished = mockResources.filter(r => r.status === 'published');
   const locked = allPublished.filter(r => !accessibleIds.has(r.id));
   const featured = accessible.filter(r => r.featured);
-
-  const [search, setSearch] = useState('');
-  const [activeType, setActiveType] = useState<string | null>(null);
-  const [activeProgram, setActiveProgram] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     return accessible.filter(r => {
@@ -39,12 +57,26 @@ export default function ResourceVaultPage() {
   const types: ResourceType[] = ['ebook', 'pdf', 'audio', 'video', 'guide', 'worksheet'];
   const programs = mockPrograms.filter(p => p.status === 'published');
 
+  if (!authChecked || !authed) {
+    return (
+      <div className="flex min-h-screen items-center justify-center" style={{ background: '#F4EFE6' }}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: '#1A6B6B', borderTopColor: 'transparent' }} />
+          <p className="text-sm font-sans text-stone-500">Verifying session…</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen bg-[#FAF8F4]">
+    <div className="flex min-h-screen" style={{ background: '#F4EFE6' }}>
       <StudentSidebar />
       <div className="flex-1 min-w-0">
         {/* Topbar */}
-        <div className="sticky top-0 z-30 bg-[#FAF8F4]/95 backdrop-blur-sm border-b border-stone-200/60 px-6 xl:px-8 h-16 flex items-center">
+        <div
+          className="sticky top-0 z-30 backdrop-blur-sm px-6 xl:px-8 h-16 flex items-center"
+          style={{ background: 'rgba(244,239,230,0.96)', borderBottom: '1px solid rgba(168,216,206,0.3)' }}
+        >
           <div>
             <p className="text-xs font-sans font-medium text-stone-400 uppercase tracking-widest">Learning</p>
             <p className="font-serif text-lg text-stone-800 leading-tight">Resource Vault</p>

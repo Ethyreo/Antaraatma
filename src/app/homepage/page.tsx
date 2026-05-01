@@ -12,17 +12,17 @@ import EcosystemScene from './components/EcosystemScene';
 import ClosingScene from './components/ClosingScene';
 
 export const metadata: Metadata = {
-  title: 'VijayHeals — Naturopathy Healing & Transformation Programs',
+  title: 'Antaraatma — Naturopathy Healing & Transformation Programs',
   description: 'Dr. Vijay Singla guides you through a structured naturopathy healing pathway — from your first free Awareness Session to complete Transformation Mastery. Heal physically, emotionally, and energetically.',
   alternates: {
-    canonical: 'https://vijayheals1931.builtwithrocket.new/homepage',
+    canonical: 'https://antaraatma1931.builtwithrocket.new/homepage',
   },
 };
 
 export default function HomepagePage() {
   return (
     <main
-      style={{ background: '#0e0d0b' }}
+      style={{ background: '#F4EFE6' }}
       className="overflow-x-hidden"
     >
       <PublicNav />

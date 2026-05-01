@@ -17,7 +17,7 @@ export default function TransformationMasteryPage() {
   if (!program) return null;
 
   return (
-    <main className="bg-[#FAF8F4] min-h-screen">
+    <main style={{ background: '#F4EFE6' }} className="min-h-screen">
       <PublicNav />
       {/* Hero */}
       <section className="pt-32 pb-20 bg-stone-900">
@@ -45,7 +45,7 @@ export default function TransformationMasteryPage() {
         </div>
       </section>
       {/* Why Deep Healing Takes Time */}
-      <section className="py-20 bg-[#FAF8F4]">
+      <section className="py-20" style={{ background: '#F4EFE6' }}>
         <div className="editorial-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -118,7 +118,7 @@ export default function TransformationMasteryPage() {
         </div>
       </section>
       {/* Benefits & Included */}
-      <section className="py-24 bg-[#FAF8F4]">
+      <section className="py-24" style={{ background: '#D4EDE8' }}>
         <div className="editorial-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <div>
@@ -182,7 +182,7 @@ export default function TransformationMasteryPage() {
         </div>
       </section>
       {/* Pricing */}
-      <section className="py-24 bg-[#FAF8F4]">
+      <section className="py-24" style={{ background: '#F4EFE6' }}>
         <div className="editorial-container">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-3 mb-12">
