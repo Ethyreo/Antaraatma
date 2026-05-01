@@ -1,9 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import StudentSidebar from '@/components/StudentSidebar';
 import { mockCommunityPosts, mockUsers } from '@/lib/data/mockData';
 import type { CommunityCategory } from '@/lib/data/types';
 import { Heart, MessageCircle, Pin, Plus, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const CURRENT_USER_ID = 'user-student-1';
 const CATEGORIES: CommunityCategory[] = ['Gratitude', 'Good Karma', 'Reflection', 'Healing Win'];
@@ -24,11 +25,28 @@ function timeAgo(dateStr: string) {
 }
 
 export default function CommunityPage() {
+  const router = useRouter();
+  const [authChecked, setAuthChecked] = React.useState(false);
+  const [authed, setAuthed] = React.useState(false);
   const [activeCategory, setActiveCategory] = useState<CommunityCategory | null>(null);
   const [showNewPost, setShowNewPost] = useState(false);
   const [newPost, setNewPost] = useState({ title: '', body: '', category: 'Gratitude' as CommunityCategory });
   const [posts, setPosts] = useState(mockCommunityPosts);
   const [reactions, setReactions] = useState<Record<string, boolean>>({});
+
+  React.useEffect(() => {
+    import('@/lib/supabase/client').then(({ createClient }) => {
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user) {
+          router.replace('/sign-up-login?redirectTo=/community');
+        } else {
+          setAuthed(true);
+        }
+        setAuthChecked(true);
+      });
+    });
+  }, [router]);
 
   const filtered = activeCategory ? posts.filter(p => p.category === activeCategory) : posts;
   const pinned = filtered.filter(p => p.isPinned);
@@ -58,6 +76,17 @@ export default function CommunityPage() {
     setNewPost({ title: '', body: '', category: 'Gratitude' });
     setShowNewPost(false);
   };
+
+  if (!authChecked || !authed) {
+    return (
+      <div className="flex min-h-screen items-center justify-center" style={{ background: '#F4EFE6' }}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: '#1A6B6B', borderTopColor: 'transparent' }} />
+          <p className="text-sm font-sans text-stone-500">Verifying session…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen" style={{ background: '#F4EFE6' }}>

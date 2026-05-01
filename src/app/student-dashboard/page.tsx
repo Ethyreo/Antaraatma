@@ -11,22 +11,24 @@ export default function StudentDashboardPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router?.replace('/sign-up-login');
+      router?.replace('/sign-up-login?redirectTo=/student-dashboard');
     }
   }, [user, loading, router]);
 
-  if (loading) {
+  // Show nothing until auth state is resolved — prevents any flash of dashboard content
+  if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#F4EFE6' }}>
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#1A6B6B', borderTopColor: 'transparent' }} />
-          <p className="text-sm font-sans text-stone-500">Loading...</p>
+          <div
+            className="w-8 h-8 rounded-full border-2 animate-spin"
+            style={{ borderColor: '#1A6B6B', borderTopColor: 'transparent' }}
+          />
+          <p className="text-sm font-sans text-stone-500">Verifying session…</p>
         </div>
       </div>
     );
   }
-
-  if (!user) return null;
 
   return (
     <div className="flex min-h-screen" style={{ background: '#F4EFE6' }}>

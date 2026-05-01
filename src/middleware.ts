@@ -15,6 +15,7 @@ const PROTECTED_ROUTES = [
   '/checkout',
   '/foundation-course',
   '/transformation-mastery',
+  '/services',
 ];
 
 // Routes only for unauthenticated users (redirect away if logged in)
@@ -27,8 +28,34 @@ const ADMIN_ROUTES = [
   '/program-management',
 ];
 
+function hasSupabaseCookies(request: NextRequest): boolean {
+  const cookies = request.cookies.getAll();
+  return cookies.some(
+    (c) =>
+      c.name.includes('auth-token') ||
+      c.name.includes('sb-') ||
+      c.name.startsWith('supabase')
+  );
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const isProtected = PROTECTED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + '/')
+  );
+  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  const isAdminRoute = ADMIN_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + '/')
+  );
+
+  // Fast-path: if protected route and no supabase cookies at all, redirect immediately
+  // This handles the case where the session is only in localStorage (not readable server-side)
+  if (isProtected && !hasSupabaseCookies(request)) {
+    const redirectUrl = new URL('/sign-up-login', request.url);
+    redirectUrl.searchParams.set('redirectTo', pathname);
+    return NextResponse.redirect(redirectUrl);
+  }
 
   // Build a response we can mutate cookies on
   let response = NextResponse.next({
@@ -62,14 +89,6 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const isProtected = PROTECTED_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route + '/')
-  );
-  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
-  const isAdminRoute = ADMIN_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route + '/')
-  );
 
   // Not logged in → redirect to sign-in immediately (no client-side fallback needed)
   if (isProtected && !user) {
