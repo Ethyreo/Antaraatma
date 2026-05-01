@@ -12,18 +12,18 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://vijayheals1931.builtwithrocket.new'),
   title: {
-    default: 'VijayHeals — Naturopathy Healing & Transformation Programs',
-    template: '%s | VijayHeals',
+    default: 'Antaraatma — Naturopathy Healing & Transformation Programs',
+    template: '%s | Antaraatma',
   },
   description: 'Dr. Vijay Singla guides you through a structured naturopathy healing pathway — from your first free Awareness Session to complete Transformation Mastery. Heal physically, emotionally, and energetically.',
   keywords: [
     'naturopathy', 'healing', 'transformation', 'Dr Vijay Singla', 'awareness session',
     'foundation course', 'transformation mastery', 'holistic health', 'energetic healing',
-    'emotional healing', 'naturopathic medicine', 'wellness programs', 'VijayHeals',
+    'emotional healing', 'naturopathic medicine', 'wellness programs', 'Antaraatma',
   ],
   authors: [{ name: 'Dr. Vijay Singla', url: 'https://vijayheals1931.builtwithrocket.new' }],
   creator: 'Dr. Vijay Singla',
-  publisher: 'VijayHeals',
+  publisher: 'Antaraatma',
   robots: {
     index: true,
     follow: true,
@@ -33,21 +33,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IN',
     url: 'https://vijayheals1931.builtwithrocket.new',
-    siteName: 'VijayHeals',
-    title: 'VijayHeals — Naturopathy Healing & Transformation Programs',
+    siteName: 'Antaraatma',
+    title: 'Antaraatma — Naturopathy Healing & Transformation Programs',
     description: 'A guided healing journey from Awareness to Transformation. Join Dr. Vijay Singla\'s naturopathy programs — free Awareness Session available.',
     images: [
       {
         url: '/assets/images/image-1775407640128.png',
         width: 1200,
         height: 630,
-        alt: 'VijayHeals — Naturopathy Healing & Transformation',
+        alt: 'Antaraatma — Naturopathy Healing & Transformation',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'VijayHeals — Naturopathy Healing & Transformation Programs',
+    title: 'Antaraatma — Naturopathy Healing & Transformation Programs',
     description: 'A guided healing journey from Awareness to Transformation. Join Dr. Vijay Singla\'s naturopathy programs.',
     images: ['/assets/images/image-1775407640128.png'],
   },
