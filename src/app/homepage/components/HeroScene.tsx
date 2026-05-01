@@ -25,7 +25,7 @@ export default function HeroScene() {
 
   useEffect(() => {
     const img = new window.Image();
-    img.src = '/assets/images/Blue_White_Modern_Buy_1_Get_1_Promotion_Instagram_Post-1775409089496.png';
+    img.src = '/assets/images/WhatsApp_Image_2026-04-28_at_4.03.01_PM-removebg-preview-1777641830144.png';
     img.onload = () => {
       imgRef.current = img;
       imgLoadedRef.current = true;
@@ -143,8 +143,8 @@ export default function HeroScene() {
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/assets/images/Blue_White_Modern_Buy_1_Get_1_Promotion_Instagram_Post-1775409089496.png"
-        alt="Chakra meditation energy visualization"
+        src="/assets/images/WhatsApp_Image_2026-04-28_at_4.03.01_PM-removebg-preview-1777641830144.png"
+        alt="Meditation figure healing visualization"
         className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
         style={{
           opacity: 0.0,
