@@ -12,6 +12,9 @@ const PROTECTED_ROUTES = [
   '/community',
   '/program-management',
   '/student-onboarding',
+  '/checkout',
+  '/foundation-course',
+  '/transformation-mastery',
 ];
 
 // Routes only for unauthenticated users (redirect away if logged in)
@@ -68,7 +71,7 @@ export async function middleware(request: NextRequest) {
     (route) => pathname === route || pathname.startsWith(route + '/')
   );
 
-  // Not logged in → redirect to sign-in
+  // Not logged in → redirect to sign-in immediately (no client-side fallback needed)
   if (isProtected && !user) {
     const redirectUrl = new URL('/sign-up-login', request.url);
     redirectUrl.searchParams.set('redirectTo', pathname);

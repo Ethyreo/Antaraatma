@@ -44,16 +44,16 @@ export default function AdminSidebar() {
   return (
     <aside
       className={`sticky top-0 h-screen flex flex-col transition-all duration-300 shrink-0 ${collapsed ? 'w-16' : 'w-56'}`}
-      style={{ background: '#242C2C', borderRight: '1px solid rgba(168,216,206,0.12)' }}
+      style={{ background: '#F4EFE6', borderRight: '1px solid rgba(168,216,206,0.4)' }}
     >
       {/* Logo */}
       <div
         className={`flex items-center gap-2.5 px-4 h-16 ${collapsed ? 'justify-center' : ''}`}
-        style={{ borderBottom: '1px solid rgba(168,216,206,0.12)' }}
+        style={{ borderBottom: '1px solid rgba(168,216,206,0.4)' }}
       >
         <AppLogo size={28} />
         {!collapsed && (
-          <span className="font-serif text-sm tracking-[0.08em]" style={{ color: '#A8D8CE', fontWeight: 300 }}>
+          <span className="font-serif text-sm tracking-[0.08em]" style={{ color: '#1A6B6B', fontWeight: 300 }}>
             ANTARAATMA
           </span>
         )}
@@ -70,22 +70,24 @@ export default function AdminSidebar() {
               title={collapsed ? item?.label : undefined}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-sans transition-all duration-150 ${collapsed ? 'justify-center' : ''}`}
               style={isActive ? {
-                background: 'rgba(26,107,107,0.25)',
-                color: '#5FBDBD',
+                background: 'rgba(26,107,107,0.1)',
+                color: '#1A6B6B',
                 borderLeft: '2px solid #1A6B6B',
+                fontWeight: 500,
               } : {
-                color: 'rgba(168,216,206,0.55)',
+                color: '#3A4A4A',
+                fontWeight: 400,
               }}
               onMouseEnter={e => {
                 if (!isActive) {
-                  (e.currentTarget as HTMLElement).style.background = 'rgba(168,216,206,0.08)';
-                  (e.currentTarget as HTMLElement).style.color = '#A8D8CE';
+                  (e.currentTarget as HTMLElement).style.background = 'rgba(168,216,206,0.2)';
+                  (e.currentTarget as HTMLElement).style.color = '#1A6B6B';
                 }
               }}
               onMouseLeave={e => {
                 if (!isActive) {
                   (e.currentTarget as HTMLElement).style.background = 'transparent';
-                  (e.currentTarget as HTMLElement).style.color = 'rgba(168,216,206,0.55)';
+                  (e.currentTarget as HTMLElement).style.color = '#3A4A4A';
                 }
               }}
             >
@@ -100,14 +102,14 @@ export default function AdminSidebar() {
           onClick={handleSignOut}
           title={collapsed ? 'Sign Out' : undefined}
           className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-sans transition-all duration-150 w-full ${collapsed ? 'justify-center' : ''}`}
-          style={{ color: 'rgba(168,216,206,0.4)' }}
+          style={{ color: '#3A4A4A', fontWeight: 400 }}
           onMouseEnter={e => {
             (e.currentTarget as HTMLElement).style.background = 'rgba(196,160,82,0.1)';
             (e.currentTarget as HTMLElement).style.color = '#C4A052';
           }}
           onMouseLeave={e => {
             (e.currentTarget as HTMLElement).style.background = 'transparent';
-            (e.currentTarget as HTMLElement).style.color = 'rgba(168,216,206,0.4)';
+            (e.currentTarget as HTMLElement).style.color = '#3A4A4A';
           }}
         >
           <LogOut size={16} className="shrink-0" />
@@ -116,16 +118,16 @@ export default function AdminSidebar() {
       </nav>
 
       {/* Collapse toggle */}
-      <div className="px-2 pb-4 pt-3" style={{ borderTop: '1px solid rgba(168,216,206,0.1)' }}>
+      <div className="px-2 pb-4 pt-3" style={{ borderTop: '1px solid rgba(168,216,206,0.4)' }}>
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={`flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-sans transition-all w-full ${collapsed ? 'justify-center' : ''}`}
-          style={{ color: 'rgba(168,216,206,0.3)' }}
+          style={{ color: 'rgba(58,74,74,0.5)' }}
           onMouseEnter={e => {
-            (e.currentTarget as HTMLElement).style.color = '#A8D8CE';
+            (e.currentTarget as HTMLElement).style.color = '#1A6B6B';
           }}
           onMouseLeave={e => {
-            (e.currentTarget as HTMLElement).style.color = 'rgba(168,216,206,0.3)';
+            (e.currentTarget as HTMLElement).style.color = 'rgba(58,74,74,0.5)';
           }}
         >
           {collapsed ? <ChevronRight size={16} /> : <><ChevronLeft size={16} /><span>Collapse</span></>}
