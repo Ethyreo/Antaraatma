@@ -213,7 +213,7 @@ export default function PhysicalEmotionalEnergeticScene() {
       style={{
         position: 'relative',
         height: '100vh',
-        background: '#0a0908',
+        background: '#EDE8DF',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
@@ -223,7 +223,7 @@ export default function PhysicalEmotionalEnergeticScene() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse 70% 55% at 50% 50%, rgba(180,130,55,${0.03 + overallProgress * 0.06}) 0%, transparent 65%)`,
+          background: `radial-gradient(ellipse 70% 55% at 50% 50%, rgba(196,160,82,${0.04 + overallProgress * 0.06}) 0%, transparent 65%)`,
           transition: 'background 0.6s ease',
         }}
       />
@@ -240,13 +240,13 @@ export default function PhysicalEmotionalEnergeticScene() {
       {/* Top progress bar */}
       <div
         className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-        style={{ background: 'rgba(180,130,55,0.06)' }}
+        style={{ background: 'rgba(196,160,82,0.1)' }}
       >
         <div
           style={{
             height: '100%',
             width: `${overallProgress * 100}%`,
-            background: 'rgba(180,130,55,0.4)',
+            background: 'rgba(196,160,82,0.45)',
             transition: 'width 0.08s linear',
           }}
         />
@@ -270,7 +270,7 @@ export default function PhysicalEmotionalEnergeticScene() {
             className="font-sans uppercase mb-8 tracking-widest"
             style={{
               fontSize: 'clamp(0.55rem, 0.8vw, 0.65rem)',
-              color: 'rgba(180,130,55,0.4)',
+              color: 'rgba(196,160,82,0.65)',
               letterSpacing: '0.3em',
             }}
           >
@@ -280,7 +280,7 @@ export default function PhysicalEmotionalEnergeticScene() {
             className="font-serif text-balance"
             style={{
               fontSize: 'clamp(2.4rem, 5.5vw, 4.8rem)',
-              color: 'rgba(232,224,208,0.9)',
+              color: 'rgba(36,44,44,0.88)',
               lineHeight: 1.0,
               maxWidth: '14ch',
             }}
@@ -291,7 +291,7 @@ export default function PhysicalEmotionalEnergeticScene() {
             className="font-serif text-balance mt-1"
             style={{
               fontSize: 'clamp(2.4rem, 5.5vw, 4.8rem)',
-              color: 'rgba(232,224,208,0.18)',
+              color: 'rgba(36,44,44,0.22)',
               lineHeight: 1.0,
               maxWidth: '14ch',
             }}
@@ -302,21 +302,21 @@ export default function PhysicalEmotionalEnergeticScene() {
             className="font-sans font-light leading-relaxed mt-8 mx-auto"
             style={{
               fontSize: 'clamp(0.82rem, 1.1vw, 0.94rem)',
-              color: 'rgba(232,224,208,0.3)',
+              color: 'rgba(36,44,44,0.42)',
               maxWidth: '44ch',
             }}
           >
             Healing stalls when we treat symptoms without addressing the three dimensions that hold the block.
           </p>
           <div className="flex flex-col items-center gap-2 mt-12" style={{ opacity: 0.45 }}>
-            <span className="font-sans uppercase text-[0.55rem] tracking-[0.2em]" style={{ color: 'rgba(232,224,208,0.5)' }}>
+            <span className="font-sans uppercase text-[0.55rem] tracking-[0.2em]" style={{ color: 'rgba(36,44,44,0.45)' }}>
               scroll to explore
             </span>
             <div
               style={{
                 width: '1px',
                 height: '2rem',
-                background: 'linear-gradient(to bottom, rgba(180,130,55,0.4), transparent)',
+                background: 'linear-gradient(to bottom, rgba(196,160,82,0.4), transparent)',
               }}
             />
           </div>
@@ -338,7 +338,7 @@ export default function PhysicalEmotionalEnergeticScene() {
             className="font-sans uppercase mb-10 tracking-widest"
             style={{
               fontSize: 'clamp(0.55rem, 0.8vw, 0.65rem)',
-              color: 'rgba(180,130,55,0.4)',
+              color: 'rgba(196,160,82,0.65)',
               letterSpacing: '0.3em',
             }}
           >
@@ -352,7 +352,7 @@ export default function PhysicalEmotionalEnergeticScene() {
           >
             <div
               className="absolute left-0 right-0"
-              style={{ top: '26px', height: '1px', background: 'rgba(180,130,55,0.1)' }}
+              style={{ top: '26px', height: '1px', background: 'rgba(196,160,82,0.15)' }}
             />
             <div
               className="absolute left-0"
@@ -360,7 +360,7 @@ export default function PhysicalEmotionalEnergeticScene() {
                 top: '26px',
                 height: '1px',
                 width: `${timelineFillPercent}%`,
-                background: 'rgba(180,130,55,0.45)',
+                background: 'rgba(196,160,82,0.5)',
                 transition: 'width 0.55s cubic-bezier(0.4,0,0.2,1)',
               }}
             />
@@ -380,7 +380,7 @@ export default function PhysicalEmotionalEnergeticScene() {
                     style={{
                       top: `calc(26px - ${nodeSize / 2}px - 1.8rem)`,
                       fontSize: 'clamp(0.65rem, 0.9vw, 0.75rem)',
-                      color: isActive ? 'rgba(180,130,55,0.55)' : isPast ? 'rgba(180,130,55,0.2)' : 'rgba(180,130,55,0.08)',
+                      color: isActive ? 'rgba(196,160,82,0.65)' : isPast ? 'rgba(196,160,82,0.3)' : 'rgba(196,160,82,0.12)',
                       letterSpacing: '0.06em',
                       transition: 'color 0.55s ease, top 0.55s cubic-bezier(0.4,0,0.2,1)',
                     }}
@@ -396,13 +396,13 @@ export default function PhysicalEmotionalEnergeticScene() {
                       width: `${nodeSize}px`,
                       height: `${nodeSize}px`,
                       borderRadius: '50%',
-                      border: `1px solid ${isActive ? 'rgba(180,130,55,0.5)' : isPast ? 'rgba(180,130,55,0.25)' : 'rgba(180,130,55,0.1)'}`,
-                      background: isActive ? 'rgba(180,130,55,0.08)' : isPast ? 'rgba(180,130,55,0.04)' : 'rgba(10,9,8,0.9)',
+                      border: `1px solid ${isActive ? 'rgba(196,160,82,0.5)' : isPast ? 'rgba(196,160,82,0.25)' : 'rgba(196,160,82,0.12)'}`,
+                      background: isActive ? 'rgba(196,160,82,0.08)' : isPast ? 'rgba(196,160,82,0.04)' : 'rgba(237,232,223,0.9)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       transition: 'all 0.55s cubic-bezier(0.4,0,0.2,1)',
-                      boxShadow: isActive ? '0 0 20px rgba(180,130,55,0.12)' : 'none',
+                      boxShadow: isActive ? '0 0 20px rgba(196,160,82,0.12)' : 'none',
                     }}
                   >
                     <div
@@ -410,7 +410,7 @@ export default function PhysicalEmotionalEnergeticScene() {
                         width: isActive ? '8px' : isPast ? '5px' : '4px',
                         height: isActive ? '8px' : isPast ? '5px' : '4px',
                         borderRadius: '50%',
-                        background: isActive ? 'rgba(200,155,70,0.9)' : isPast ? 'rgba(180,130,55,0.45)' : 'rgba(180,130,55,0.15)',
+                        background: isActive ? 'rgba(196,160,82,0.9)' : isPast ? 'rgba(196,160,82,0.45)' : 'rgba(196,160,82,0.2)',
                         transition: 'all 0.55s cubic-bezier(0.4,0,0.2,1)',
                       }}
                     />
@@ -421,7 +421,7 @@ export default function PhysicalEmotionalEnergeticScene() {
                       top: `calc(26px + ${nodeSize / 2}px + 0.5rem)`,
                       fontSize: 'clamp(0.55rem, 0.75vw, 0.62rem)',
                       letterSpacing: '0.22em',
-                      color: isActive ? 'rgba(180,130,55,0.8)' : isPast ? 'rgba(232,224,208,0.3)' : 'rgba(232,224,208,0.12)',
+                      color: isActive ? 'rgba(196,160,82,0.85)' : isPast ? 'rgba(36,44,44,0.3)' : 'rgba(36,44,44,0.15)',
                       transition: 'color 0.55s ease, top 0.55s cubic-bezier(0.4,0,0.2,1)',
                       whiteSpace: 'nowrap',
                     }}
@@ -461,7 +461,7 @@ export default function PhysicalEmotionalEnergeticScene() {
                   className="font-serif mb-4"
                   style={{
                     fontSize: 'clamp(1.1rem, 2.2vw, 1.6rem)',
-                    color: 'rgba(180,130,55,0.65)',
+                    color: 'rgba(196,160,82,0.7)',
                     letterSpacing: '0.04em',
                     lineHeight: 1,
                   }}
@@ -472,7 +472,7 @@ export default function PhysicalEmotionalEnergeticScene() {
                   className="font-serif text-balance mb-6"
                   style={{
                     fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
-                    color: 'rgba(232,224,208,0.9)',
+                    color: 'rgba(36,44,44,0.88)',
                     lineHeight: 1.1,
                   }}
                 >
@@ -482,7 +482,7 @@ export default function PhysicalEmotionalEnergeticScene() {
                   className="font-sans font-light leading-relaxed mx-auto"
                   style={{
                     fontSize: 'clamp(0.82rem, 1.1vw, 0.94rem)',
-                    color: 'rgba(232,224,208,0.32)',
+                    color: 'rgba(36,44,44,0.42)',
                     maxWidth: '44ch',
                   }}
                 >
@@ -505,7 +505,7 @@ export default function PhysicalEmotionalEnergeticScene() {
                 width: i === stage ? '20px' : '5px',
                 height: '5px',
                 borderRadius: '3px',
-                background: i === stage ? 'rgba(180,130,55,0.6)' : i < stage ? 'rgba(180,130,55,0.25)' : 'rgba(180,130,55,0.1)',
+                background: i === stage ? 'rgba(196,160,82,0.65)' : i < stage ? 'rgba(196,160,82,0.3)' : 'rgba(196,160,82,0.12)',
                 transition: 'all 0.4s ease',
               }}
             />

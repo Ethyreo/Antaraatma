@@ -23,27 +23,27 @@ export default function ClosingScene() {
     <section
       ref={sectionRef}
       className="relative overflow-hidden"
-      style={{ background: '#1A2828', paddingTop: 'clamp(6rem, 14vw, 12rem)', paddingBottom: 'clamp(6rem, 14vw, 12rem)' }}
+      style={{ background: '#1A6B6B', paddingTop: 'clamp(6rem, 14vw, 12rem)', paddingBottom: 'clamp(6rem, 14vw, 12rem)' }}
     >
       {/* Sacred geometry — lotus mandala watermark */}
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-        <svg width="500" height="500" viewBox="0 0 500 500" fill="none" opacity="0.05" aria-hidden="true">
-          <circle cx="250" cy="250" r="50" stroke="#5FBDBD" strokeWidth="0.8"/>
-          <circle cx="250" cy="250" r="100" stroke="#5FBDBD" strokeWidth="0.8"/>
-          <circle cx="250" cy="250" r="150" stroke="#5FBDBD" strokeWidth="0.8"/>
-          <circle cx="250" cy="250" r="200" stroke="#5FBDBD" strokeWidth="0.8"/>
-          <circle cx="250" cy="250" r="240" stroke="#5FBDBD" strokeWidth="0.8"/>
-          <line x1="250" y1="10" x2="250" y2="490" stroke="#5FBDBD" strokeWidth="0.5"/>
-          <line x1="10" y1="250" x2="490" y2="250" stroke="#5FBDBD" strokeWidth="0.5"/>
-          <line x1="80" y1="80" x2="420" y2="420" stroke="#5FBDBD" strokeWidth="0.5"/>
-          <line x1="420" y1="80" x2="80" y2="420" stroke="#5FBDBD" strokeWidth="0.5"/>
+        <svg width="500" height="500" viewBox="0 0 500 500" fill="none" opacity="0.07" aria-hidden="true">
+          <circle cx="250" cy="250" r="50" stroke="#F4EFE6" strokeWidth="0.8"/>
+          <circle cx="250" cy="250" r="100" stroke="#F4EFE6" strokeWidth="0.8"/>
+          <circle cx="250" cy="250" r="150" stroke="#F4EFE6" strokeWidth="0.8"/>
+          <circle cx="250" cy="250" r="200" stroke="#F4EFE6" strokeWidth="0.8"/>
+          <circle cx="250" cy="250" r="240" stroke="#F4EFE6" strokeWidth="0.8"/>
+          <line x1="250" y1="10" x2="250" y2="490" stroke="#F4EFE6" strokeWidth="0.5"/>
+          <line x1="10" y1="250" x2="490" y2="250" stroke="#F4EFE6" strokeWidth="0.5"/>
+          <line x1="80" y1="80" x2="420" y2="420" stroke="#F4EFE6" strokeWidth="0.5"/>
+          <line x1="420" y1="80" x2="80" y2="420" stroke="#F4EFE6" strokeWidth="0.5"/>
           <circle cx="250" cy="250" r="5" fill="#C4A052" opacity="0.8"/>
         </svg>
       </div>
 
-      {/* Ambient teal glow */}
+      {/* Ambient warm glow */}
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 55% 45% at 50% 55%, rgba(26,107,107,0.08) 0%, transparent 65%)' }} />
+        style={{ background: 'radial-gradient(ellipse 55% 45% at 50% 55%, rgba(196,160,82,0.08) 0%, transparent 65%)' }} />
 
       <div className="editorial-container relative z-10 flex flex-col items-center text-center">
         {/* Sacred Gold rule */}
@@ -53,11 +53,11 @@ export default function ClosingScene() {
             transition: 'opacity 0.8s ease',
           }}
         >
-          <div className="w-12 h-px" style={{ background: '#C4A052', opacity: 0.5 }} />
-          <span className="text-xs font-sans uppercase tracking-[0.2em]" style={{ color: '#C4A052', opacity: 0.7, fontWeight: 600 }}>
+          <div className="w-12 h-px" style={{ background: '#C4A052', opacity: 0.6 }} />
+          <span className="text-xs font-sans uppercase tracking-[0.2em]" style={{ color: '#C4A052', opacity: 0.85, fontWeight: 600 }}>
             Dr. Vijay Singla · Antaraatma
           </span>
-          <div className="w-12 h-px" style={{ background: '#C4A052', opacity: 0.5 }} />
+          <div className="w-12 h-px" style={{ background: '#C4A052', opacity: 0.6 }} />
         </div>
 
         {/* Headline — Raleway 200 weight */}
@@ -65,7 +65,7 @@ export default function ClosingScene() {
           className="font-serif text-balance mx-auto mb-10"
           style={{
             fontSize: 'clamp(2.8rem, 6vw, 5.5rem)',
-            color: 'rgba(244,239,230,0.88)',
+            color: 'rgba(244,239,230,0.92)',
             lineHeight: 1.05,
             fontWeight: 200,
             letterSpacing: '0.05em',
@@ -84,7 +84,7 @@ export default function ClosingScene() {
           className="font-serif leading-relaxed mb-6 mx-auto"
           style={{
             fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
-            color: 'rgba(95,189,189,0.55)',
+            color: 'rgba(196,160,82,0.75)',
             maxWidth: '40ch',
             fontStyle: 'italic',
             fontWeight: 300,
@@ -100,7 +100,7 @@ export default function ClosingScene() {
           className="font-sans font-light leading-relaxed mb-16 mx-auto"
           style={{
             fontSize: 'clamp(0.9rem, 1.3vw, 1.05rem)',
-            color: 'rgba(244,239,230,0.28)',
+            color: 'rgba(244,239,230,0.45)',
             maxWidth: '36ch',
             fontWeight: 300,
             opacity: visible ? 1 : 0,
@@ -123,18 +123,18 @@ export default function ClosingScene() {
           <Link
             href="/awareness-session"
             className="inline-flex items-center gap-3 px-8 py-3.5 text-sm font-sans tracking-wide rounded-sm transition-all duration-300"
-            style={{ background: '#1A6B6B', color: '#F4EFE6', fontWeight: 600, letterSpacing: '0.06em' }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#155858')}
-            onMouseLeave={e => (e.currentTarget.style.background = '#1A6B6B')}
+            style={{ background: '#F4EFE6', color: '#1A6B6B', fontWeight: 600, letterSpacing: '0.06em' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#EDE8DF')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#F4EFE6')}
           >
             Join the Free Awareness Session
           </Link>
           <Link
             href="/programs-overview"
             className="inline-flex items-center gap-3 text-sm font-sans tracking-wide transition-all duration-300"
-            style={{ color: 'rgba(168,216,206,0.35)', fontWeight: 400 }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(168,216,206,0.65)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(168,216,206,0.35)')}
+            style={{ color: 'rgba(244,239,230,0.45)', fontWeight: 400 }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(244,239,230,0.75)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(244,239,230,0.45)')}
           >
             View All Programs →
           </Link>
@@ -143,7 +143,7 @@ export default function ClosingScene() {
         <p
           className="mt-12 text-xs font-sans uppercase tracking-widest"
           style={{
-            color: 'rgba(244,239,230,0.1)',
+            color: 'rgba(244,239,230,0.18)',
             opacity: visible ? 1 : 0,
             transition: 'opacity 1s ease 0.6s',
           }}

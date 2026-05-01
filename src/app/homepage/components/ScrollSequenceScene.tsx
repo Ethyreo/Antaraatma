@@ -214,7 +214,7 @@ export default function ScrollSequenceScene() {
       style={{
         position: 'relative',
         height: '100vh',
-        background: '#0e0d0b',
+        background: '#F4EFE6',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
@@ -224,7 +224,7 @@ export default function ScrollSequenceScene() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse 60% 50% at 50% ${45 + progress * 10}%, rgba(180,130,55,${0.05 + progress * 0.07}) 0%, transparent 65%)`,
+          background: `radial-gradient(ellipse 60% 50% at 50% ${45 + progress * 10}%, rgba(196,160,82,${0.06 + progress * 0.07}) 0%, transparent 65%)`,
           transition: 'background 0.4s ease',
         }}
       />
@@ -241,13 +241,13 @@ export default function ScrollSequenceScene() {
       {/* Progress line — left edge */}
       <div
         className="absolute left-0 top-0 w-px pointer-events-none"
-        style={{ height: '100%', background: 'rgba(180,130,55,0.08)' }}
+        style={{ height: '100%', background: 'rgba(196,160,82,0.1)' }}
       >
         <div
           style={{
             width: '100%',
             height: `${progress * 100}%`,
-            background: 'rgba(180,130,55,0.35)',
+            background: 'rgba(196,160,82,0.4)',
             transition: 'height 0.08s linear',
           }}
         />
@@ -267,7 +267,7 @@ export default function ScrollSequenceScene() {
               className="font-serif"
               style={{
                 fontSize: 'clamp(2.8rem, 5vw, 4.2rem)',
-                color: 'rgba(232,224,208,0.85)',
+                color: 'rgba(36,44,44,0.75)',
                 lineHeight: 1,
                 letterSpacing: '-0.03em',
               }}
@@ -278,7 +278,7 @@ export default function ScrollSequenceScene() {
               className="font-sans uppercase mt-2"
               style={{
                 fontSize: '0.6rem',
-                color: 'rgba(180,130,55,0.55)',
+                color: 'rgba(196,160,82,0.7)',
                 letterSpacing: '0.22em',
               }}
             >
@@ -293,7 +293,7 @@ export default function ScrollSequenceScene() {
               style={{
                 width: '100%',
                 height: '2px',
-                background: 'rgba(180,130,55,0.12)',
+                background: 'rgba(196,160,82,0.15)',
                 borderRadius: '2px',
                 position: 'relative',
               }}
@@ -305,7 +305,7 @@ export default function ScrollSequenceScene() {
                   top: 0,
                   height: '100%',
                   width: `${progress * 100}%`,
-                  background: 'rgba(180,130,55,0.6)',
+                  background: 'rgba(196,160,82,0.6)',
                   borderRadius: '2px',
                   transition: 'width 0.12s linear',
                 }}
@@ -326,11 +326,11 @@ export default function ScrollSequenceScene() {
                       height: isActive ? '8px' : '6px',
                       borderRadius: '50%',
                       background: isActive
-                        ? 'rgba(200,155,70,0.95)'
+                        ? 'rgba(196,160,82,0.95)'
                         : isPast
-                        ? 'rgba(180,130,55,0.55)'
-                        : 'rgba(180,130,55,0.15)',
-                      border: isActive ? '1.5px solid rgba(200,155,70,0.4)' : 'none',
+                        ? 'rgba(196,160,82,0.55)'
+                        : 'rgba(196,160,82,0.2)',
+                      border: isActive ? '1.5px solid rgba(196,160,82,0.4)' : 'none',
                       transition: 'background 0.4s ease, width 0.3s ease, height 0.3s ease',
                     }}
                   />
@@ -351,10 +351,10 @@ export default function ScrollSequenceScene() {
                       fontSize: '0.52rem',
                       letterSpacing: '0.18em',
                       color: isActive
-                        ? 'rgba(180,130,55,0.8)'
+                        ? 'rgba(196,160,82,0.85)'
                         : isPast
-                        ? 'rgba(232,224,208,0.3)'
-                        : 'rgba(232,224,208,0.12)',
+                        ? 'rgba(36,44,44,0.35)'
+                        : 'rgba(36,44,44,0.18)',
                       transition: 'color 0.4s ease',
                       textAlign: i === 0 ? 'left' : i === 2 ? 'right' : 'center',
                       flex: 1,
@@ -393,7 +393,7 @@ export default function ScrollSequenceScene() {
                 className="font-serif mb-4"
                 style={{
                   fontSize: 'clamp(1.15rem, 2.4vw, 1.7rem)',
-                  color: 'rgba(180,130,55,0.6)',
+                  color: 'rgba(196,160,82,0.7)',
                   letterSpacing: '0.04em',
                   lineHeight: 1,
                 }}
@@ -404,7 +404,7 @@ export default function ScrollSequenceScene() {
                 className="font-serif text-balance mb-6"
                 style={{
                   fontSize: 'clamp(1.6rem, 3.2vw, 2.6rem)',
-                  color: 'rgba(232,224,208,0.9)',
+                  color: 'rgba(36,44,44,0.88)',
                   lineHeight: 1.08,
                 }}
               >
@@ -414,7 +414,7 @@ export default function ScrollSequenceScene() {
                 className="font-sans font-light leading-relaxed mx-auto"
                 style={{
                   fontSize: 'clamp(0.82rem, 1.1vw, 0.94rem)',
-                  color: 'rgba(232,224,208,0.32)',
+                  color: 'rgba(36,44,44,0.45)',
                   maxWidth: '42ch',
                 }}
               >
@@ -439,10 +439,10 @@ export default function ScrollSequenceScene() {
                     width: isActive ? '2rem' : '1rem',
                     height: '1px',
                     background: isActive
-                      ? 'rgba(180,130,55,0.7)'
+                      ? 'rgba(196,160,82,0.7)'
                       : isPast
-                      ? 'rgba(180,130,55,0.3)'
-                      : 'rgba(255,255,255,0.1)',
+                      ? 'rgba(196,160,82,0.3)'
+                      : 'rgba(36,44,44,0.12)',
                     transition: 'width 0.4s ease, background 0.4s ease',
                   }}
                 />
@@ -452,10 +452,10 @@ export default function ScrollSequenceScene() {
                     fontSize: '0.6rem',
                     letterSpacing: '0.18em',
                     color: isActive
-                      ? 'rgba(180,130,55,0.75)'
+                      ? 'rgba(196,160,82,0.8)'
                       : isPast
-                      ? 'rgba(232,224,208,0.25)'
-                      : 'rgba(232,224,208,0.12)',
+                      ? 'rgba(36,44,44,0.3)'
+                      : 'rgba(36,44,44,0.15)',
                     transition: 'color 0.4s ease',
                   }}
                 >
@@ -474,14 +474,14 @@ export default function ScrollSequenceScene() {
             transition: 'opacity 0.5s ease',
           }}
         >
-          <span className="font-sans uppercase text-[0.55rem] tracking-[0.2em]" style={{ color: 'rgba(232,224,208,0.5)' }}>
+          <span className="font-sans uppercase text-[0.55rem] tracking-[0.2em]" style={{ color: 'rgba(36,44,44,0.45)' }}>
             scroll
           </span>
           <div
             style={{
               width: '1px',
               height: '2rem',
-              background: 'linear-gradient(to bottom, rgba(180,130,55,0.4), transparent)',
+              background: 'linear-gradient(to bottom, rgba(196,160,82,0.4), transparent)',
             }}
           />
         </div>

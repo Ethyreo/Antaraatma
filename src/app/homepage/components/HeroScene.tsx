@@ -134,7 +134,7 @@ export default function HeroScene() {
       ref={containerRef}
       className="relative min-h-screen flex flex-col overflow-hidden"
       style={{
-        background: '#1A2828',
+        background: '#F4EFE6',
         '--mx': '30%',
         '--my': '40%',
       } as React.CSSProperties}
@@ -160,7 +160,7 @@ export default function HeroScene() {
         className="absolute inset-0 pointer-events-none"
         style={{
           zIndex: 2,
-          background: 'radial-gradient(ellipse 55% 45% at var(--mx) var(--my), rgba(26,107,107,0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 55% 45% at var(--mx) var(--my), rgba(26,107,107,0.06) 0%, transparent 70%)',
           transition: 'background 0.15s ease',
         }}
       />
@@ -168,9 +168,9 @@ export default function HeroScene() {
       {/* Static ambient layers */}
       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 2 }}>
         <div className="absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse 70% 55% at 12% 18%, rgba(95,189,189,0.04) 0%, transparent 55%)' }} />
+          style={{ background: 'radial-gradient(ellipse 70% 55% at 12% 18%, rgba(95,189,189,0.07) 0%, transparent 55%)' }} />
         <div className="absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse 45% 65% at 88% 82%, rgba(58,122,90,0.03) 0%, transparent 55%)' }} />
+          style={{ background: 'radial-gradient(ellipse 45% 65% at 88% 82%, rgba(196,160,82,0.05) 0%, transparent 55%)' }} />
       </div>
 
       {/* Grain */}
@@ -185,14 +185,14 @@ export default function HeroScene() {
 
       {/* Sacred geometry watermark — concentric circles */}
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ zIndex: 2 }}>
-        <svg width="600" height="600" viewBox="0 0 600 600" fill="none" opacity="0.04" aria-hidden="true">
-          <circle cx="300" cy="300" r="60" stroke="#5FBDBD" strokeWidth="0.8"/>
-          <circle cx="300" cy="300" r="120" stroke="#5FBDBD" strokeWidth="0.8"/>
-          <circle cx="300" cy="300" r="180" stroke="#5FBDBD" strokeWidth="0.8"/>
-          <circle cx="300" cy="300" r="240" stroke="#5FBDBD" strokeWidth="0.8"/>
-          <circle cx="300" cy="300" r="290" stroke="#5FBDBD" strokeWidth="0.8"/>
-          <line x1="300" y1="10" x2="300" y2="590" stroke="#5FBDBD" strokeWidth="0.5"/>
-          <line x1="10" y1="300" x2="590" y2="300" stroke="#5FBDBD" strokeWidth="0.5"/>
+        <svg width="600" height="600" viewBox="0 0 600 600" fill="none" opacity="0.06" aria-hidden="true">
+          <circle cx="300" cy="300" r="60" stroke="#1A6B6B" strokeWidth="0.8"/>
+          <circle cx="300" cy="300" r="120" stroke="#1A6B6B" strokeWidth="0.8"/>
+          <circle cx="300" cy="300" r="180" stroke="#1A6B6B" strokeWidth="0.8"/>
+          <circle cx="300" cy="300" r="240" stroke="#1A6B6B" strokeWidth="0.8"/>
+          <circle cx="300" cy="300" r="290" stroke="#1A6B6B" strokeWidth="0.8"/>
+          <line x1="300" y1="10" x2="300" y2="590" stroke="#1A6B6B" strokeWidth="0.5"/>
+          <line x1="10" y1="300" x2="590" y2="300" stroke="#1A6B6B" strokeWidth="0.5"/>
           <circle cx="300" cy="300" r="4" fill="#C4A052" opacity="0.6"/>
         </svg>
       </div>
@@ -212,7 +212,7 @@ export default function HeroScene() {
             className="font-sans uppercase tracking-[0.22em] mb-14"
             style={{
               fontSize: '0.62rem',
-              color: 'rgba(95,189,189,0.5)',
+              color: 'rgba(26,107,107,0.55)',
               fontWeight: 600,
               opacity: loaded ? 1 : 0,
               transform: loaded ? 'translateY(0)' : 'translateY(10px)',
@@ -227,7 +227,7 @@ export default function HeroScene() {
             className="font-serif leading-[1.0] mb-10 text-balance"
             style={{
               fontSize: 'clamp(3rem, 7vw, 6.5rem)',
-              color: '#F4EFE6',
+              color: '#1A2828',
               fontWeight: 200,
               letterSpacing: '0.06em',
               opacity: loaded ? 1 : 0,
@@ -236,7 +236,7 @@ export default function HeroScene() {
             }}
           >
             Enter stillness.<br />
-            <span style={{ color: 'rgba(95,189,189,0.6)' }}>Begin healing.</span>
+            <span style={{ color: '#1A6B6B' }}>Begin healing.</span>
           </h1>
 
           {/* Subtext */}
@@ -244,7 +244,7 @@ export default function HeroScene() {
             className="font-sans font-light leading-relaxed mb-20 mx-auto"
             style={{
               fontSize: 'clamp(0.9rem, 1.4vw, 1.05rem)',
-              color: 'rgba(244,239,230,0.35)',
+              color: 'rgba(36,44,44,0.45)',
               maxWidth: '38ch',
               fontWeight: 300,
               opacity: loaded ? 1 : 0,
@@ -282,17 +282,17 @@ export default function HeroScene() {
               href="/programs-overview"
               className="inline-flex items-center gap-3 px-8 py-3.5 text-sm font-sans tracking-wide rounded-sm transition-all duration-300"
               style={{
-                border: '1px solid rgba(95,189,189,0.3)',
-                color: 'rgba(95,189,189,0.7)',
+                border: '1px solid rgba(26,107,107,0.3)',
+                color: 'rgba(26,107,107,0.7)',
                 fontWeight: 400,
               }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(95,189,189,0.6)';
-                (e.currentTarget as HTMLElement).style.color = '#5FBDBD';
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(26,107,107,0.6)';
+                (e.currentTarget as HTMLElement).style.color = '#1A6B6B';
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(95,189,189,0.3)';
-                (e.currentTarget as HTMLElement).style.color = 'rgba(95,189,189,0.7)';
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(26,107,107,0.3)';
+                (e.currentTarget as HTMLElement).style.color = 'rgba(26,107,107,0.7)';
               }}
             >
               Explore Programs
@@ -303,7 +303,7 @@ export default function HeroScene() {
           <div
             className="mt-20 pt-8 grid grid-cols-3 gap-6"
             style={{
-              borderTop: '1px solid rgba(168,216,206,0.1)',
+              borderTop: '1px solid rgba(26,107,107,0.12)',
               opacity: loaded ? 1 : 0,
               transition: 'opacity 1s ease 0.8s',
             }}
@@ -314,8 +314,8 @@ export default function HeroScene() {
               { value: '12 yrs', label: 'Clinical Practice' },
             ]?.map((stat) => (
               <div key={`hero-stat-${stat?.label}`} className="text-center">
-                <p className="font-serif tabular-nums" style={{ fontSize: '1.5rem', color: 'rgba(244,239,230,0.7)', fontWeight: 300 }}>{stat?.value}</p>
-                <p className="text-xs font-sans uppercase tracking-widest mt-1" style={{ color: 'rgba(168,216,206,0.3)', fontWeight: 600 }}>{stat?.label}</p>
+                <p className="font-serif tabular-nums" style={{ fontSize: '1.5rem', color: '#1A6B6B', fontWeight: 300 }}>{stat?.value}</p>
+                <p className="text-xs font-sans uppercase tracking-widest mt-1" style={{ color: 'rgba(26,107,107,0.4)', fontWeight: 600 }}>{stat?.label}</p>
               </div>
             ))}
           </div>
@@ -324,8 +324,8 @@ export default function HeroScene() {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
-        <div className="w-px h-8 animate-pulse-soft" style={{ background: '#5FBDBD' }} />
-        <span className="text-2xs font-sans tracking-[0.15em] uppercase" style={{ color: '#5FBDBD' }}>Scroll</span>
+        <div className="w-px h-8 animate-pulse-soft" style={{ background: '#1A6B6B' }} />
+        <span className="text-2xs font-sans tracking-[0.15em] uppercase" style={{ color: '#1A6B6B' }}>Scroll</span>
       </div>
     </section>
   );

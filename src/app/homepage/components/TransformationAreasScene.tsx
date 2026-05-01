@@ -44,7 +44,7 @@ export default function TransformationAreasScene() {
       ref={sectionRef}
       className="relative overflow-hidden"
       style={{
-        background: '#FAF8F4',
+        background: '#F4EFE6',
         paddingTop: 'clamp(6rem, 14vw, 11rem)',
         paddingBottom: 'clamp(6rem, 14vw, 11rem)',
       }}
@@ -69,7 +69,7 @@ export default function TransformationAreasScene() {
         >
           <p
             className="text-xs font-sans uppercase tracking-[0.2em] mb-10 inline-block"
-            style={{ color: 'rgba(180,130,55,0.5)' }}
+            style={{ color: 'rgba(196,160,82,0.65)', fontWeight: 600 }}
           >
             Areas of Transformation
           </p>
@@ -77,24 +77,24 @@ export default function TransformationAreasScene() {
             className="font-serif text-balance mx-auto"
             style={{
               fontSize: 'clamp(2.2rem, 5vw, 4rem)',
-              color: '#1c1a17',
+              color: '#1A2828',
               lineHeight: 1.0,
               maxWidth: '20ch',
             }}
           >
             Healing happens across<br />
-            <span style={{ color: 'rgba(28,26,23,0.22)' }}>every dimension of life.</span>
+            <span style={{ color: 'rgba(36,44,44,0.22)' }}>every dimension of life.</span>
           </h2>
         </div>
 
         {/* Areas list */}
-        <div style={{ borderTop: '1px solid rgba(28,26,23,0.07)' }}>
+        <div style={{ borderTop: '1px solid rgba(36,44,44,0.08)' }}>
           {areas?.map((area, i) => (
             <div
               key={area?.label}
               className="grid grid-cols-1 lg:grid-cols-12 gap-0 group"
               style={{
-                borderBottom: '1px solid rgba(28,26,23,0.07)',
+                borderBottom: '1px solid rgba(36,44,44,0.08)',
                 opacity: rowVisible[i] ? 1 : 0,
                 transform: rowVisible[i] ? 'translateY(0)' : 'translateY(14px)',
                 transition: `opacity 0.7s ease, transform 0.7s ease`,
@@ -107,7 +107,7 @@ export default function TransformationAreasScene() {
                   className="font-serif"
                   style={{
                     fontSize: 'clamp(1.4rem, 2.2vw, 2rem)',
-                    color: '#1c1a17',
+                    color: '#1A6B6B',
                     transition: 'color 0.25s ease',
                   }}
                 >
@@ -116,11 +116,11 @@ export default function TransformationAreasScene() {
               </div>
               <div
                 className="lg:col-span-9 py-8 lg:py-10 lg:pl-12 flex items-center"
-                style={{ borderLeft: '1px solid rgba(28,26,23,0.07)' }}
+                style={{ borderLeft: '1px solid rgba(36,44,44,0.07)' }}
               >
                 <p
                   className="font-sans font-light leading-relaxed max-w-[52ch]"
-                  style={{ fontSize: '0.875rem', color: 'rgba(28,26,23,0.38)' }}
+                  style={{ fontSize: '0.875rem', color: 'rgba(36,44,44,0.45)' }}
                 >
                   {area?.description}
                 </p>
