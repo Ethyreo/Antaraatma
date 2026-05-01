@@ -1,9 +1,9 @@
 # Antaraatma Project Overview (Codex Guide)
 
 ## Current State & Branching Logic
-- **Primary Branch:** `rocket-update`
-  - This branch contains the most recent and significant updates, including a complete overhaul of the admin dashboard, student onboarding flows, API routes, and Supabase integrations.
-  - **Do not use `main` for development**, as it contains outdated code.
+- **Primary Branch:** `main`
+  - This branch is now the source of truth, containing all the latest updates including the rebranding to Antaraatma, admin dashboard, student onboarding, and Supabase integrations.
+  - The `rocket-update` branch has been merged into `main`.
 - **Platform:** Next.js 15 (App Router), React 19, Tailwind CSS.
 - **Origin:** Created via [Rocket.ai](https://rocket.new).
 - **Hosting:** Netlify (Custom Domain).
