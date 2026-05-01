@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     canonical: 'https://vijayheals1931.builtwithrocket.new',
   },
   icons: {
-    icon: [{ url: '/favicon.ico', type: 'image/x-icon' }],
+    icon: [{ url: '/assets/images/WhatsApp_Image_2026-05-02_at_12.27.23_AM-removebg-preview-1777663044774.png', type: 'image/png' }],
   },
 };
 
