@@ -84,9 +84,9 @@ export default function PublicNav() {
               key={`nav-${link?.label?.toLowerCase()}`}
               href={link?.href}
               className="text-sm font-sans transition-colors tracking-wide"
-              style={{ color: scrolled ? '#3A4A4A' : 'rgba(244,239,230,0.75)', fontWeight: 400 }}
+              style={{ color: scrolled ? '#3A4A4A' : '#3A4A4A', fontWeight: 400 }}
               onMouseEnter={e => (e.currentTarget.style.color = '#1A6B6B')}
-              onMouseLeave={e => (e.currentTarget.style.color = scrolled ? '#3A4A4A' : 'rgba(244,239,230,0.75)')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#3A4A4A')}
             >
               {link?.label}
             </Link>

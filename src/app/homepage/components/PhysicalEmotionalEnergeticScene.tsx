@@ -213,7 +213,7 @@ export default function PhysicalEmotionalEnergeticScene() {
       style={{
         position: 'relative',
         height: '100vh',
-        background: '#EDE8DF',
+        background: '#F4EFE6',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',

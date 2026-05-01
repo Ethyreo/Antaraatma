@@ -37,7 +37,7 @@ export default function AuthorityScene() {
       ref={sectionRef}
       className="relative overflow-hidden"
       style={{
-        background: '#EDE8DF',
+        background: '#F4EFE6',
         paddingTop: 'clamp(6rem, 14vw, 11rem)',
         paddingBottom: 'clamp(6rem, 14vw, 11rem)',
       }}

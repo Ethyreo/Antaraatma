@@ -56,10 +56,10 @@ const cards = [
         <path d="M14 3 L17 11 L26 11 L19 16.5 L21.5 25 L14 20 L6.5 25 L9 16.5 L2 11 L11 11 Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" fill="none" />
       </svg>
     ),
-    accent: '#6b5b9e',
-    accentLight: 'rgba(107,91,158,0.07)',
-    accentBorder: 'rgba(107,91,158,0.26)',
-    textAccent: '#6b5b9e',
+    accent: '#1A6B6B',
+    accentLight: 'rgba(26,107,107,0.07)',
+    accentBorder: 'rgba(26,107,107,0.26)',
+    textAccent: '#1A6B6B',
   },
 ];
 
@@ -129,7 +129,7 @@ export default function PathwaySliderSection() {
       ref={sectionRef}
       className="relative overflow-hidden"
       style={{
-        background: '#EDE8DF',
+        background: '#F4EFE6',
         paddingTop: 'clamp(5rem, 12vw, 9rem)',
         paddingBottom: 'clamp(6rem, 14vw, 11rem)',
       }}
