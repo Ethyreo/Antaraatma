@@ -199,7 +199,7 @@ export default function HeroScene() {
 
       {/* Main content */}
       <div
-        className="relative flex flex-col flex-1 justify-center items-center text-center pt-32 pb-24 px-6"
+        className="relative flex flex-col flex-1 justify-center items-center text-center pt-20 pb-16 px-6"
         style={{
           zIndex: 10,
           transform: `translateY(${-parallaxOffset}px) translateZ(0)`,
@@ -209,7 +209,7 @@ export default function HeroScene() {
         <div className="max-w-2xl w-full mx-auto">
           {/* Eyebrow */}
           <p
-            className="font-sans uppercase tracking-[0.22em] mb-14"
+            className="font-sans uppercase tracking-[0.22em] mb-8"
             style={{
               fontSize: '0.62rem',
               color: 'rgba(26,107,107,0.55)',
@@ -224,9 +224,9 @@ export default function HeroScene() {
 
           {/* Headline — Raleway light weight */}
           <h1
-            className="font-serif leading-[1.0] mb-10 text-balance"
+            className="font-serif leading-[1.0] mb-7 text-balance"
             style={{
-              fontSize: 'clamp(3rem, 7vw, 6.5rem)',
+              fontSize: 'clamp(2rem, 4.5vw, 3.8rem)',
               color: '#1A2828',
               fontWeight: 200,
               letterSpacing: '0.06em',
@@ -241,7 +241,7 @@ export default function HeroScene() {
 
           {/* Subtext */}
           <p
-            className="font-sans font-light leading-relaxed mb-20 mx-auto"
+            className="font-sans font-light leading-relaxed mb-12 mx-auto"
             style={{
               fontSize: 'clamp(0.9rem, 1.4vw, 1.05rem)',
               color: 'rgba(36,44,44,0.45)',
@@ -301,7 +301,7 @@ export default function HeroScene() {
 
           {/* Stats */}
           <div
-            className="mt-20 pt-8 grid grid-cols-3 gap-6"
+            className="mt-12 pt-6 grid grid-cols-3 gap-6"
             style={{
               borderTop: '1px solid rgba(26,107,107,0.12)',
               opacity: loaded ? 1 : 0,
