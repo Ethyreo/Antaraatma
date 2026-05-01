@@ -69,7 +69,7 @@ export default function TransformationAreasScene() {
         >
           <p
             className="text-xs font-sans uppercase tracking-[0.2em] mb-10 inline-block"
-            style={{ color: 'rgba(196,160,82,0.65)', fontWeight: 600 }}
+            style={{ color: 'rgba(26,107,107,0.65)', fontWeight: 600 }}
           >
             Areas of Transformation
           </p>

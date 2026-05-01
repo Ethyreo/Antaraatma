@@ -19,10 +19,10 @@ const cards = [
         <circle cx="14" cy="14" r="2" fill="currentColor" />
       </svg>
     ),
-    accent: '#b4822a',
-    accentLight: 'rgba(180,130,42,0.08)',
-    accentBorder: 'rgba(180,130,42,0.28)',
-    textAccent: '#b4822a',
+    accent: '#1A6B6B',
+    accentLight: 'rgba(26,107,107,0.08)',
+    accentBorder: 'rgba(26,107,107,0.28)',
+    textAccent: '#1A6B6B',
   },
   {
     number: '02',
@@ -38,10 +38,10 @@ const cards = [
         <path d="M8 8 L20 20 M20 8 L8 20" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeOpacity="0.4" />
       </svg>
     ),
-    accent: '#4a7c6f',
-    accentLight: 'rgba(74,124,111,0.07)',
-    accentBorder: 'rgba(74,124,111,0.26)',
-    textAccent: '#4a7c6f',
+    accent: '#1A6B6B',
+    accentLight: 'rgba(26,107,107,0.07)',
+    accentBorder: 'rgba(26,107,107,0.26)',
+    textAccent: '#1A6B6B',
   },
   {
     number: '03',
@@ -138,7 +138,7 @@ export default function PathwaySliderSection() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 80% 50% at 50% 30%, rgba(196,160,82,0.06) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 80% 50% at 50% 30%, rgba(26,107,107,0.06) 0%, transparent 70%)',
         }}
       />
 
@@ -154,7 +154,7 @@ export default function PathwaySliderSection() {
         >
           <p
             className="text-xs font-sans uppercase tracking-[0.22em] mb-6 inline-block"
-            style={{ color: 'rgba(196,160,82,0.7)' }}
+            style={{ color: 'rgba(26,107,107,0.7)' }}
           >
             Program Architecture
           </p>
