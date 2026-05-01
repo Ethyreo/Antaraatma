@@ -151,7 +151,7 @@ export default function StudentSignupForm({ invitedEmail = '', invitedName = '' 
         </div>
         {inviteStatus === 'valid' && (
           <p className="text-xs font-sans text-green-600 mt-1 flex items-center gap-1">
-            <CheckCircle2 size={10} /> Email verified — you are invited to join VijayHeals
+            <CheckCircle2 size={10} /> Email verified — you are invited to join Antaraatma
           </p>
         )}
         {inviteStatus === 'invalid' && (

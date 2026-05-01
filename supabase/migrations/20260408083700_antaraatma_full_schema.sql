@@ -1098,17 +1098,17 @@ BEGIN
     phone_change_token, phone_change_sent_at
   ) VALUES
     (admin_uuid, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
-     'admin@vijayheals.com', crypt('admin123', gen_salt('bf', 10)), NOW(), NOW(), NOW(),
+     'admin@antaraatma.com', crypt('admin123', gen_salt('bf', 10)), NOW(), NOW(), NOW(),
      jsonb_build_object('full_name', 'Dr. Vijay Singla', 'role', 'admin'),
      jsonb_build_object('provider', 'email', 'providers', ARRAY['email']::TEXT[]),
      false, false, '', null, '', null, '', '', null, '', 0, '', null, null, '', '', null),
     (student1_uuid, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
-     'priya@vijayheals.com', crypt('student123', gen_salt('bf', 10)), NOW(), NOW(), NOW(),
+     'priya@antaraatma.com', crypt('student123', gen_salt('bf', 10)), NOW(), NOW(), NOW(),
      jsonb_build_object('full_name', 'Priya Sharma', 'role', 'student'),
      jsonb_build_object('provider', 'email', 'providers', ARRAY['email']::TEXT[]),
      false, false, '', null, '', null, '', '', null, '', 0, '', null, null, '', '', null),
     (student2_uuid, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
-     'arjun@vijayheals.com', crypt('student123', gen_salt('bf', 10)), NOW(), NOW(), NOW(),
+     'arjun@antaraatma.com', crypt('student123', gen_salt('bf', 10)), NOW(), NOW(), NOW(),
      jsonb_build_object('full_name', 'Arjun Mehta', 'role', 'student'),
      jsonb_build_object('provider', 'email', 'providers', ARRAY['email']::TEXT[]),
      false, false, '', null, '', null, '', '', null, '', 0, '', null, null, '', '', null)
@@ -1118,7 +1118,7 @@ BEGIN
   INSERT INTO public.programs (id, title, slug, tagline, description, long_description, duration, price, price_label, price_note, payment_type, status, featured, sort_order, outcomes, who_is_it_for) VALUES
     (prog_awareness_id, 'Awareness Session', 'awareness-session', 'Your first step into natural healing',
      'A free 1-hour live session that introduces you to naturopathy, Dr. Vijay''s healing philosophy, and the transformation pathway.',
-     'The Awareness Session is the entry point to the VijayHeals ecosystem. In this free, live 1-hour session, Dr. Vijay Singla introduces the foundational principles of naturopathy.',
+     'The Awareness Session is the entry point to the Antaraatma ecosystem. In this free, live 1-hour session, Dr. Vijay Singla introduces the foundational principles of naturopathy.',
      '1 hour', 0, 'Free', 'No credit card required', 'one_time'::public.payment_type, 'published'::public.publish_status, true, 1,
      '["Understand why your body holds illness","Learn the 3-stage healing pathway","Discover your primary healing blocks"]'::JSONB,
      '["Anyone curious about natural healing","People who have tried conventional medicine without lasting results"]'::JSONB),
@@ -1252,13 +1252,13 @@ BEGIN
      'Most people treat symptoms. Naturopathy asks a different question: why is the body creating this symptom in the first place?',
      'The symptom is a signal, not the problem. Your body is extraordinarily intelligent and does not create pain or dysfunction randomly.',
      admin_uuid, 'Dr. Vijay Singla', cat_nat_id, NOW() - INTERVAL '24 days', 'published'::public.publish_status, true, 380, 2,
-     'Why Your Body Holds Illness — Naturopathic Perspective | VijayHeals',
+     'Why Your Body Holds Illness — Naturopathic Perspective | Antaraatma',
      'Discover why naturopathy treats the root cause of illness, not just symptoms.'),
     (post2_id, 'The Healing Power of Conscious Breathing', 'healing-power-conscious-breathing',
      'Breath is the one physiological function that bridges the conscious and unconscious mind.',
      'Of all the healing practices available to us, conscious breathing is perhaps the most immediate and accessible.',
      admin_uuid, 'Dr. Vijay Singla', cat_breath_id, NOW() - INTERVAL '17 days', 'published'::public.publish_status, false, 340, 2,
-     'The Healing Power of Conscious Breathing | VijayHeals',
+     'The Healing Power of Conscious Breathing | Antaraatma',
      'Learn how breathwork activates the parasympathetic nervous system and accelerates healing.')
   ON CONFLICT (id) DO NOTHING;
 
@@ -1323,9 +1323,9 @@ BEGIN
 
   -- ── SEO METADATA ────────────────────────────────────────────
   INSERT INTO public.seo_metadata (page_key, title, description, keywords, og_title, og_description) VALUES
-    ('homepage', 'VijayHeals — Natural Healing with Dr. Vijay Singla', 'Structured naturopathic healing programs for lasting physical, emotional, and energetic transformation.', 'naturopathy, natural healing, Dr. Vijay Singla, wellness', 'VijayHeals — Heal from Within', 'Join Dr. Vijay Singla for a structured healing journey grounded in naturopathy.'),
-    ('programs', 'Healing Programs — VijayHeals', 'Explore the VijayHeals program pathway: Awareness Session, Foundation Course, and Transformation Mastery.', 'healing programs, naturopathy courses, transformation mastery', 'VijayHeals Programs', 'From awareness to mastery — find your healing pathway.'),
-    ('blog', 'Healing Insights Blog — VijayHeals', 'Articles on naturopathy, breathwork, nutrition, emotional healing, and student transformation stories.', 'naturopathy blog, healing articles, breathwork, nutrition', 'VijayHeals Blog', 'Insights on natural healing, breathwork, and transformation.')
+    ('homepage', 'Antaraatma — Natural Healing with Dr. Vijay Singla', 'Structured naturopathic healing programs for lasting physical, emotional, and energetic transformation.', 'naturopathy, natural healing, Dr. Vijay Singla, wellness', 'Antaraatma — Heal from Within', 'Join Dr. Vijay Singla for a structured healing journey grounded in naturopathy.'),
+    ('programs', 'Healing Programs — Antaraatma', 'Explore the Antaraatma program pathway: Awareness Session, Foundation Course, and Transformation Mastery.', 'healing programs, naturopathy courses, transformation mastery', 'Antaraatma Programs', 'From awareness to mastery — find your healing pathway.'),
+    ('blog', 'Healing Insights Blog — Antaraatma', 'Articles on naturopathy, breathwork, nutrition, emotional healing, and student transformation stories.', 'naturopathy blog, healing articles, breathwork, nutrition', 'Antaraatma Blog', 'Insights on natural healing, breathwork, and transformation.')
   ON CONFLICT (page_key) DO NOTHING;
 
 EXCEPTION
