@@ -72,7 +72,7 @@ export default function PublicNav() {
           <AppLogo size={32} />
           <span
             className="font-serif text-lg tracking-[0.08em] transition-colors"
-            style={{ color: scrolled ? '#1A6B6B' : '#F4EFE6', fontWeight: 300 }}
+            style={{ color: scrolled ? '#1A6B6B' : '#1A6B6B', fontWeight: 300 }}
           >
             ANTARAATMA
           </span>
@@ -117,7 +117,7 @@ export default function PublicNav() {
             <Link
               href="/sign-up-login"
               className="text-sm font-sans transition-colors"
-              style={{ color: scrolled ? '#3A4A4A' : 'rgba(244,239,230,0.7)', fontWeight: 400 }}
+              style={{ color: scrolled ? '#3A4A4A' : '#1A6B6B', fontWeight: 400 }}
             >
               Sign In
             </Link>
