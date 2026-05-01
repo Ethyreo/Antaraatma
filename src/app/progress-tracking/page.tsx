@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import StudentSidebar from '@/components/StudentSidebar';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import { CheckCircle, Lock, Play, ChevronDown, ChevronUp, Loader2, RefreshCw } from 'lucide-react';
 
 interface LessonRow {
@@ -48,12 +49,20 @@ interface ProgramData {
 }
 
 export default function ProgressTrackingPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
   const [programDataList, setProgramDataList] = useState<ProgramData[]>([]);
   const [loading, setLoading] = useState(true);
   const [markingLesson, setMarkingLesson] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Auth guard
+  const router = useRouter();
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/sign-up-login');
+    }
+  }, [user, authLoading, router]);
 
   const fetchData = useCallback(async (silent = false) => {
     if (!user) return;

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
 import { LayoutDashboard, BookOpen, Users, FileText, ShoppingCart, Star, HelpCircle, MessageSquare, Bell, Package, Settings, ChevronLeft, ChevronRight, Layers, Globe, TrendingUp, LogOut, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 const navItems = [
   { label: 'Dashboard', href: '/admin-dashboard', icon: LayoutDashboard },
@@ -29,10 +30,15 @@ export default function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
 
-  const handleSignOut = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userRole');
-    router?.push('/sign-up-login');
+  const handleSignOut = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Sign out error:', err);
+    } finally {
+      router?.push('/sign-up-login');
+    }
   };
 
   return (

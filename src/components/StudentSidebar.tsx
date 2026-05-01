@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
 import { LayoutDashboard, BookOpen, Award, ChevronLeft, ChevronRight, TrendingUp, Package, Home, MessageSquare, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 const navItems = [
   { label: 'Dashboard', href: '/student-dashboard', icon: LayoutDashboard },
@@ -21,10 +22,15 @@ export default function StudentSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
 
-  const handleSignOut = () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userRole');
-    router?.push('/sign-up-login');
+  const handleSignOut = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Sign out error:', err);
+    } finally {
+      router?.push('/sign-up-login');
+    }
   };
 
   return (
