@@ -51,8 +51,8 @@ export default function AdminDashboardContent() {
       try {
         // Fetch all counts in parallel
         const [
-          { count: totalLeads },
-          { count: studentCount },
+          leadsApiRes,
+          studentsApiRes,
           { count: serviceCount },
           { count: programCount },
           { count: resourceCount },
@@ -70,8 +70,8 @@ export default function AdminDashboardContent() {
           { data: recentLeads },
           { data: recentOrders },
         ] = await Promise.all([
-          supabase.from('leads').select('*', { count: 'exact', head: true }),
-          supabase.from('user_profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+          fetch('/api/leads').then(r => r.json()),
+          fetch('/api/students').then(r => r.json()),
           supabase.from('services').select('*', { count: 'exact', head: true }),
           supabase.from('programs').select('*', { count: 'exact', head: true }),
           supabase.from('resources').select('*', { count: 'exact', head: true }),
@@ -88,7 +88,10 @@ export default function AdminDashboardContent() {
           supabase.from('blog_posts').select('*', { count: 'exact', head: true }).eq('status', 'published'),
           supabase.from('leads').select('id, name, email, source, lead_status, created_at').order('created_at', { ascending: false }).limit(5),
           supabase.from('orders').select('id, amount, order_status, payment_type, user_profiles(full_name), programs(title)').order('created_at', { ascending: false }).limit(5),
-        ]);
+        ] as const);
+
+        const totalLeads = (leadsApiRes.data as any[])?.length ?? 0;
+        const studentCount = (studentsApiRes.students as any[])?.length ?? 0;
 
         const totalRevenue = paidOrders?.reduce((sum, o) => sum + Number(o.amount), 0) ?? 0;
 
@@ -100,8 +103,8 @@ export default function AdminDashboardContent() {
         ]);
 
         setSections([
-          { label: 'Leads', href: '/admin/leads', icon: TrendingUp, count: totalLeads ?? 0, color: 'text-amber-700 bg-amber-50 border-amber-200' },
-          { label: 'Students', href: '/admin/students', icon: Users, count: studentCount ?? 0, color: 'text-blue-700 bg-blue-50 border-blue-200' },
+          { label: 'Leads', href: '/admin/leads', icon: TrendingUp, count: totalLeads, color: 'text-amber-700 bg-amber-50 border-amber-200' },
+          { label: 'Students', href: '/admin/students', icon: Users, count: studentCount, color: 'text-blue-700 bg-blue-50 border-blue-200' },
           { label: 'Services', href: '/admin/services', icon: Globe, count: serviceCount ?? 0, color: 'text-purple-700 bg-purple-50 border-purple-200' },
           { label: 'Programs', href: '/program-management', icon: Layers, count: programCount ?? 0, color: 'text-green-700 bg-green-50 border-green-200' },
           { label: 'Resources', href: '/admin/resources', icon: BookOpen, count: resourceCount ?? 0, color: 'text-orange-700 bg-orange-50 border-orange-200' },
