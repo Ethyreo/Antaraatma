@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
@@ -23,11 +23,6 @@ export default function AuthForm() {
   const supabase = createClient();
 
   const loginForm = useForm<LoginFormData>({ defaultValues: { email: '', password: '', remember: false } });
-
-  // Seed test accounts on first load
-  React.useEffect(() => {
-    fetch('/api/seed-test-accounts', { method: 'POST' }).catch(() => {});
-  }, []);
 
   const handleLoginSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -192,48 +187,6 @@ export default function AuthForm() {
               Create an account
             </button>
           </p>
-
-          {/* Testing Accounts */}
-          <div className="mt-6 p-3 rounded-sm" style={{ background: 'rgba(212,237,232,0.3)', border: '1px solid rgba(168,216,206,0.5)' }}>
-            <p className="text-xs font-sans uppercase tracking-wide mb-2" style={{ color: '#3A7A5A', fontWeight: 600 }}>🧪 Test Accounts</p>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-sans" style={{ color: '#242C2C', fontWeight: 500 }}>Admin</p>
-                  <p className="text-xs font-sans" style={{ color: 'rgba(36,44,44,0.5)', fontWeight: 400 }}>admin@vijayheals.com</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    loginForm.setValue('email', 'admin@vijayheals.com');
-                    loginForm.setValue('password', 'Admin@123');
-                  }}
-                  className="text-xs font-sans px-2 py-1 rounded-sm transition-colors"
-                  style={{ color: '#1A6B6B', border: '1px solid rgba(26,107,107,0.3)', fontWeight: 500 }}
-                >
-                  Use
-                </button>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-sans" style={{ color: '#242C2C', fontWeight: 500 }}>Student</p>
-                  <p className="text-xs font-sans" style={{ color: 'rgba(36,44,44,0.5)', fontWeight: 400 }}>student@vijayheals.com</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    loginForm.setValue('email', 'student@vijayheals.com');
-                    loginForm.setValue('password', 'Student@123');
-                  }}
-                  className="text-xs font-sans px-2 py-1 rounded-sm transition-colors"
-                  style={{ color: '#1A6B6B', border: '1px solid rgba(26,107,107,0.3)', fontWeight: 500 }}
-                >
-                  Use
-                </button>
-              </div>
-            </div>
-            <p className="text-xs font-sans mt-2" style={{ color: 'rgba(36,44,44,0.4)', fontWeight: 400 }}>Password: <span className="font-mono">Admin@123</span> / <span className="font-mono">Student@123</span></p>
-          </div>
         </form>
       )}
 
