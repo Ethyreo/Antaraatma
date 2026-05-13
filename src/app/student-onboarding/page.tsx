@@ -51,7 +51,7 @@ export default function StudentOnboardingPage() {
           <div className="w-6 h-6 rounded-sm bg-amber-700 flex items-center justify-center">
             <span className="font-serif text-amber-100 text-xs">V</span>
           </div>
-          <span className="font-serif text-base text-stone-800 tracking-tight">Antaraatma</span>
+          <span className="font-serif text-base text-stone-800 tracking-tight">VijayHeals</span>
         </div>
         <div className="ml-auto">
           <span className="text-xs font-sans text-stone-400">Welcome, {profile?.full_name || user?.email}</span>

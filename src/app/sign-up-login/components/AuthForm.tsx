@@ -193,11 +193,6 @@ export default function AuthForm() {
       {/* Signup Form */}
       {tab === 'signup' && (
         <div>
-          <div className="mb-5 p-3 rounded-sm" style={{ background: 'rgba(26,107,107,0.06)', border: '1px solid rgba(26,107,107,0.2)' }}>
-            <p className="text-xs font-sans leading-relaxed" style={{ color: '#1A6B6B', fontWeight: 400 }}>
-              <span style={{ fontWeight: 600 }}>Enrollment required:</span> You can only sign up if your email has been registered by an admin. Contact your program coordinator if you need access.
-            </p>
-          </div>
           <StudentSignupForm />
           <p className="mt-5 text-center text-xs font-sans" style={{ color: 'rgba(36,44,44,0.5)', fontWeight: 400 }}>
             Already have an account?{' '}

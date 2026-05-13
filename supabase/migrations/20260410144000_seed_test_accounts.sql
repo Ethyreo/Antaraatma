@@ -1,5 +1,5 @@
 -- Seed test accounts for admin and student login
--- Credentials: admin@antaraatma.com / Admin@123 and student@antaraatma.com / Student@123
+-- Credentials: admin@vijayheals.com / Admin@123 and student@vijayheals.com / Student@123
 
 DO $$
 DECLARE
@@ -9,8 +9,8 @@ DECLARE
     existing_student_id UUID;
 BEGIN
     -- Check if admin user already exists in auth.users
-    SELECT id INTO existing_admin_id FROM auth.users WHERE email = 'admin@antaraatma.com' LIMIT 1;
-    SELECT id INTO existing_student_id FROM auth.users WHERE email = 'student@antaraatma.com' LIMIT 1;
+    SELECT id INTO existing_admin_id FROM auth.users WHERE email = 'admin@vijayheals.com' LIMIT 1;
+    SELECT id INTO existing_student_id FROM auth.users WHERE email = 'student@vijayheals.com' LIMIT 1;
 
     -- Create admin auth user if not exists
     IF existing_admin_id IS NULL THEN
@@ -27,7 +27,7 @@ BEGIN
             '00000000-0000-0000-0000-000000000000',
             'authenticated',
             'authenticated',
-            'admin@antaraatma.com',
+            'admin@vijayheals.com',
             crypt('Admin@123', gen_salt('bf', 10)),
             now(),
             now(),
@@ -39,14 +39,14 @@ BEGIN
 
         -- Create user_profile for admin (in case trigger did not fire)
         INSERT INTO public.user_profiles (id, email, full_name, role, is_active, onboarding_completed)
-        VALUES (admin_uuid, 'admin@antaraatma.com', 'Admin User', 'admin'::public.user_role, true, true)
+        VALUES (admin_uuid, 'admin@vijayheals.com', 'Admin User', 'admin'::public.user_role, true, true)
         ON CONFLICT (email) DO UPDATE SET role = 'admin'::public.user_role, is_active = true;
 
-        RAISE NOTICE 'Admin user created: admin@antaraatma.com';
+        RAISE NOTICE 'Admin user created: admin@vijayheals.com';
     ELSE
         -- Ensure the existing admin profile has the correct role
         INSERT INTO public.user_profiles (id, email, full_name, role, is_active, onboarding_completed)
-        VALUES (existing_admin_id, 'admin@antaraatma.com', 'Admin User', 'admin'::public.user_role, true, true)
+        VALUES (existing_admin_id, 'admin@vijayheals.com', 'Admin User', 'admin'::public.user_role, true, true)
         ON CONFLICT (email) DO UPDATE SET role = 'admin'::public.user_role, is_active = true;
 
         RAISE NOTICE 'Admin user already exists, ensured correct role.';
@@ -67,7 +67,7 @@ BEGIN
             '00000000-0000-0000-0000-000000000000',
             'authenticated',
             'authenticated',
-            'student@antaraatma.com',
+            'student@vijayheals.com',
             crypt('Student@123', gen_salt('bf', 10)),
             now(),
             now(),
@@ -79,14 +79,14 @@ BEGIN
 
         -- Create user_profile for student (in case trigger did not fire)
         INSERT INTO public.user_profiles (id, email, full_name, role, is_active, onboarding_completed)
-        VALUES (student_uuid, 'student@antaraatma.com', 'Student User', 'student'::public.user_role, true, true)
+        VALUES (student_uuid, 'student@vijayheals.com', 'Student User', 'student'::public.user_role, true, true)
         ON CONFLICT (email) DO UPDATE SET role = 'student'::public.user_role, is_active = true;
 
-        RAISE NOTICE 'Student user created: student@antaraatma.com';
+        RAISE NOTICE 'Student user created: student@vijayheals.com';
     ELSE
         -- Ensure the existing student profile has the correct role
         INSERT INTO public.user_profiles (id, email, full_name, role, is_active, onboarding_completed)
-        VALUES (existing_student_id, 'student@antaraatma.com', 'Student User', 'student'::public.user_role, true, true)
+        VALUES (existing_student_id, 'student@vijayheals.com', 'Student User', 'student'::public.user_role, true, true)
         ON CONFLICT (email) DO UPDATE SET role = 'student'::public.user_role, is_active = true;
 
         RAISE NOTICE 'Student user already exists, ensured correct role.';

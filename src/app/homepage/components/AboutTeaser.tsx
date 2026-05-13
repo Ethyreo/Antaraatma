@@ -50,7 +50,7 @@ export default function AboutTeaser() {
                 Dr. Vijay Singla trained as a naturopath and has spent over a decade working with patients across chronic illness, metabolic dysfunction, hormonal imbalance, and mental fatigue — conditions that conventional medicine often treats with suppression rather than resolution.
               </p>
               <p>
-                His approach is precise, evidence-informed, and deeply rooted in the body&apos;s natural healing capacity. He built Antaraatma to take that work beyond the clinic — to reach people who need structured guidance but cannot access it in person.
+                His approach is precise, evidence-informed, and deeply rooted in the body&apos;s natural healing capacity. He built VijayHeals to take that work beyond the clinic — to reach people who need structured guidance but cannot access it in person.
               </p>
             </div>
 

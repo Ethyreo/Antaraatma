@@ -9,8 +9,8 @@ export async function POST() {
   );
 
   const accounts = [
-    { email: 'admin@antaraatma.com', password: 'Admin@123', role: 'admin' },
-    { email: 'student@antaraatma.com', password: 'Student@123', role: 'student' },
+    { email: 'admin@vijayheals.com', password: 'Admin@123', role: 'admin' },
+    { email: 'student@vijayheals.com', password: 'Student@123', role: 'student' },
   ];
 
   const results: { email: string; status: string; error?: string }[] = [];

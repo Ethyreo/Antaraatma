@@ -1,7 +1,7 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, ArrowRight, Loader2, CheckCircle2, AlertCircle, Phone, User, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Loader2, AlertCircle, Phone, User, Mail, Lock } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface StudentSignupProps {
@@ -22,35 +22,6 @@ export default function StudentSignupForm({ invitedEmail = '', invitedName = '' 
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [checkingInvite, setCheckingInvite] = useState(false);
-  const [inviteStatus, setInviteStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
-
-  useEffect(() => {
-    if (invitedEmail) {
-      setInviteStatus('valid');
-    }
-  }, [invitedEmail]);
-
-  const checkInvitation = async (email: string) => {
-    if (!email || !email.includes('@')) return;
-    setCheckingInvite(true);
-    try {
-      const res = await fetch(`/api/students/check-invitation?email=${encodeURIComponent(email)}`);
-      const json = await res.json();
-      if (json.invited && json.invitation?.status === 'pending') {
-        setInviteStatus('valid');
-        if (json.invitation.full_name && !form.fullName) {
-          setForm(p => ({ ...p, fullName: json.invitation.full_name }));
-        }
-      } else {
-        setInviteStatus('invalid');
-      }
-    } catch {
-      setInviteStatus('unchecked');
-    } finally {
-      setCheckingInvite(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +30,6 @@ export default function StudentSignupForm({ invitedEmail = '', invitedName = '' 
     if (!form.fullName.trim()) { setError('Full name is required.'); return; }
     if (!form.email.trim()) { setError('Email is required.'); return; }
     if (form.password.length < 8) { setError('Password must be at least 8 characters.'); return; }
-    if (inviteStatus === 'invalid') { setError('This email is not registered for enrollment. Please contact your admin.'); return; }
 
     setLoading(true);
     try {
@@ -79,7 +49,7 @@ export default function StudentSignupForm({ invitedEmail = '', invitedName = '' 
       if (signUpError) throw signUpError;
 
       if (data.user) {
-        // Complete signup - create/update profile
+        // Complete signup - create profile and lead record
         await fetch('/api/students/complete-signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -125,38 +95,15 @@ export default function StudentSignupForm({ invitedEmail = '', invitedName = '' 
           <Mail size={11} className="inline mr-1" />
           Email Address <span className="text-red-500">*</span>
         </label>
-        <div className="relative">
-          <input
-            type="email"
-            value={form.email}
-            onChange={e => {
-              setForm(p => ({ ...p, email: e.target.value }));
-              setInviteStatus('unchecked');
-            }}
-            onBlur={e => checkInvitation(e.target.value)}
-            placeholder="you@example.com"
-            readOnly={!!invitedEmail}
-            className={`w-full px-3 py-2.5 text-sm font-sans border rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700 placeholder-stone-400 ${invitedEmail ? 'bg-stone-50 cursor-not-allowed' : ''} ${inviteStatus === 'invalid' ? 'border-red-300' : inviteStatus === 'valid' ? 'border-green-300' : 'border-stone-200'}`}
-            required
-          />
-          {checkingInvite && (
-            <Loader2 size={13} className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-stone-400" />
-          )}
-          {!checkingInvite && inviteStatus === 'valid' && (
-            <CheckCircle2 size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500" />
-          )}
-          {!checkingInvite && inviteStatus === 'invalid' && (
-            <AlertCircle size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500" />
-          )}
-        </div>
-        {inviteStatus === 'valid' && (
-          <p className="text-xs font-sans text-green-600 mt-1 flex items-center gap-1">
-            <CheckCircle2 size={10} /> Email verified — you are invited to join Antaraatma
-          </p>
-        )}
-        {inviteStatus === 'invalid' && (
-          <p className="text-xs font-sans text-red-600 mt-1">This email is not registered for enrollment. Contact your admin.</p>
-        )}
+        <input
+          type="email"
+          value={form.email}
+          onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+          placeholder="you@example.com"
+          readOnly={!!invitedEmail}
+          className={`w-full px-3 py-2.5 text-sm font-sans border border-stone-200 rounded-sm bg-white focus:outline-none focus:ring-1 focus:ring-amber-600/40 text-stone-700 placeholder-stone-400 ${invitedEmail ? 'bg-stone-50 cursor-not-allowed' : ''}`}
+          required
+        />
       </div>
 
       {/* Phone */}
@@ -210,7 +157,7 @@ export default function StudentSignupForm({ invitedEmail = '', invitedName = '' 
 
       <button
         type="submit"
-        disabled={loading || inviteStatus === 'invalid'}
+        disabled={loading}
         className="w-full flex items-center justify-center gap-2 bg-amber-800 text-amber-50 py-3 text-sm font-sans font-medium rounded-sm transition-all hover:bg-amber-900 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {loading ? (

@@ -14,7 +14,7 @@ export const mockUsers: User[] = [
 {
   id: 'user-admin-1',
   fullName: 'Dr. Vijay Singla',
-  email: 'admin@antaraatma.com',
+  email: 'admin@vijayheals.com',
   role: 'admin',
   isActive: true,
   createdAt: '2024-01-01T00:00:00Z'
@@ -22,7 +22,7 @@ export const mockUsers: User[] = [
 {
   id: 'user-student-1',
   fullName: 'Priya Sharma',
-  email: 'priya.student@antaraatma.com',
+  email: 'priya.student@vijayheals.com',
   phone: '+91 98765 43210',
   role: 'student',
   isActive: true,
@@ -111,7 +111,7 @@ export const mockPrograms: Program[] = [
   slug: 'awareness-session',
   tagline: 'Your first step into natural healing',
   description: 'A free 1-hour live session that introduces you to naturopathy, Dr. Vijay\'s healing philosophy, and the transformation pathway.',
-  longDescription: 'The Awareness Session is the entry point to the Antaraatma ecosystem. In this free, live 1-hour session, Dr. Vijay Singla introduces the foundational principles of naturopathy — why the body holds illness, how emotional patterns create physical symptoms, and what a structured healing journey looks like. This session is the beginning of everything.',
+  longDescription: 'The Awareness Session is the entry point to the VijayHeals ecosystem. In this free, live 1-hour session, Dr. Vijay Singla introduces the foundational principles of naturopathy — why the body holds illness, how emotional patterns create physical symptoms, and what a structured healing journey looks like. This session is the beginning of everything.',
   duration: '1 hour',
   price: 0,
   priceLabel: 'Free',
@@ -296,7 +296,7 @@ Unprocessed emotions — grief, fear, resentment, chronic stress — do not simp
 
 True healing requires working across all three layers simultaneously. You cannot resolve chronic gut issues through diet alone if the emotional patterns driving the gut-brain axis remain unaddressed. You cannot sustain energy through supplements if your nervous system is chronically dysregulated.
 
-This is the foundation of the Antaraatma approach — a structured, layered healing pathway that begins with awareness and moves toward complete integration.
+This is the foundation of the VijayHeals approach — a structured, layered healing pathway that begins with awareness and moves toward complete integration.
 
 The first step is always the same: **understand what your body is trying to tell you.**`,
   coverImageUrl: "https://images.unsplash.com/photo-1582556904644-15ab1a33a63d",
@@ -313,7 +313,7 @@ The first step is always the same: **understand what your body is trying to tell
   featured: true,
   wordCount: 380,
   readTimeMinutes: 2,
-  seoTitle: 'Why Your Body Holds Illness — Naturopathic Perspective | Antaraatma',
+  seoTitle: 'Why Your Body Holds Illness — Naturopathic Perspective | VijayHeals',
   seoDescription: 'Discover why naturopathy treats the root cause of illness, not just symptoms. Learn about the three layers of illness and what true healing requires.',
   createdAt: '2026-03-10T00:00:00Z'
 },
@@ -364,7 +364,7 @@ Consistency matters more than duration. Five minutes daily will transform your n
   featured: false,
   wordCount: 340,
   readTimeMinutes: 2,
-  seoTitle: 'The Healing Power of Conscious Breathing | Antaraatma',
+  seoTitle: 'The Healing Power of Conscious Breathing | VijayHeals',
   seoDescription: 'Learn how breathwork activates the parasympathetic nervous system and accelerates healing. Three foundational practices to start today.',
   createdAt: '2026-03-18T00:00:00Z'
 },
@@ -414,7 +414,7 @@ The goal is not perfection — it is a consistent shift toward foods that suppor
   featured: false,
   wordCount: 360,
   readTimeMinutes: 2,
-  seoTitle: 'Food as Medicine: Naturopathic Nutrition Guide | Antaraatma',
+  seoTitle: 'Food as Medicine: Naturopathic Nutrition Guide | VijayHeals',
   seoDescription: 'Discover how naturopathy uses food as medicine. Learn which foods heal and which disrupt, and how to eat for genuine, lasting health.',
   createdAt: '2026-03-25T00:00:00Z'
 },
@@ -466,8 +466,8 @@ Priya now facilitates a local healing circle and has completed her certification
   featured: false,
   wordCount: 390,
   readTimeMinutes: 2,
-  seoTitle: 'How Priya Reversed Chronic Fatigue in 3 Months | Antaraatma',
-  seoDescription: 'Read how Priya Sharma reversed 8 years of chronic fatigue through the Antaraatma naturopathy program. A real transformation story.',
+  seoTitle: 'How Priya Reversed Chronic Fatigue in 3 Months | VijayHeals',
+  seoDescription: 'Read how Priya Sharma reversed 8 years of chronic fatigue through the VijayHeals naturopathy program. A real transformation story.',
   createdAt: '2026-03-28T00:00:00Z'
 }];
 
