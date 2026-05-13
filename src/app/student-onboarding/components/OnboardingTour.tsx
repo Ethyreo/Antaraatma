@@ -12,7 +12,7 @@ interface OnboardingTourProps {
 const tourSteps = [
   {
     icon: <Sparkles size={28} className="text-amber-700" />,
-    title: 'Welcome to Antaraatma',
+    title: 'Welcome to VijayHeals',
     desc: 'Your personal healing journey starts here. This platform is designed to guide you through transformation — body, mind, and energy.',
     highlight: null,
   },

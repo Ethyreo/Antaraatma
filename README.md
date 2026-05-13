@@ -1,4 +1,4 @@
-# Antaraatma
+# Next.js
 
 A modern Next.js 15 application built with TypeScript and Tailwind CSS.
 
@@ -88,4 +88,4 @@ You can check out the [Next.js GitHub repository](https://github.com/vercel/next
 - Powered by Next.js and React
 - Styled with Tailwind CSS
 
-Built on Rocket.new
+Built with ❤️ on Rocket.new
