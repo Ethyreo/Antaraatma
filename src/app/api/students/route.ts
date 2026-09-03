@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServiceRoleClient, requireAdminUser } from '@/lib/supabase/route';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = createServiceRoleClient();
 
 // GET /api/students — list all students (user_profiles with role=student) + invitations
 export async function GET() {
   try {
+    const auth = await requireAdminUser();
+    if (auth.error) return auth.error;
+
     const { data: students, error: studentsError } = await supabase
       .from('user_profiles')
       .select('*')
@@ -33,6 +33,9 @@ export async function GET() {
 // POST /api/students — admin adds a new student invitation
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireAdminUser();
+    if (auth.error) return auth.error;
+
     const body = await req.json();
     const { email, full_name, notes } = body;
 
@@ -73,6 +76,9 @@ export async function POST(req: NextRequest) {
 // PATCH /api/students — update invitation status or student profile
 export async function PATCH(req: NextRequest) {
   try {
+    const auth = await requireAdminUser();
+    if (auth.error) return auth.error;
+
     const body = await req.json();
     const { id, type, ...updates } = body;
 
@@ -105,6 +111,9 @@ export async function PATCH(req: NextRequest) {
 // DELETE /api/students — delete invitation
 export async function DELETE(req: NextRequest) {
   try {
+    const auth = await requireAdminUser();
+    if (auth.error) return auth.error;
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     const type = searchParams.get('type') || 'invitation';

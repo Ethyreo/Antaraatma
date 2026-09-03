@@ -1,15 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { createServiceRoleClient, requireAdminUser } from '@/lib/supabase/route';
 
 function getAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  return createServiceRoleClient();
 }
 
 export async function GET() {
   try {
+    const auth = await requireAdminUser();
+    if (auth.error) return auth.error;
+
     const supabaseAdmin = getAdmin();
     const { data, error } = await supabaseAdmin
       .from('leads')
@@ -64,6 +64,9 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    const auth = await requireAdminUser();
+    if (auth.error) return auth.error;
+
     const body = await request.json();
     const { id, ...updates } = body;
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
@@ -90,6 +93,9 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const auth = await requireAdminUser();
+    if (auth.error) return auth.error;
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });

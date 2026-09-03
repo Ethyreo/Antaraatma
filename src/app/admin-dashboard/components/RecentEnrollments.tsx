@@ -38,7 +38,7 @@ export default function RecentEnrollments() {
           .select('id, enrolled_at, enrollment_status, user_profiles(full_name), programs(title), orders(amount, order_status)')
           .order('enrolled_at', { ascending: false })
           .limit(8);
-        setEnrollments((data ?? []) as EnrollmentRow[]);
+        setEnrollments((data ?? []) as unknown as EnrollmentRow[]);
       } catch (err) {
         console.error('RecentEnrollments fetch error:', err);
       } finally {

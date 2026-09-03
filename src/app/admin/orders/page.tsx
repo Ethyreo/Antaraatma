@@ -36,7 +36,7 @@ export default function AdminOrdersPage() {
           .from('orders')
           .select('id, amount, currency, order_status, payment_type, payment_provider, payment_ref, created_at, user_profiles(full_name, email), programs(title)')
           .order('created_at', { ascending: false });
-        if (!error) setOrders((data ?? []) as Order[]);
+        if (!error) setOrders((data ?? []) as unknown as Order[]);
       } catch (err) {
         console.error('Orders fetch error:', err);
       } finally {

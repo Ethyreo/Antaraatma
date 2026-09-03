@@ -1,19 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServiceRoleClient, requireAuthenticatedUser } from '@/lib/supabase/route';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = createServiceRoleClient();
 
 // PATCH /api/students/update-profile
 export async function PATCH(req: NextRequest) {
   try {
+    const auth = await requireAuthenticatedUser();
+    if (auth.error) return auth.error;
+
     const body = await req.json();
     const { userId, ...profileFields } = body;
 
     if (!userId) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+    }
+
+    if (auth.user.id !== userId && auth.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const { data, error } = await supabase

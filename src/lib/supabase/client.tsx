@@ -64,15 +64,15 @@ export function createClient() {
     {
       cookies: {
         getAll: () => canUseCookies() ? fromCookies() : fromStorage(),
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: any[]) {
           if (typeof document === 'undefined') return;
           if (canUseCookies()) {
-            cookiesToSet.forEach(({ name, value, options }) =>
+            cookiesToSet.forEach(({ name, value, options }: any) =>
               value ? setCookie(name, value, options)
                     : (document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=None; Secure`)
             );
           } else {
-            cookiesToSet.forEach(({ name, value, options }) => {
+            cookiesToSet.forEach(({ name, value, options }: any) => {
               try {
                 value ? localStorage.setItem(`${PFX}${name}`, value)
                       : localStorage.removeItem(`${PFX}${name}`);

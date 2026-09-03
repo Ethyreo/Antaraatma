@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServiceRoleClient, requireAdminUser } from '@/lib/supabase/route';
 
 export async function POST() {
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
+  const supabaseAdmin = createServiceRoleClient();
 
   const accounts = [
     { email: 'admin@antaraatma.com', password: 'Admin@123', role: 'admin' },

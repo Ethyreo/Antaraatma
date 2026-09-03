@@ -1,19 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServiceRoleClient, requireAuthenticatedUser } from '@/lib/supabase/route';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = createServiceRoleClient();
 
 // POST /api/students/complete-signup
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireAuthenticatedUser();
+    if (auth.error) return auth.error;
+
     const body = await req.json();
     const { userId, email, fullName, phone } = body;
 
     if (!userId || !email) {
       return NextResponse.json({ error: 'userId and email are required' }, { status: 400 });
+    }
+
+    if (auth.user.id !== userId && auth.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    if (
+      auth.role !== 'admin' &&
+      auth.user.email?.toLowerCase() !== email.toLowerCase().trim()
+    ) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Upsert user_profiles with student role

@@ -1,25 +1,96 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import {
+  createServiceRoleClient,
+  getRouteAuthContext,
+  requireAdminUser,
+} from '@/lib/supabase/route';
 
 function getAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
+  return createServiceRoleClient();
 }
 
 export async function GET() {
   const supabase = getAdmin();
-  const { data, error } = await supabase
+  const { role, user } = await getRouteAuthContext();
+
+  const { data: resources, error } = await supabase
     .from('resources')
     .select('*')
     .order('sort_order', { ascending: true });
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (role === 'admin') {
+    return NextResponse.json({ data: resources ?? [] });
+  }
+
+  const publishedResources = (resources ?? []).filter((resource) => resource.status === 'published');
+  const programIds = Array.from(
+    new Set(
+      publishedResources
+        .map((resource) => resource.program_id)
+        .filter((programId): programId is string => Boolean(programId))
+    )
+  );
+
+  let accessibleProgramIds = new Set<string>();
+
+  if (user) {
+    const { data: enrollments, error: enrollmentError } = await supabase
+      .from('enrollments')
+      .select('program_id')
+      .eq('user_id', user.id)
+      .eq('enrollment_status', 'active');
+
+    if (enrollmentError) {
+      return NextResponse.json({ error: enrollmentError.message }, { status: 500 });
+    }
+
+    accessibleProgramIds = new Set(
+      (enrollments ?? [])
+        .map((enrollment) => enrollment.program_id)
+        .filter((programId): programId is string => Boolean(programId))
+    );
+  }
+
+  const programTitleMap = new Map<string, string>();
+  if (programIds.length > 0) {
+    const { data: programs, error: programError } = await supabase
+      .from('programs')
+      .select('id, title')
+      .in('id', programIds);
+
+    if (programError) {
+      return NextResponse.json({ error: programError.message }, { status: 500 });
+    }
+
+    (programs ?? []).forEach((program) => {
+      programTitleMap.set(program.id, program.title);
+    });
+  }
+
+  const data = publishedResources.map((resource) => {
+    const isAccessible =
+      resource.access_level === 'free' ||
+      (resource.program_id ? accessibleProgramIds.has(resource.program_id) : false);
+
+    return {
+      ...resource,
+      file_url: isAccessible ? resource.file_url : '',
+      is_accessible: isAccessible,
+      program_title: resource.program_id ? programTitleMap.get(resource.program_id) ?? null : null,
+    };
+  });
+
   return NextResponse.json({ data });
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const body = await req.json();
   const { data, error } = await supabase
@@ -44,6 +115,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const body = await req.json();
   const { id, ...updates } = body;
@@ -59,6 +133,9 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');

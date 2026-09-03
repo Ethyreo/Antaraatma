@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { getRouteAuthContext, requireAdminUser } from '@/lib/supabase/route';
 
 function getAdmin() {
   return createClient(
@@ -10,6 +11,8 @@ function getAdmin() {
 
 export async function GET(request: NextRequest) {
   try {
+    const { role } = await getRouteAuthContext();
+    const isAdmin = role === 'admin';
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const slug = searchParams.get('slug');
@@ -29,7 +32,11 @@ export async function GET(request: NextRequest) {
       `)
       .order('created_at', { ascending: false });
 
-    if (status) query = query.eq('status', status);
+    if (status) {
+      query = query.eq('status', status);
+    } else if (!isAdmin) {
+      query = query.eq('status', 'published');
+    }
     if (slug) query = query.eq('slug', slug).single() as typeof query;
     if (featured === 'true') query = query.eq('featured', true);
     if (limit) query = query.limit(parseInt(limit));
@@ -50,6 +57,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAdminUser();
+    if (auth.error) return auth.error;
+
     const body = await request.json();
     const {
       title, slug, excerpt, body: postBody, cover_image_url, cover_image_alt,
@@ -108,6 +118,9 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    const auth = await requireAdminUser();
+    if (auth.error) return auth.error;
+
     const body = await request.json();
     const { id, tag_ids, body: postBody, status, ...rest } = body;
 
@@ -162,6 +175,9 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const auth = await requireAdminUser();
+    if (auth.error) return auth.error;
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

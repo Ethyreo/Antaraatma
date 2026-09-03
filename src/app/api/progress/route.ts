@@ -3,17 +3,17 @@ import { createServerClient } from '@supabase/ssr';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
-function createSupabaseServer() {
-  const cookieStore = cookies();
+async function createSupabaseServer() {
+  const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() { return cookieStore.getAll(); },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: any[]) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
+            cookiesToSet.forEach(({ name, value, options }: any) =>
               cookieStore.set(name, value, options)
             );
           } catch {}
@@ -34,7 +34,7 @@ function createServiceSupabase() {
 // GET /api/progress?program_id=xxx — fetch progress records for the authenticated user
 export async function GET(req: NextRequest) {
   try {
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     // Authenticate via cookie-based client
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServiceRoleClient, requireAdminUser } from '@/lib/supabase/route';
 
 function getAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
+  return createServiceRoleClient();
 }
 
 // GET /api/modules?program_id=xxx
 export async function GET(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const { searchParams } = new URL(req.url);
   const programId = searchParams.get('program_id');
@@ -29,6 +28,9 @@ export async function GET(req: NextRequest) {
 
 // POST /api/modules — create a new module
 export async function POST(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const body = await req.json();
 
@@ -56,6 +58,9 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/modules — update a module
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const body = await req.json();
   const { id, ...updates } = body;
@@ -74,6 +79,9 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/modules?id=xxx
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');

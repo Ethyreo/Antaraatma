@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createServiceRoleClient, requireAdminUser } from '@/lib/supabase/route';
 
 function getAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
+  return createServiceRoleClient();
 }
 
 // GET /api/enrollments?user_id=xxx or ?program_id=xxx
 export async function GET(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get('user_id');
@@ -31,6 +30,9 @@ export async function GET(req: NextRequest) {
 
 // POST /api/enrollments — enroll a student in a program
 export async function POST(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const body = await req.json();
 
@@ -68,6 +70,9 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/enrollments — update enrollment status
 export async function PATCH(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const body = await req.json();
   const { id, ...updates } = body;
@@ -86,6 +91,9 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/enrollments?id=xxx
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdminUser();
+  if (auth.error) return auth.error;
+
   const supabase = getAdmin();
   const { searchParams } = new URL(req.url);
   const id = searchParams.get('id');

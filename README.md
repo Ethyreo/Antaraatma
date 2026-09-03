@@ -1,91 +1,69 @@
 # Antaraatma
 
-A modern Next.js 15 application built with TypeScript and Tailwind CSS.
+Antaraatma is a Next.js 15 application for Antaraatma's healing ecosystem. It includes:
 
-## 🚀 Features
+- Public marketing pages for programs, services, and blog content
+- Student onboarding, dashboard, progress tracking, and resource access
+- Admin tools for content, students, leads, enrollments, and program management
+- Supabase-backed authentication, data storage, and row-level-security policies
 
-- **Next.js 15** - Latest version with improved performance and features
-- **React 19** - Latest React version with enhanced capabilities
-- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
+## Stack
 
-## 🛠️ Installation
+- Next.js 15 App Router
+- React 19
+- TypeScript
+- Tailwind CSS
+- Supabase Auth and Postgres
+
+## Local Development
 
 1. Install dependencies:
-  ```bash
-  npm install
-  # or
-  yarn install
-  ```
 
-2. Start the development server:
-  ```bash
-  npm run dev
-  # or
-  yarn dev
-  ```
-3. Open [http://localhost:4028](http://localhost:4028) with your browser to see the result.
-
-## 📁 Project Structure
-
-```
-nextjs/
-├── public/             # Static assets
-├── src/
-│   ├── app/            # App router components
-│   │   ├── layout.tsx  # Root layout component
-│   │   └── page.tsx    # Main page component
-│   ├── components/     # Reusable UI components
-│   ├── styles/         # Global styles and Tailwind configuration
-├── next.config.mjs     # Next.js configuration
-├── package.json        # Project dependencies and scripts
-├── postcss.config.js   # PostCSS configuration
-└── tailwind.config.js  # Tailwind CSS configuration
-
+```bash
+npm install
 ```
 
-## 🧩 Page Editing
+2. Create `.env` with the required Supabase variables:
 
-You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+```
 
-## 🎨 Styling
+3. Start the app:
 
-This project uses Tailwind CSS for styling with the following features:
-- Utility-first approach for rapid development
-- Custom theme configuration
-- Responsive design utilities
-- PostCSS and Autoprefixer integration
+```bash
+npm run dev
+```
 
-## 📦 Available Scripts
+4. Open `http://localhost:4028`.
 
-- `npm run dev` - Start development server on port 4028
-- `npm run build` - Build the application for production
-- `npm run start` - Start the development server
-- `npm run serve` - Start the production server
-- `npm run lint` - Run ESLint to check code quality
-- `npm run lint:fix` - Fix ESLint issues automatically
-- `npm run format` - Format code with Prettier
+## Scripts
 
-## 📱 Deployment
+- `npm run dev` starts the dev server on port `4028`
+- `npm run build` builds the app
+- `npm run serve` starts the production server
+- `npm run lint` runs ESLint
+- `npm run lint:fix` applies ESLint fixes
+- `npm run format` formats `src/**/*.{ts,tsx,css,md,json}`
+- `npm run type-check` runs TypeScript without emitting files
 
-Build the application for production:
+## Project Notes
 
-  ```bash
-  npm run build
-  ```
+- `main` is the current source-of-truth branch.
+- The historical `rocket-update` work has already been merged into `main`.
+- Core schema and data changes live in `supabase/migrations/`.
+- Some pages still use legacy mock data while newer flows are already Supabase-backed.
 
-## 📚 Learn More
+## Key Paths
 
-To learn more about Next.js, take a look at the following resources:
+- `src/app/` application routes and API handlers
+- `src/components/` shared UI and layout components
+- `src/contexts/AuthContext.tsx` client auth state
+- `src/lib/supabase/` Supabase browser and route helpers
+- `supabase/migrations/` database schema and migration history
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial
+## Deployment
 
-You can check out the [Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## 🙏 Acknowledgments
-
-- Built with [Rocket.new](https://rocket.new)
-- Powered by Next.js and React
-- Styled with Tailwind CSS
-
-Built on Rocket.new
+The project is configured for Netlify and standard Next.js production builds.

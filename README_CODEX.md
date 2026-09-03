@@ -1,46 +1,65 @@
 # Antaraatma Project Overview (Codex Guide)
 
-## Current State & Branching Logic
-- **Primary Branch:** `main`
-  - This branch is now the source of truth, containing all the latest updates including the rebranding to Antaraatma, admin dashboard, student onboarding, and Supabase integrations.
-  - The `rocket-update` branch has been merged into `main`.
-- **Platform:** Next.js 15 (App Router), React 19, Tailwind CSS.
-- **Origin:** Created via [Rocket.ai](https://rocket.new).
-- **Hosting:** Netlify (Custom Domain).
+## Current State
 
-## 🛠️ Supabase & Data Architecture
-- **Connection:** Configured via `.env` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-- **Database Schema:** Located in `supabase/migrations/`.
-  - The core schema is in `20260408083700_antaraatma_full_schema.sql`.
-  - Recent migrations (April/May 2026) added leads management, student enrollment, and progress tracking.
-  - **RLS Policies:** Row Level Security is heavily utilized. Check `20260409093300_leads_rls_final_fix.sql` for lead submission patterns and `src/components/AdminGuard.tsx` for access control.
-- **Seed Data:** Admin account (`theantaraatmahealing@gmail.com`) is seeded via `20260501181900_reset_data_and_seed_admin.sql`.
+- Primary branch: `main`
+- Historical branch: `rocket-update` has already been merged into `main`
+- Platform: Next.js 15 App Router, React 19, Tailwind CSS
+- Hosting target: Netlify
 
-## 🔐 Authentication & Security
-- **Auth Provider:** Supabase Auth via `@supabase/ssr`.
-- **Context:** `src/contexts/AuthContext.tsx` provides the `useAuth` hook for user state.
-- **Middleware:** `src/middleware.ts` handles redirects for `/admin` and `/student-dashboard` based on user roles and session status.
-- **Admin Protection:** `src/components/AdminGuard.tsx` ensures only users with the `admin` role can access management pages.
+## Supabase and Data
 
-## 📦 Key Application Modules
-1. **Admin Suite (`/admin-dashboard`, `/admin/*`)**:
-   - Advanced management for Blog, Leads, Orders, Students, services, and shipments.
-   - Includes KPI grids and health panels for content.
-2. **Student Experience**:
-   - **Onboarding (`/student-onboarding`)**: Interactive tour and signup flow.
-   - **Dashboard (`/student-dashboard`)**: Progress tracking, current lessons, and resource access.
-   - **Resource Vault (`/resource-vault`)**: Central repository for student assets.
-3. **Program Management**:
-   - Complex "Module Tree" UI for managing courses and lessons (`src/app/program-management/components/ModuleTree.tsx`).
+- Client auth uses `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- Server-side admin workflows also require `SUPABASE_SERVICE_ROLE_KEY`
+- Core schema lives in `supabase/migrations/20260408083700_antaraatma_full_schema.sql`
+- Later migrations add student invitations, enrollment flow, and progress auto-initialization
+- Admin seed/reset lives in `supabase/migrations/20260501181900_reset_data_and_seed_admin.sql`
 
-## 🚀 Development Notes
-- **Local Port:** `4028`.
-- **Mass Rename:** The project was migrated from `VijayHeals` to `Antaraatma`. All code references have been updated, but watch for any hardcoded strings in external service configurations.
-- **NPM Optimization:** The `npm` prefix and cache have been moved to the D: drive to handle local disk space constraints.
+## Auth and Access Control
 
-## 📋 Task History & Progress
-- [x] Pull repo and checkout `rocket-update`.
-- [x] Perform global rename (Folder, Repo, Code).
-- [x] Configure npm for D: drive.
-- [x] Update Supabase migration file names.
-- [x] Verify local build/install.
+- Client auth state is managed in `src/contexts/AuthContext.tsx`
+- Route protection and role redirects are handled in `src/middleware.ts`
+- Admin pages use `src/components/AdminGuard.tsx` as a client-side secondary check
+- API routes now need to use shared helpers from `src/lib/supabase/route.ts` when service-role access is involved
+
+## Application Areas
+
+1. Admin suite
+- `src/app/admin-dashboard`
+- `src/app/admin/*`
+- `src/app/program-management`
+
+2. Student experience
+- `src/app/sign-up-login`
+- `src/app/student-onboarding`
+- `src/app/student-dashboard`
+- `src/app/progress-tracking`
+- `src/app/resource-vault`
+- `src/app/community`
+
+3. Public site
+- `src/app/homepage`
+- `src/app/awareness-session`
+- `src/app/foundation-course`
+- `src/app/transformation-mastery`
+- `src/app/services`
+- `src/app/programs-overview`
+- `src/app/blog`
+
+## Known Migration Debt
+
+- Some public and student-facing pages still read from `src/lib/data/mockData.ts`
+- Admin CRUD and progress flows are much more Supabase-backed than the marketing pages
+- Some built-with-Rocket metadata and deployment URLs are still hardcoded in the app shell
+
+## Development Notes
+
+- Local port: `4028`
+- The repo was renamed from `VijayHeals` to `Antaraatma`
+- npm cache/prefix were moved to `D:` because of local disk constraints
+
+## Recommended Next Work
+
+- Continue replacing mock-data-driven pages with Supabase reads
+- Keep tightening API authorization around service-role routes
+- Clean up remaining rebrand leftovers and hardcoded Rocket URLs where appropriate

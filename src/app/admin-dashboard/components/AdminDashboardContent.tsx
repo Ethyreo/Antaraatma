@@ -127,7 +127,7 @@ export default function AdminDashboardContent() {
         ]);
 
         setLeads(recentLeads ?? []);
-        setOrders((recentOrders ?? []) as Order[]);
+        setOrders((recentOrders ?? []) as unknown as Order[]);
       } catch (err) {
         console.error('Admin dashboard fetch error:', err);
       } finally {
